@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://files.morketsmerke.net/resources/mm.png">
+			<style>
+				.code-block {
+					display: block;
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+					text-align: left;
+				}
+				.code-inline {
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+				}
+				ul {
+					text-align: left;
+				}
+			</style>
+		</head>
+		<body style="font-family: monospace;" >
+<pre>
+ _                      _             _ _
+| |_ ___ _ __ _ __ ___ (_)_ __   __ _| | | ___   __ _
+| __/ _ \ '__| '_ ` _ \| | '_ \ / _` | | |/ _ \ / _` |
+| ||  __/ |  | | | | | | | | | | (_| | | | (_) | (_| |
+ \__\___|_|  |_| |_| |_|_|_| |_|\__,_|_|_|\___/ \__, |
+			                        |___/
+</pre>
+<p style="margin: 0; padding: 0; outline: 0; font-size: 18pt;">
+	&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+</p>
+			<div style="margin-left: auto; margin-right: auto; width: 80%;">
+				<ul style="list-style-type: none;">
+          <li><a href="BASH_bushido.html">BASH bushido</a></li>
+          <li><a href="Git_-_podstawy_systemu_kontroli_wersji.html">Git - podstawy systemu kontroli wersji</a></li>
+          <li><a href="jak_działa_linux/index.html">Jak działa Linux</a></li>
+          <li><a href="konfiguracja_HAProxy_dla_HTTP_i_HTTPS.html">Konfiguracja HAProxy dla HTTP i HTTPS</a></li>
+          <li><a href="labolatorium_sieci_VPN.html">Labolatorium sieci VPN</a></li>
+          <li><a href="sieci_VPN.html">Sieci VPN</a></li>
+          <li><a href="ściąga_z_PYTHONga.html">Ściąga z PYTHONga</a></li>
+				</ul>
+			</div>
+			<p style="margin: 15px; padding: 0; outline: 0;">
+				2021; COPYLEFT; ALL RIGHT REVERSED;
+			</p>
+		</body>
+	</html>
