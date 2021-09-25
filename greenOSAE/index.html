@@ -209,7 +209,7 @@ exec startxfce4
         zauważyć, że nie można wpisać żadnego z polskich znaków. Należy to
         naprawić, wymaga to jednego polecenia i zrestartowania komputera.
 <pre class="code-block">
-[user@greenOSAE ~]$ sudo localctl set-x11-keymap pl
+[user@greenOSAE ~]$ sudo localectl set-x11-keymap pl
 </pre>
         Restartujemy komputer, lub zamykamy i uruchamiamy ponownie serwer
         <em>X window</em>.
@@ -217,7 +217,7 @@ exec startxfce4
       <li>
         Ustawienia terminala. W preferencjach emulatora terminala w zakładce
         <em>Kolory</em> wybieramy profil <em>Zielone na czarnym</em> oraz
-        kolor aktywnych kart na jaskrawożółty, w zakładce <em>Wygląc</em>
+        kolor aktywnych kart na jaskrawożółty, w zakładce <em>Wygląd</em>
         zmieniamy czcionkę na <em>Source Code Pro Regular</em> oraz ustawiamy
         przezroczyste tło na poziomie 0.85.
       </li>
@@ -322,7 +322,7 @@ przjeście do katalogu zawierającego pobrane pliki.
         właśnie KVM i to też zainstalujemy. Instalacje rozpoczynamy od
         zainstalowania paczek z repozytorium.
 <pre class="code-block">
-[user@greenOSAE: ~]$ sudo pacman -Syu virt-manager qemu vde2 ebetables dnsmasq bridge-utils openbsd-netcat
+[user@greenOSAE: ~]$ sudo pacman -Syu virt-manager qemu vde2 ebtables dnsmasq bridge-utils openbsd-netcat
 </pre>
         Następnie włączamy usługę do autostartu i uruchamiamy ją.
 <pre class="code-block">
