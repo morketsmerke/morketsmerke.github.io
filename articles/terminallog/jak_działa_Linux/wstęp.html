@@ -2,7 +2,7 @@
 	<html>
 		<head>
 			<meta charset="utf-8" />
-			<link rel="icon" type="image/png" href="https://files.morketsmerke.net/resources/mm.png">
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
 			<style>
 				.code-block {
 					display: block;
