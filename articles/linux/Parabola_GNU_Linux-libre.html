@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<style>
+			.code-block {
+				display: block;
+				background-color: silver;
+				font-family: monospace;
+				font-weight: bolder;
+			}
+			.code-inline {
+				background-color: silver;
+				font-family: monospace;
+
+				font-weight: bolder;
+			}
+			p { text-align: justify; }
+		</style>
+	</head>
+	<body style="font-family: monospace;" >
+<pre>
+  ____ _   _ _   _   ___     _                       _ _ _              
+ / ___| \ | | | | | / / |   (_)_ __  _   ___  __    | (_) |__  _ __ ___ 
+| |  _|  \| | | | |/ /| |   | | '_ \| | | \ \/ /____| | | '_ \| '__/ _ \
+| |_| | |\  | |_| / / | |___| | | | | |_| |>  <_____| | | |_) | | |  __/
+ \____|_| \_|\___/_/  |_____|_|_| |_|\__,_/_/\_\    |_|_|_.__/|_|  \___|
+</pre>
+	<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div style="margin-left: auto; margin-right: auto; width: 80%;">
+    <h1 style="text-align: center">Parabola GNU/Linux-libre</h1>
+    <p>
+      <strong>Parabola GNU/Linux-libre</strong> lub poprostu 
+      <em>Parabola Linux</em>, jest to dystrybucja oparta na Arch Linux
+      stworzona przy użyciu kernela <strong>Linux-libre</strong> pozbawionego
+      wszelkiego zamkniętego oprogramowania (blobów binarnych) oraz 
+      zaciemnionego kodu. Uznana za całkowicie wolną przez Free Software
+      Fundation.
+    </p>
+    <p>
+      Skoro dystrybucja jest oparta na Arch-u to możemy spodziewać się
+      ręcznej instalacji. Na swoją instalację wybrałem starszy sprzęt bez
+      Intel ME, dość ciekawe urządzenie bo jest to stary poliwęglanowy
+      Apple Macbook A1181.
+    </p>
+    <p>
+      <img src="https://i.ibb.co/KWpcVkv/2021-11-11-192551-1280x800-scrot.png" alt="macbook_parabola_screenshot" style="width: 100%;"/>
+    </p>
+    <ol>
+      <li><strong>Utworzenie obrazu instalacyjnego</strong>
+          <p>
+            Instalacje systemu zaczniemy od utworzenia obrazu na jakimś pendrive
+            czy dysku USB. I tu już zaczynają się schody ponieważ ten komputer
+            nie posiada BIOS-u, lecz wbudowany firmware mianowicie 32-bitowe 
+            EFI.
+            Niestety metoda opisana na stronie Arch Linux nie działa z tym
+            sprzętem. Chcąc utworzyć obraz instalacjny dla tego sprzętu musimy
+            przygotwać nasz dysk wg. instrukcji: 
+            <a href="https://wiki.debian.org/InstallingDebianOn/Apple/MacBook/2-1">
+              https://wiki.debian.org/InstallingDebianOn/Apple/MacBook/2-1
+            </a>
+            Po rozpakowaniu pliku iso za pomocą 7-zip-a, kopiujemy cały folder
+            <em>parabola</em> na dysk USB, następnie należy użyć poniższej
+            konfiguracji dla GRUB-a.
+          </p>
+<pre class="code-block">
+if loadfont /boot/grub/fonts/unicode.pf2 ; then
+    set gfxmode=800x600
+    insmod efi_gop
+    insmod efi_uga
+    insmod video_bochs
+    insmod video_cirrus
+    insmod gfxterm
+    insmod png
+    terminal_output gfxterm
+fi
+linux (hd0,msdos1)/parabola/boot/x86_64/vmlinuz-linux-libre parabolabasedir=parabola parabolaisolabel=PARA_202108
+initrd (hd0,msdos1)/parabola/boot/x86_64/initramfs-linux-libre.img
+</pre>
+          <p>
+            Ostatnią rzeczą jaką należy zrobić przed uruchomieniem komputera
+            z tego dysku, to trzeba ustawić etykietę dysku na etykietę obrazu
+            płyty za pomocą polecenia <strong>fatlabel</strong>
+          </p> 
+<pre class="code-block">
+# fatlabel /dev/sda1 PARA_202108
+</pre>
+          <p>
+            Obraz płyty jest gotowy, do <em>boot menu</em> na Macu przechodzimy
+            przytrzymując klawisz <strong>alt/option</strong> podczas włączania
+            komputera pokaże się dysk usb z etykietą "EFI Boot".
+          </p>
+      </li>
+      <li><strong>Instalacja systemu</strong>
+          <p>
+            Parabola dystrybuowana jest w dwóch wersjach, 
+            <strong>OpenRC</strong>
+            lub <strong>systemd</strong>. Osobiście wybrałem <em>OpenRC</em>,
+            (i dla tego typu programu <em>init</em>, przedstawię instalację
+            jeśli wybierzemy <em>systemd</em>, to opis instalacji znajduje
+            się pod tym linkiem
+            <a href="https://wiki.parabola.nu/Installation_Guide">
+              http://wiki.parabola.nu/Installation_Guide
+            </a>, lub podczas instalacji za pomocą polecenia
+            <code class="code-inline">Installation_guide</code>) 
+            nie wiem czy to nie strzał w stopę, bo jest przyzwyczajony do
+            <em>systemd</em>, jednak dla takiego sprzetu wydajemi się że
+            <em>OpenRC</em> będzie lepszym wyborem. 
+          </p>
+          <p>
+            Odziwo Parabola posiada sterowniki do karty bezprzewodowej na
+            Macu. Połączyć się możemy za pomocą apletu NetworkManager
+            <em>nmtui-connect</em>. Strzałką wybieramy sieć, zatwierdzamy
+            enterem, podajemy hasło i następuje łączenie. Połączenie sieciowe
+            jest wymagane do zainstalowania systemu.
+          </p>
+          <p>
+            Instalacje systemu rozpocznamy od partycjonowania dysku. Swój
+            system skonfigurowałem w taki sposób, że mam 3 partycje podstawowe.
+            EFI, partycja z katalogiem głównym oraz partycję szyfrowaną z
+            katalogiem domowym. Dlaczego nie użyłem szyfrowania partycji z
+            z katalogiem głównym? Natknąłem się na błąd, który to uniemożliwiał
+            podczas ładowania się jądra po wpisaniu hasła do odblokowania 
+            partycji
+            nie działo się nic. System się zawieszał. Dlatego wybrałem taki
+            kompromis, ponieważ tak naprawdę zależy mi wyłącznie na ochronie 
+            moich danych.
+          </p>
+          <table>
+              <tr>
+                <th>Urządzenie</th>
+                <th>Rozmiar</th>
+                <th>Punkt montowania</th>
+              </tr>
+              <tr>
+                <td>/dev/sda1</td>
+                <td>600M</td>
+                <td>/boot (EFI)</td>
+              </tr>
+              <tr>
+                <td>/dev/sda2</td>
+                <td>-1G</td>
+                <td>/</td>
+              </tr>
+              <tr>
+                <td>/dev/sda5</td>
+                <td>1G</td>
+                <td>swap</td>
+              </tr>
+          </table>
+          <p>
+            Powyżej znajduje się tabela przedstawiająca partycjonowanie.
+            Pominąłem partycję dla szyfrowania pod <em>/home</em>, nią zajmiemy
+            po zainstalowaniu systemu. Po spartycjonowaniu dysku tworzymy
+            odpowiednie dla przeznaczenia partycji systemy plików.
+          </p>
+<pre class="code-block">
+#Partycja /boot:
+# mkfs.vfat -F32 /dev/sda1
+#Partycja /:
+# mkfs.ext4 /dev/sda2
+#Swap:
+# mkswap /dev/sda5
+</pre>
+          <p>
+            Montujemy główny system plików pod katalogiem <em>/mnt</em>,
+            po zamontowaniu tworzymy w nim nowy katalog <em>boot</em> pod ten
+            katalog montujemy partycje EFI, na sam koniec możemy włączyć
+            przestrzeń wymiany.
+          </p>
+<pre class="code-block">
+# mount /dev/sda2 /mnt
+# mkdir /mnt/boot
+# mount /dev/sda1 /mnt/boot
+# swapon /dev/sda5
+</pre>
+          <p>
+            Teraz przechodzimy do instalacji systemu. Instalacja systemu
+            polega na instalacji pakietów za pomocą odpowiedniego narzędzia.
+            Poradnik instalacji, rozmienia się z tą czynnością na kilka
+            podpunktów, ja złoże je w jedno duże polecenie.
+          </p>
+<pre class="code-block">
+$ pacstrap /mnt base libelogind udev-init-scripts linux-libre-lts networkmanager grub vim cryptsetup dhclient man-db man-pages texinfo 
+</pre>
+          <p>
+            Jest wielce prawdopodobne, że podczas instalacji wystąpi błąd 
+            związany z podpisami lub integralnością pakietów instalacja
+            zostanie przerwana i należy go naprawić aby pójść dalej.
+          </p>
+          <p>
+            W poradniku instalacji w podpunkcie poświęconym temu problemowi
+            są dwa polecenia. Należy je przepisać i uruchomić.
+          </p>
+<pre class="code-block">
+# pacman -Sy archlinux-keyring archlinuxarm-keyring parabola-keyring
+# pacman -U https://www.parabola.nu/packages/core/i686/archlinux32-keyring-transition/download/
+</pre>
+          <p>
+            Następnie musimy odswierzyć klucze dewelopera, które się 
+            niezgadzają.
+          </p>
+<pre class="code-block">
+# pacman-key --refresh-keys mail_dewelopera@example.com
+</pre>
+          <p>
+            Po wykonaniu tej czynności należy powtórzyć te dwa polecenia
+            wykonywane przed odświerzeniem kluczy. Teraz klucze powinny się
+            zgadzać i instalacja powinna ruszyć dalej.
+          </p>
+          <p>
+            Zakończenie działania polecenia 
+            <code class="code-inline">pacstrap</code> oznacza teoretycznie, że
+            system jest zainstalowany. Niestety tylko w teorii. Wymaga on
+            jeszcze konfiguracji. Zaczniemy od wygenerowania pliku
+            <em>/etc/fstab</em> na podstawie zamontowanych dysków.
+          </p>
+<pre class="code-block">
+# genfstab -U /mnt &gt;&gt; /mnt/etc/fstab
+</pre>
+          <p>
+            Zmieniamy nasz katalog główny na <em>/mnt</em>, wykorzystując do
+            tego specjalne narzędzie dostarczane wraz ze wszystkimi
+            dystrybucjami opartymi na Arch Linux.
+          </p>
+<pre class="code-block">
+# arch-chroot /mnt
+</pre>
+          <p>
+            Ustawienia właściwe adresy w pliku <em>/etc/hosts</em>.
+          </p>
+<pre class="code-block">
+127.0.0.1   localhost
+::1         localhost
+127.0.1.1   macbook.localdomain macbook
+</pre>
+          <p>
+            W pliku <em>/etc/conf.d/hostname</em> ustawiamy nazwę hosta. Nie 
+            działa to
+            jednak ponieważ nie w systemie brakuje polecenia, które miały by
+            tę nazwę ustawić. Nazwę ustalimy za pomocą polecenia
+            <em>nmtui-hostname</em>, kiedy już go uruchomimy.
+          </p>
+          <p>
+            Następną rzeczą do ustawienia są <strong>locale</strong>. W pliku
+            <em>/etc/locale.conf</em>, zapisujemy poniższe dane.
+          </p>
+<pre class="code-block">
+LANG="pl_PL.UTF-8"
+LC_COLLATE="C"
+LC_TIME="pl_PL.UTF-8"
+</pre>
+          <p>
+            Powyższy plik nie jest jedym plikiem, w którym należy zapisać
+            <em>locale</em>. Otwieramy plik <em>/etc/locale.gen</em>, w pliku
+            poszukujemy <em>pl_PL.UTF-8 UTF-8</em>. Usuwamy znak komentarza 
+            sprzed wyszukanej frazy i zapisujemy plik.
+          </p>
+<pre class="code-block">
+...
+#pap_AW UTF8
+pl_PL.UTF-8 UTF-8
+#pl_PL ISO-8859-2
+...
+</pre>
+        <p>
+          Nastepnie wydajemy polecenie:
+        </p>
+<pre class="code-block">
+(chroot)# locale-gen
+</pre>
+        <p>
+          W pliku <em>/etc/conf.d/keymaps</em> ustawimy układ klawiatury dla
+          konsoli, natomiast w pliku <em>/etc/conf.d/consolefont</em> ustawimy
+          czcionkę oraz mapę znaków aby zapewnić poprawne wyświetlanie
+          polskich znaków w konsoli.
+        </p>
+        <p>
+         W <em>/etc/conf.d/keymaps</em> ustawiamy opcję
+         <strong>keymap</strong>, resztę pozostawiamy bez zmian.
+        </p>
+<pre class="code-block">
+keymap="pl"
+</pre>
+        <p>
+          W <em>/etc/conf.d/consolefont</em> ustawiamy dwie opcje
+          <strong>consolefont</strong> oraz <strong>consoletranslation</strong>
+          zgodnie z poniższymi ustawieniami.
+        </p>
+<pre class="code-block">
+consolefont="lat2-16"
+consoletranslation="8859-2"
+</pre>
+        <p>
+          Po zapisaniu zmian w pliku możemy przejść do instalacji
+          programu rozruchowego <strong>GRUB</strong>. Instalacja wymaga
+          jedynie dwóch poleceń.
+        </p>
+<pre class="code-block">
+(chroot)# grub-install --target=i386-efi --efi-directory=/boot --bootloader-id=GRUB
+(chroot)# grub-config -o /boot/grub/grub.cfg
+</pre>
+        <p>
+           Teraz instalacja jest teorytcznie zakończona, jednak przed 
+           odmontowaniem partycji musimy:
+        </p>
+        <ul>
+          <li><strong>Ustawić hasło dla superużytkownika.</strong></li>
+          <li><strong>Skopiowiać plik /etc/init.d/NetworkManager z</strong>
+              <strong>uruchomionego z płyty, najlepiej do katalogu</strong>
+              <strong>użytkownika root.</strong></li>
+        </ul>
+        <p>
+          Ustawienie hasła dla <em>root</em>-a jest banalnie proste.
+        </p>
+<pre class="code-block">
+(chroot)# passwd
+</pre>
+        <p>
+          Podajemy nowe hasło dwa razy. Druga czynność wymaga już opuszczenia
+          środowiska zmienionego katalogu głównego. Katalog z dysku opuszczamy
+          wydając po prostu polecenie <code class="code-inline">exit</code>.
+          Następnie kopiujemy plik usługi NetworkManager do katalogu 
+          <em>/mnt/root</em>.
+        </p>
+<pre class="code-block">
+(chroot)# exit
+# cp /etc/init.d/NetworkManager /mnt/root
+</pre>
+        <p>
+          Po wykonaniu tej czynności możemy odmontować systemy plików dysku
+          za pomocą jednego polecenia następnie uruchomić komputer ponownie.
+          Instalacja została zakończona.
+        </p>
+<pre class="code-block">
+# umount -R /mnt
+# reboot
+</pre>
+      </li>
+      <li><strong>Pierwsze uruchomienie i konfiguracja katalogu /home</strong>
+          <p>
+            Po uruchomieniu komputeraz uslyszysmy charakterystyczny gong. Na 
+            ekranie pojawi się białe tlo. Zostaniemy przeniesieni odrazu do
+            menu GRUB-a. Wybieramy domyślną opcję. Komputer może się zawiesić
+            w trakcie ładowania jądra do pamięci, więc jeśli utkniemy z dwoma
+            napisami w lewym górnym rogu ekranu, to możemy wyłączyć twardo
+            komputer i uruchomić go ponownie. Teraz z GRUBa wybieramy tę drugą
+            opcję i z następnego podmenu wybieramy opcje nr. 1. Teraz system
+            powinien się uruchomić. Jeśli znów się zawiesił, to znów twardo go
+            wyłączamy i wybieramy domyślną opcję z menu GRUB-a. Czasami
+            potrzeba kilku takich uruchomień aby komputer się uruchomił.
+            Po załadowaniu dostaniemy wyłącznie dostęp do konsoli. 
+            Na początku musimy zalogować się jako <em>root</em>.
+          </p>
+          <p>
+            Na partycji, dla której przeznaczyliśmy większość miejsca na dysku.
+            Nie tworzymy zwykłego systemu plików, tylko system 
+            plików przeznaczony do szyfrowania <strong>LUKS</strong>.
+          </p>
+<pre class="code-block">
+# cryptsetup -y -v luksFormat /dev/sda3
+</pre>
+          <p>
+            Program podczas tworzenia plików zapyta o potwierdzenie, trzeba
+            wiekimi literami wpisać <strong>YES</strong>. Następnie polecenie
+            zapyta o hasło szyfrowania woluminu, dwukrotnie. Po utworzeniu
+            trzeba wolumin otworzyć.
+          </p>
+<pre class="code-block">
+# cryptsetup open /dev/sda3 crytphome
+</pre>
+          <p>
+            Polecenie zapyta o klucz do odszyfrowania (hasło), następnie
+            utworzy nowe urządzenie blokowe w katalogu <em>/dev/mapper</em> o
+            nazwie, podanej jako ostatni argument polecenia. To nazwą może być
+            cokolwiek. To utworzone urządzenie montujemy pod katalogiem
+            <em>/home</em>.
+          </p>
+<pre class="code-block">
+# mount /dev/mapper/crypthome /home
+</pre>
+          <p>
+            Przy tej konfiguracji będziemy wracać do tego punktu podczas
+            zamykania systemu. Dla bezpieczeństwa szyfrowanego woluminu lepiej
+            kulturalnie go odmontować i zamknąć.
+          </p>
+<pre class="code-block">
+# umount /home
+</pre>
+          <p>
+            Czasami na pewno zadarzy się sytuacja, że nie będziemy mogli 
+            odmontować tego katalogu, ponieważ <em>cel jest zajęty</em>.
+            Oznacza to mniej więcej tyle, że w systemie istnieje
+            jeszcze jakiś działający proces użytkownika, w celu zbadania
+            sytuacji, wydajemy polecenie:
+          </p>
+<pre class="code-block">
+# ps -aux
+</pre>
+          <p>
+            Jeśli proces jest nie istotny, dla wyników naszej pracy na
+            komputerze, możemy go na początku spróbować kulturalnie zamknąć
+            wydajac polecenie <em>kill</em> wraz z PID-em procesu, oczywiście
+            bez podawania żadnego symbolu sygnału.
+          </p>
+<pre class="code-block">
+# kill PID
+</pre>
+          <p>
+            Jeśli to nie pomoże, proces należy zabić dodając do powyższego
+            polecenia opcje <em>-9</em>, prosząc jądro o wysłanie do procesu
+            sygnału <em>KILL</em>.
+          </p>
+<pre class="code-block">
+# kill -9 PID
+</pre>
+          <p>
+            Innym powodem problemów z odmontowaniem katalogu <em>/home</em> 
+            są podmontowane w jego podkatalogach inne systemy plików jak
+            udziały SMB. Należy je ręczenie odmontować lub użyć polecenia:
+          </p>
+<pre class="code-block">
+# umount -R /home
+</pre>
+      </li>
+      <li>
+        <strong>
+          Nowy użytkownik oraz nadanie mu uprawnień superużytkownika
+        </strong>
+        <p>
+          Kiedy mamy już miejsce na nasze dane, możemy utworzyć nowego konto
+          na którym będziemy je przechowywać. Prawdopodobnie jesteśmy
+          jedymi realnymi użytkownikami tego systemu więc nadamy mu 
+          uprawnienia superużytkownika aby nie trzeba było się przelogowywać.
+          Wyższych uprawnień będziemy potrzebować do instalacji środowiska 
+          graficznego.
+        </p>
+        <p>
+          Użytkownika tworzymy za pomocą poleceania <strong>useradd</strong>,
+          wraz z opcją <em>-m</em>, która spowoduje utworzenie katalogu
+          domowego oraz skopiowanie zawartości katalogu <em>/etc/skel</em> 
+          zawierającego pliki konfiguracyjne powłoki oraz pliki domyślne
+          użytkowników systemu. Po utworzeniu użytkownika należy pamiętać o
+          zdefiniowaniu hasła dla użytkownika. Hasło należy podać dwukrotnie.
+        </p>
+<pre class="code-block">
+# useradd -m xf0r3m
+# passwd xf0r3m
+</pre>
+        <p>
+          W systemie prawdopodbnie nie będzie zainstalowanego programu
+          <strong>sudo</strong>. Więc możemy go doinstalować, jeśli czytasz
+          to przed rozpczęciem jakich kolwiek prac, możesz dopisać 
+          <em>sudo</em> do polecenia <code class="code-inline">pacstrap</code>
+          instalującego system.
+        </p>
+<pre class="code-block">
+# pacman -Syu sudo
+</pre>
+        <p>
+          Po zainstalowaniu pakietu, przechodzimy do pliku 
+          <em>/etc/sudoers</em>. Plik jest tylko do odczytu, nawet dla
+          <em>root</em>. Przejście w tryb edycji (jeśli używamy programu Vim)
+          czy zapisanie zmian będzie wymagać potwierdzenia. W pliku odszukujemy
+          lini <em>root ALL=(ALL) ALL</em>, pod nią możemy zapisać identyczną
+          frazę zmieniając tylko użytkownika lub poniższą dzięki, której nie
+          będzie potrzeby wpisywania hasła. 
+        </p>
+<pre class="code-block">
+xf0r3m ALL=(ALL) NOPASSWD:ALL
+</pre>
+        <p>
+          Po zapisaniu zmian możemy opuścić konto superużytkownika, wylogowując
+          się poleceniem <em>exit</em>. Następnie zalogować się na swoje konto.
+        </p>
+      </li>
+      <li>
+        <strong>Instalacja i konfiguracja środowiska graficznego</strong>.
+        <p>
+          Na tym Macbook-u, którego użyłem do instalacji, procesor 
+          Core2Duo poci się niemiłośernie. Osiągając 65 - 70 stopnii C
+          temperatury roboczej, co przekłada się na hałas generowany przez
+          wentylator, na tym sprzęcie mam ograniczenia również co do wiekości
+          zainstalowanej pamięci RAM, mimo włożenia dwóch kości po 2GB system
+          system obsługuje maksymalnie 3GB. Aby móc na nim bez przeszkód 
+          pracować
+          potrzebowałem lekkiego środowiska aby przeznaczyć więcej pamięci na
+          programy, do tej instalacji użyłem środowiska 
+          <strong>fluxbox</strong>. Teraz
+          pisząc ten tekst, z włączonym Vim-em oraz odtwarzaczem muzyki
+          <em>moc</em> oraz menedżerem zadań <em>htop</em> wykorzystane ma
+          122MB. Pozostawiając ponad 2,5 GB na pozostałe programy. Ta 
+          konfiguracja
+          jest rozwiązaniem dla osób, które nie boją się terminala. Jednak
+          wybierając dystrybucję z rodziny Arch Linux, trzeba mieć to
+          na uwadze. Instalacje rozpoczynamy od zainstalowania odpowiednich
+          pakietów.
+        </p>
+<pre class="code-block">
+$ pacman -Syu xorg xorg-xinit xorg-xauth fluxbox xf86-video-intel terminator
+</pre>
+        <p>
+          W dystrybucjach opartych na Arch-u zauważyłem, że duże pakiety
+          oprogramowania są podzielone na mniejsze częsci, jeśli nie 
+          zainstalujemy pakietu xorg-xinit to będzie brakować polecenia
+          <strong>startx</strong>. Pakiet 
+          <code class="code-block">xf86-video-intel</code> można by tak
+          rzec, że jest to podstawowy sterownik grafiki, bez niego środowisko 
+          nie ruszy
+          czego osobiście doświadczyłem. Jako emulator terminala wybrałem, 
+          <strong>terminator</strong>
+          ponieważ jest samodzielnym programem zapewniającym poprawne
+          wyświetlanie polskich znaków (O tym będzie w następnym punkcie).
+        </p>
+        <p>
+          Po zainstalowaniu pakietów uruchamiamy środowisko graficzne i
+          zaraz je zamykamy. Przez to <em>fluxbox</em> utworzy w katalogu
+          domowym użytkownika, katalog konfiguracyjny <em>.fluxbox</em> w
+          nim znajduje się plik pod nazwą <em>menu</em>. Aby uruchomić poraz
+          pierwszy środowisko graficzne, potrzebujemy pliku, który wskaże
+          serwerowi X11, który menedżer okien ma uruchomić, taki plik nazywa
+          <em>.xinitrc</em> i znajduje się w katalogu domowym użytkownika.
+          W pliku wystarczy zapisać jedno polecenie:
+        </p>
+<pre class="code-block">
+exec fluxbox
+</pre>
+        <p>
+          Ten plik może wydawać się nie pozorny, jednak będzie zawierać
+          istotne ustawienia, takie jak ustawienie tapety czy chyba
+          najważniejsze, ustawienia układu klawiatury w środowisku graficznym.
+        </p>
+        <p>
+          Przy pierwszym uruchomieniu <em>fluxbox</em> utworzy w katalogu
+          domowym użytkownika, katalog konfiguracyjny <em>.fluxbox</em> w
+          nim znajduje się plik <em>menu</em>. W pliku odnajdujemy
+          znacznik <em>[begin]</em> w nawiasie okrągłym obok możemy podać
+          tytuł menu np. "<em>Parabola GNU/Linux-libre on MacBook 2,1</em>".
+          Od znacznika <em>[begin]</em> po znacznik <em>[end]</em>
+          znajduje się definicja menu głównego, pierwszy
+          wpis oznaczony znacznikiem <em>[exec]</em> zawiera wpis w menu dla
+          programu <em>xterm</em>, takie programu w systemie nie ma (możemy
+          go doinstalować jednak na próżno szukać w nim poprawnego wyświetlania
+          polskich znaków). Ten wpis przystowujemy, aby uruchamiał program
+          <em>terminator</em>. Budowa wpisu elementu menu, wygląda następująco. 
+          Na początku mamy <strong>typ elementu</strong>, może być to program
+          co jest równoznaczne z typem <em>[exec]</em> lub np. submenu jeśli
+          chcemy podzielić wpisy. Wiele typów jest wypisanych w
+          domyślnej konfiguracji wewnątrz pliku. Na tym etapie interesować nas
+          będzie wyłącznie <em>[exec]</em>. Następnym elementem wpisu jest
+          etykieta elementu umieszczona wewnątrz nawiasów okrągłych
+          <strong>()</strong>. Możemy wpisać cokolwiek, oczywiście warto 
+          pamiętać o tym, że ta etykieta pozwoli nam odnaleźć ten konkretny 
+          program, gdy w menu nagromadzi się wiele wpisów w miarę 
+          korzystania z komputera. Ostatnim elementem jest polecenie zawarte
+          w tym przypadku w nawiasach klamrowych <strong>{}</strong>. Aby
+          dostosować wpis <em>xterm</em> dla <em>terminatora</em>, zamieniamy
+          <em>xterm</em> na <em>terminator</em>. Skoro wiemy jak dodawać
+          programy do menu, to nic nie stoi na przeszkodzie, aby doinstalować
+          swoje ulubione programy, o ile tylko znajdują się one w repozytorium.
+        </p>
+        <p>
+          Warto wspomnieć że wykorzystywaną przeglądarką w tej dystrybujcji
+          jest <strong>Iceweasel</strong>. Jest to z przerobiony Firefox, z
+          którego usunięto obsługę DRM oraz wszystkie rzeczy, które przez FSDG
+          (<em>Free Software Distribution Guidelines</em>) - wytyczne dla
+          wolnych dystrybucji uznawane są za nie wolne (<em>non-free</em>). 
+          Ta przeglądarka była zamiennikiem Firefoxa dla Debiana od 4 wersji 
+          oraz dla innych dystrybucji bazujących na nim do 2016 roku. Pamiętam,           że jej zaletą była
+          świetna wydajność na każdym możliwym sprzęcie, i to się chyba nie
+          zmieniło. Deweloperzy Parabola GNU/Linux-libre są chyba jedynym
+          zespołem, który aktywnie rozwija ten porzucony projekt. Brak DRM
+          oznacza, że korzystając z tej przeglądarki możemy zapomnieć o
+          korzystaniu z większości serwisów streamingowych.
+        </p>
+        <p>
+          Jeśli chodzi o moją konfigurację, to używam <em>terminatora</em> jako
+          emulatora terminala, <em>Vim</em>-a jako domyślnego edytora tekstów
+          w nim pisze ten tekst, <em>moc (ang. Music on Console)</em> - jako
+          odtwarzacza muzyki, <em>mpv</em> jako odtwarzacza plików wideo.
+          <em>leafpada</em> jako podręcznego notatnika, <em>htop</em> jako
+          mendżera zadań (istotną jego rolą jest wskaźnik poziomu naładowania
+          baterii, dlatego działa non stop), graficzny menedżer plików zastępuje
+          mi konsolowy <em>ranger</em>. To wszystko. 
+        </p>
+        <p>
+          Wrócimy do menu. W podmenu <em>Fluxbox</em> możemy zmienić
+          domyślny motyw mendżera okien. Na swoim komputerze wybrałem
+          temat <em>BlueNight</em>, który komponuje się z tapetą Parabola
+          GNU/Linux-libre, ukradzoną z obrazu instalacyjnego wersji 
+          skierowanej na desktopy. Żeby nie musieć uruchamiać jeszcze raz
+          komputera z płyty umieściłem ją na w serwisie ImgBB, link znajduje 
+          się poniżej.
+        </p>
+        <p>
+          <a href="https://ibb.co/RPjpy4g">https://ibb.co/RPjpy4g</a>
+        </p>
+        <p>
+          Aby ustawić tapetę potrzebujemy zewnętrznego programu. Takim program
+          może być <strong>feh</strong>, w którym ustawienie tapety jest jedną
+          z dodatkowych funkcji, tak naprawdę to program do otwierania plików
+          graficznych czy też obrazów. Pobrany plik tapety należało by gdzieś
+          zabezpieczyć aby nie usunąć go przypadkiem podczas oczyszczania,
+          katalogu <em>Pobrane</em> czy <em>Downloads</em>. W pliku
+          <em>~/.xinitrc</em> nad poleceniem 
+          <code class="code-inline">exec</code> zapisujemy poniższe polecenie.
+        </p>
+<pre class="code-block">
+feh --bg-fill ~/sciezka/do/pliku/tapety
+</pre>
+        <p>
+          Zapisujemy zmiany. Jeśli uruchomimy teraz środowisko graficzne,
+          tapeta mignie nam na chwile i najprawdopodbniej zostanie zastąpiona
+          tłem wybranego przez nas tematu. Musimy wyłączyć tło z tego tematu.
+          Motywy dostarczane wraz z system dostępne są w katalogu 
+          <em>/usr/share/fluxbox/styles</em>, jeśli styl w tym katalogu jest
+          podkatalogiem, to w środku podkatalogu znajduje się plik
+          <em>theme.cfg</em>, w nim trzeba wyłączyć wszystkie linie dotyczące
+          tła (ang. <em>background</em>). Wyłączyć je możemy umieszczając
+          na ich początku symbol komentarza.
+        </p>
+<pre class="code-block">
+#background: flat
+#background.color: rgb:6A/9A/AF
+</pre>
+      </li>
+      <li>
+        <strong>Ustawienie polskich znaków w konsoli, polskiego układu
+        klawiatury w środowisku graficznym oraz problemy z NetworkManager po
+        aktualizacji oraz nazwa komputera.</strong>
+        <p>
+          Podczas instalacji ustawialiśmy w pliku opcje dotyczące czcionki oraz
+          mapę znaków konsoli. Jednak jak mogliśmy zauważyć zamiast
+          polskich znaków wyświetlają się białe kwadraciki. Jeśli otworzymy
+          ten plik jeszcze raz, w pierwszej linii znajduje sie informacja, że 
+          te ustawienia nie są włączone domyślnie i trzeba je właczyć za pomocą
+          podanego polecenia.
+        </p>
+<pre class="code-block">
+$ sudo rc-update add consolefont boot
+</pre>
+        <p>
+          Po restarcie, polskie znaki powinny poprawnie się wyświetlać.
+        </p>
+        <p>
+          Kiedy uruchomimy środowisko graficzne oraz terminator, to tutaj też
+          może być problem z polskimi znakami. Problem wynika z tego, że
+          serwer <em>xorg</em>, nie ma załadowanego polskiego układu klawiatury
+          Układ klawiatury dla <em>X Window</em> może być ładowany przed jego 
+          startem, więc dodamy kolejne trzecie polecenie do pliku
+          <em>~/.xinitrc</em>. Polecenie to umieszczamy nad poleceniem
+          <code class="code-inline">exec</code>.
+        </p>
+<pre class="code-block">
+setxkbmap -layout pl
+</pre>
+        <p>
+          Po zamknięciu <em>Fluxbox</em>-a (opcja <em>Exit</em> w submenu
+          <em>Fluxbox</em>) i uruchomieniu jeszcze raz środowiska graficznego,
+          polskie znaki w <em>terminatorze</em> powinny się wyświetlać
+          poprawnie.
+        </p>
+        <p>
+          Podczas aktualizacji systemu zostanie zainstalowana nowa wersja
+          programu <em>NetworkManager</em>. Instalacja tej aktualizacji
+          usuwa ten program jako usługę, co może nieco utrudnić nam życie,
+          ponieważ będzie trzeba za każdym razem łączyć się samodzielnie
+          z internetem, jest to jeszcze do zniesienia jeśli mamy
+          zainstalowany pakiet <em>dhclient</em>. <em>NetworkManager</em>
+          zawiera kilka wygodnych narzędzi jak <em>nmtui-connect</em>
+          (menedżer połaczeń sieciowych) czy <em>nmtui-hostname</em>. Ze
+          względu na ten problem kazałem podczas instalacji skopiować plik 
+          usługi
+          NetworkManager. Teraz wystarczy go przekopiować do katalog 
+          <em>/etc/init.d</em> nadać odpowiednie uprawnienia i dodać do
+          uruchomienia wraz ze startem systemu.
+        </p>
+<pre class="code-block">
+$ sudo su
+# cp /root/NetworkManager /etc/init.d
+# chmod +x /etc/init.d/NetworkManager
+# rc-update add NetworkManager boot
+</pre>
+        <p>
+          Ostatnim zagadnieniem na tej liście będzie nazwa komputera. Podczas
+          instalacji wsponiałem, że zdefiniowanie nazwy hosta w pliku tak jak 
+          każe przewodnik instalacji nic nie da ponieważ to nie działa.
+          Podczas uruchamiania systemu, uruchamiana jest również usługa
+          <em>hostname</em> jednak jej start kończy się fiaskiem. Dlaczego?
+          Otóż dlatego, że mino odczytu nazwy z pliku podanego w poradniku to
+          w systemie brakuje programu, który tę nazwę ustawi - polecenia 
+          <strong>hostname</strong>. 
+          Podejrzewam, że usługa ta jest jedną z domyślnych systemu
+          <em>OpenRC</em>, a sama dystrybujcja wykorzystująca tego typu wersję
+          programu <em>init</em> nie przewiduje potrzeby posiadania polecenia
+          <em>hostname</em>. Jedynym w miarę zadawalającym wynikiem jest
+          użycie wspomnianego już narzędzia <strong>nmtui-hostname</strong>.
+          Problem z tym rozwiązaniem jest tego typu, że nazwa zostanie 
+          ustawiona dopiero po zalogowaniu się użytkownika. Po wydaniu
+          polecenia:
+        </p>
+<pre class="code-block">
+$ sudo mntui-hostname
+</pre>
+        <p>
+          Wyświetli się okienko z polem do wpisania nazwy komputera, następnie
+          wybieramy "Ok", jeśli nazwa nie zostanie ustawiona od razu wymagany
+          będzie restart systemu.
+        </p>
+        <p>
+          Opisane powyżej problemy prawdopodbnie występują wyłącznie w wersji
+          OpenRC Parabola GNU/Linux-libre.
+        </p>
+      </li>
+    </ol>
+    <p>
+      Podsumowując, dużo satysfakcji daje posiadanie w pełni wolnego systemu
+      operacyjnego na mogło by się wydawać tak zamkniętym sprzęcie jakim
+      może być ten MacBook. Sam jestem zdumiony, że wszystko w nim działa od
+      możliwości uruchomienia środowiska graficznego po sieć bezprzewodową to
+      pierwsze potrafi nie być tak oczywiste a o tym drugim na wielu sprzętach
+      przenośnych możemy poprostu zapomnieć lub dokupić sobie adapter z chipem,
+      dla którego istnieje wolny sterownik. Jaką kartę kupić możemy sprawdzić
+      na tym portalu: <a href="https://deviwiki.com/">https://deviwiki.com</a>.
+      Problem z korzystaniem z komputera tego typu jest klawiatura, MacBooki
+      mają inny okład klaiwszy od zwykłych pecetowych klawiatur. Sam system
+      posiada kilka niedociągnęć. Podejrzewam jednak, że niema dystrybucji
+      doskonałej, a bazując na swoich doświadczeniach zauważyłem, że im więcej
+      warstw (duża ilość róźnych demonów, podsystemów itp.) tym więcej jest
+      z taką dystrybucją problemów. Warto by naprawić w tej dystrybucji tę
+      nazwę komputera bo to trochę żałosne. Każą Ci to zrobić w poradniku
+      instalacji, a to i tak niedziała (XD). Czy będe korzystał z tego
+      komputera i systemu? Podoba mi się wydajność opisanego tu rozwiązania
+      na tym sprzęcie. Jedyną wadą może być brak dostępu do maszyn wirtualych,
+      ale mam w zanadzrzu jescze kilka serwerów. Więc myślę, że tak.
+      Wracając do klawiatury. MacBooki zarówno
+      te stare jak i te nowe posiadają inny układ klawiatury, różni się on
+      o tyle, że przesiadając się na z PC na Maca i odwrotnie trzeba
+      się chwilę do niej przyzwyczaić. Komputery Apple
+      w swoich klawiaturach mają zamieniony miejscem (względem klawiatur PC) 
+      prawy alt. Klawisz ten to modyfikator do
+      wpisywania liter diakrytycznych specyficznych dla konkretnego języka.
+      W moim przypadku gdy korzystam na PC z klawiatur gamingowych nie 
+      posiadają one prawego klawisza Windows. Posiadają przycisk Fn, który nie
+      jest przekazywany do komputera przez klawiaturę, więc nie miałem z czym
+      zamienić klawisza alt, ale jeśli nie w tę strone to może w drugą. Na
+      MacBooku zamienię prawy alt z prawym CMD.
+      Znalazłem na serwisie <a href="https://superuser.com">superuser.com</a>
+      jak zamienić ze sobą klawisze na środowiskach graficznych opartych na
+      <em>X Window</em>. Potrzebny jest dodatkowy <em>dot-file</em> 
+      <em>.Xmodmaprc</em> w katalogu
+      domowym użytkownika oraz dodatkowe polecenie w pliku <em>.xinitrc</em>.
+      Poniżej znajduje się listing pliku <em>.Xmodmaprc</em> z poleceniami dla 
+      programu <strong>xmodmap</strong>.
+    </p>
+<pre class="code-block">
+remove mod5 = ISO_Level3_Shift
+remove mod4 = Super_R
+keycode 108 = Super_R
+keycode 134 = ISO_Level3_Shift
+add mod5 = Super_R
+add mod4 = ISO_Level3_Shift
+</pre>
+    <p>
+      Po utworzeniu pliku zapisujemy polecenie, które uruchomi zamianę klawiszy
+      przed uruchomieniem środowiska graficznego (polecenie umieszczamy przed
+      poleceniem <code class="code-inline">exec</code>). To rozwiązanie działa 
+      tylko dla środowiska graficznego.
+    </p>
+<pre class="code-block">
+xmodmap ~/.Xmodmaprc
+</pre>
+    <p>
+      Z czystej ciekawości postanowiłem sprawdzić na większości swoich sprzętów
+      jak na nich będzie funkcjonować Parabola. Poniżej zamieściłem tabelkę z
+      nazwą sprzętu oraz z tym co działa a co nie.
+    </p>
+    <table style="text-align: center;">
+      <tr>
+        <th>Lp.</th>
+        <th>Nazwa sprzętu</th>
+        <th>GUI</th>
+        <th>Audio</th>
+        <th>Wi-Fi</th>
+      </tr>
+      <tr>
+        <td>1.</td>
+        <td>Apple MacBook A1181</td>
+        <td>&#9745;</td>
+        <td>&#9745;</td>
+        <td>&#9745;</td>
+      </tr>
+    </table>
+    <p>
+      Jeden wpis nie oznacza całej tabeli, w miarę moich możliwości będę
+      sprawdzał inne sprzęty, o aktualizacjach będę informował w changelogu
+      na stronie głównej.
+    <p>
+    <p>
+      Źródła:
+    </p>
+    <ol>
+        <li><a href="https://wiki.debian.org/InstallingDebianOn/Apple/MacBook/2-1">Przydatne informacje podczas tworzenia USB z obrazem płyty dla MacBook 2,1</a></li>
+        <li><a href="https://wiki.parabola.nu/Installation_Guide">
+            Poradnik instalacji Parabola GNU/Linux-libre</a></li>
+        <li><a href="https://superuser.com/questions/277990/how-do-i-swap-alt-and-windows-keys-with-xmodmap">
+            Zamiana klawiszy za pomocą xmodmap na https://superuser.com</a>
+        </li>
+    </ol>
+    <p>
+      ~xf0r3m
+    </p>
+	</div>
+
+	<p style="margin: 15px; padding: 0; outline: 0;">
+		2021; COPYLEFT; ALL RIGHTS REVERSED;
+	</p>
+
+	</body>
+</html>
