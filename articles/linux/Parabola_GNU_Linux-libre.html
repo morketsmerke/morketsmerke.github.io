@@ -17,6 +17,11 @@
 				font-weight: bolder;
 			}
 			p { text-align: justify; }
+      td { border-bottom: 1px solid black; }
+      th { 
+           border-top: 1px solid black;
+           border-bottom: 1px solid black;
+      }
 		</style>
 	</head>
 	<body style="font-family: monospace;" >
@@ -569,7 +574,8 @@ exec fluxbox
           (<em>Free Software Distribution Guidelines</em>) - wytyczne dla
           wolnych dystrybucji uznawane są za nie wolne (<em>non-free</em>). 
           Ta przeglądarka była zamiennikiem Firefoxa dla Debiana od 4 wersji 
-          oraz dla innych dystrybucji bazujących na nim do 2016 roku. Pamiętam,           że jej zaletą była
+          oraz dla innych dystrybucji bazujących na nim do 2016 roku. 
+          Pamiętam, że jej zaletą była
           świetna wydajność na każdym możliwym sprzęcie, i to się chyba nie
           zmieniło. Deweloperzy Parabola GNU/Linux-libre są chyba jedynym
           zespołem, który aktywnie rozwija ten porzucony projekt. Brak DRM
@@ -780,11 +786,12 @@ xmodmap ~/.Xmodmaprc
     </p>
     <table style="text-align: center;">
       <tr>
-        <th>Lp.</th>
-        <th>Nazwa sprzętu</th>
+        <th style="border-bottom: 1px solid black;">Lp.</th>
+        <th style="border-bottom: 1px solid black;">Nazwa sprzętu</th>
         <th>GUI</th>
         <th>Audio</th>
         <th>Wi-Fi</th>
+        <th>Uwagi</th>
       </tr>
       <tr>
         <td>1.</td>
@@ -792,6 +799,85 @@ xmodmap ~/.Xmodmaprc
         <td>&#9745;</td>
         <td>&#9745;</td>
         <td>&#9745;</td>
+            <td style="text-align: justify;">
+          32-bitowe EFI, trzeba specjalnie przygotować dysk USB, żeby zbootwać 
+          Linux-a na tym sprzęcie.
+        </td>
+      </tr>
+      <tr>
+        <td>2.</td>
+        <td>Saphire Pure White Fusion<br />AMD E-350 mini-ITX</td>
+        <td>&#9745;</td>
+        <td>&#9745;</td>
+        <td>N/A</td>
+        <td style="text-align: justify;">
+            Domyślnym wyjściem audio jest port HDMI, możemy zmienić to
+            wyświetlając listę wyjść audio oraz wskazując odpowiednie wyjście
+            sterownikowi. Listę wyjść możemy wyświetlić za pomocą polecenia:
+<pre class="code-block">
+$ lspci -knn | grep -iA2 audio
+</pre>
+            Lista domyślnie numerowana jest od 0. Jest to istotne, ponieważ
+            trzeba podać <em>index</em> - pozycję na liście.
+            Domyślne wyjście ustawiamy tworząc plik <em>default.conf</em> w
+            katalogu <em>/etc/modprobe.d</em>. W pliku zapisujemy poniższą
+            linię.
+<pre class="code-block">
+options snd_hda_intel index=1
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>3.</td>
+        <td>HP Z600 Workstation</td>
+        <td>&#9745;</td>
+        <td>&#9745;</td>
+        <td>N/A</td>
+        <td style="text-align: justify;">
+          Bardzo szybkie działanie systemu!
+        </td> 
+      </tr>
+      <tr>
+        <td>4.</td>
+        <td>Gigabyte H55M-UD2H/i5-650/<br />16GB DDR3 1333MHz/GeForce 210</td>
+        <td>&#9745;</td>
+        <td>&#9745;</td>
+        <td>N/A</td>
+        <td style="text-align: justify;"></td>   
+      </tr>
+      <tr>
+        <td>5.</td>
+        <td>HP 550</td>
+        <td>&#9745;</td>
+        <td>&#9745;</td>
+        <td>&#9746;</td>
+        <td style="text-align: justify;">
+          Karta sieciowa Broadcom, brak wolnego sterownika.
+        </td>
+      </tr>
+      <tr>
+        <td>6.</td>
+        <td>Dell Wyse Z90D7</td>
+        <td>&#9745;</td>
+        <td>&#9745;</td>
+        <td>N/A</td>
+        <td style="text-align: justify;">
+            Problemy z UEFI, przy próbie zainstalowania systemu wyświetla się
+            <em>"Could not prepare boot variable: No space left on device"</em>.
+            Nie możliwe jest zbootowania z BIOS. Zainstalowałem 
+            <strong>rEFInd</strong> na
+            dysku USB w środowisku zmienionego katalogu (dysk z zainstalowanym
+            system oraz programem rozruchowym w trybie BIOS), przez co program
+            utworzy wpis w menu umożliwiający uruchomienie z niego jądra.
+            Program należy zainstalować z repozytorium a następnie wydać
+            poniższe polecenie.
+<pre class="code-block">
+refind-install --usedefault /dev/sdXY
+</pre>
+            Gdzie <code class="code-block">/dev/sdXY</code> jest partycją
+            stworzoną na dysku USB, partycja powinna być ustawiona na
+            <em>EFI</em> (kod typu partycji w programie <em>fdisk</em>: 
+            <em>ef</em>) oraz sformatowana na <em>FAT-32</em>.</td>
       </tr>
     </table>
     <p>
@@ -809,6 +895,11 @@ xmodmap ~/.Xmodmaprc
         <li><a href="https://superuser.com/questions/277990/how-do-i-swap-alt-and-windows-keys-with-xmodmap">
             Zamiana klawiszy za pomocą xmodmap na https://superuser.com</a>
         </li>
+        <li><a href="https://forums.debian.net/viewtopic.php?t=123902">
+            Ustawienie domyślnego wyjścia audio dla sterownika HDA Intel</a>
+        </li>
+        <li><a href="https://wiki.archlinux.org/title/REFInd">
+            Artykuł o rEFInd na Wiki Arch Linux</a></li>
     </ol>
     <p>
       ~xf0r3m
