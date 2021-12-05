@@ -50,12 +50,18 @@
       <li>
         <p>
           Instalacja greenOS wymaga połączenia z Internetem, skądś należy 
-          pobrać paczkę z plikami katalogu głównego (rootfs). Oczywiście jeśli 
-          posiadamy sterowniki w zbootowanym systemie. Jeśli będziemy łączyć 
-          się za pomocą sieci Ethernet, to połączenie z internetem spowadza 
-          się do podłączenia kabla następnie wydaniu polecnenia, dzięku któremu
-          pobierzemy adres IP z DHCP: 
+          pobrać paczkę z plikami katalogu głównego (rootfs). Połączenie
+          sieciowe Ethernet odbywa się automatycznie, ze względu na
+          NetworkManager, połączyć się z siecią bezprzewodową możemy za pomocą
+          apletu konsoli NetworkManagera: <em>nmtui-connect</em>. W nim
+          wybieramy jedną z sieci, jeśli sieć jest zabezpieczona hasła to aplet
+          wyświetli okienko, w którym podamy hasło, po zatwierdzeniu hasła
+          następuje łącznie z siecią.
         </p>
+<pre class="code-block">
+# nmtui-connect
+</pre>
+        <!--
 <pre class="code-block">
 # dhclient enp0s3
 </pre>
@@ -135,6 +141,7 @@ iwconfig $interface
           powiodło to jedyne co nam pozostało w tym przypadku to pobrać adres
           IP z DHCP.
         </p>
+      -->
       </li>
       <li>
         <p>
@@ -257,42 +264,17 @@ iwconfig $interface
           te dyski, zeby poźniej nie bawić się w kopiowanie. Po ewewntualnym
           zamontowaniu pozostałych katalogów, możemy pobrać archwium z
           <em>rootfs</em>, w tym celu przechodzimy do katalogu montowania 
-          głównego systemu plików następnie wydajemy polecenie (lub pobieramy
-          archiwum ze strony [<a href="https://greenos.morketsmerke.net">https://greenos.morketsmerke.net</a>]
-          głównej projektu):
+          głównego systemu plików następnie wydajemy polecenie:
         </p>
 <pre class="code-block">
-/mnt# wget http://ftp.morketsmerke.net/greenOS/rootfs/$arch/$mode/rootfs_$arch_$mode[_$browser].tgz
+/mnt# wget http://ftp.morketsmerke.net/greenOS/rootfs.tgz
 </pre>
-        <ul>
-          <li><code class="code-inline">$arch</code> - architektura procesora
-            komputera. GreenOS posiada wsparcie dla architektur <em>amd64</em>
-            oraz <em>i386</em>.
-          </li>
-          <li><code class="code-inline">$mode</code> - rodzaj instalacji
-            greenOS. Do wyboru są trzy rodzaje: <em>desktop</em> - instalacja
-            systemu ze środowiskiem graficznym - menedżerem okien IceWM, i
-            kilkoma dodatkowymi programami; <em>server</em> - instalacja bez
-            środowiska graficznego, zwierająca tylko edytor <em>vim</em> oraz
-            serwer SSH; <em>hacker</em> - najczystsza wersja posiadająca
-            jedynie pakiety pozwalające na połączenie sieciowe. Wszyskie te
-            wersje zawierają pakiety jądra oraz programy niezbędne do
-            funkcjonowania systemu.
-          </li>
-          <li><code class="code-inline">$browser</code> - przeglądarka 
-            internetowa. Jeśli wybrany rodzaj instalacji to <em>desktop</em>,
-            należy wskazać przeglądarkę internetową z jakiej będziemy korzystać
-            do wyboru mamy: Mozillę Firefox ESR z oznaczniem (wartością
-            <code class="code-inline">$browser</code>) <em>ffesr</em> oraz
-            GNU IceCat z oznaczeniem <em>gnuic</em>.
-          </li>
-        </ul>
         <p>
           Po ściągnięciu archiwm należy je rozpakować, do tego wystarczy
           użyć polecnia <em>tar</em> z odpowiednimi przełącznikami.
         </p>
 <pre class="code-block">
-# tar -xzvf rootfs_$arch_$mode[_$browser].tgz
+# tar -xzvf rootfs.tgz
 </pre>
         <p>
           Po rozpakowaniu, archiwum należy usunać aby nie zalegało na dysku.
@@ -305,6 +287,7 @@ iwconfig $interface
           <em>blkid</em>, do pliku <em>/mnt/etc/fstab</em>.
         </p>
 <pre class="code-block">
+# cd
 # blkid &gt; /mnt/etc/fstab
 </pre>
         <p>
@@ -476,13 +459,6 @@ UUID="..."  none  swap  sw  0 0
           Sprzątnie w tym wpadku będzie polegać na kulturalnym odmontowaniu
           systemów plików. Do tego celu wykorzystamy konstrukcję powłoki, która
           została już raz użyta podczas instalacji.
-        </p>
-<pre class="code-block">
-# for i in /dev /dev/pts /proc /sys /run; do umount -R /mnt$i; done
-</pre>
-        <p>
-          Teraz pozostaje odmontować pozostałe zamontowane partycje wraz
-          z katalogiem głównym.
         </p>
 <pre class="code-block">
 # umount -R /mnt
