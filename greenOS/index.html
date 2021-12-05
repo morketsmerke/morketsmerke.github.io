@@ -54,12 +54,13 @@
     <p>
       <strong>Celem dystrybucji</strong> jest dostarczenie użytkownikowi 
       stabilnego systemu operacyjnego wraz z popularnym oprogramowaniem,
-      którego instalacja na dystrybucjach Linuxa może niebyć oczywista. 
-      Dystrybucja jest kompromisem pomiedzy UI/UX a regułą KISS.
+      którego instalacja na dystrybucjach Linuxa może nie być oczywista. 
+      Dystrybucja jest kompromisem pomiedzy stylem <em>user friendly</em> a 
+      hakerską regułą KISS.
       Wiele dotyczasowych czynności takich jak np. logowanie (dawniej za pomocą
       konsoli obecnie za pomocą menedżera wyświetlania) zostało uproszczonych.
-      Tej dystrybucji jednak daleko do bycia <em>user friendly</em>. Nadal można
-      ją uznać z hakerską.
+      Tej dystrybucji jednak daleko do bycia typowym desktopem przyjaznym
+      użytkownikowi. Nadal można ją uznać z hakerską.
     </p>
     <p>
       Dystrybucja została ograniczona do jednej wersji <strong>Desktop</strong>.
@@ -119,29 +120,31 @@
     <h2>Specyficzne rzeczy wymagające obsługi:</h2>
     <ul>
       <li>Wpisów w menu dokonujemy ręcznie posiłkując się zapisanym już w pliku
-          <em>~/.icewm/menu</em> lub dokumentacją IceWM dostępna na stronie
+          <em>~/.icewm/menu</em> lub dokumentacją IceWM dostępną na stronie
           <a href="https://ice-wm.org/man/">https://ice-wm.org/man/</a>.</li>
       <li>Zmiany wyświetlania obrazu generowane przez <em>Ustawienia ekranu</em>
           zapisywane są w pliku w katalogu <em>.screenlayout</em>, aby
-          zastosować ustawienia w należy uruchimić plik przed uruchomieniem
+          zastosować ustawienia w należy uruchomić plik przed uruchomieniem
           mendżera okien. <em>Lightdm</em> korzysta z pliku <em>~/.xsession</em>
           więc w nim należy dodać tę linię:
 <pre class="code-block">
 sh -c ~/.screenlayout/plik_ustawien_arandr.sh &amp;
 </pre>
           Z <em>plik_ustawien_arandr</em> podajemy swoją nazwą pod którą
-          zostały zapiane zamiany.</li>
+          zostały zapisane zamiany.</li>
       <li>Jeśli w systemie jest wiele wyjść audio, i nie mamy dźwieku 
           uruchamiając coś na <em>yt</em>, to system może domyślnie przypisał
-          sobie inną kartę sieciową niż byśmy tego chcieli. Za pomocą poniższego
-          polecenia wyświetlamy dostępnie karty w systenie. Należy zapamietać
+          sobie inną kartę dziwiękową niż byśmy tego chcieli. Za pomocą 
+          poniższego
+          polecenia wyświetlamy dostępnie karty w systemie. Należy zapamiętać
           pozycję pożądanej karty na wypisanej przez polecenie liście.
 <pre class="code-block">
 $ lspci -knn | grep -iA2 audio
 </pre>
           Po ustaleniu kolejności domyślnej karty dzwiękowej, należy ustawić
-          ją w pliku <em>/etc/modprobe.d/default.conf</em>, plik najprawdobniej
-          nie istnieje więc trzeba go będzie utworzyć. W pliku zapisujemy
+          ją w pliku <em>/etc/modprobe.d/default.conf</em>, plik 
+          najprawdopodobniej
+          nie istnieje, więc trzeba go będzie utworzyć. W pliku zapisujemy
           poniższą linię:
 <pre class="code-block">
 options snd_hda_intel index=N
@@ -150,7 +153,7 @@ options snd_hda_intel index=N
           liście z poprzedniego polecenia.</li>
     </ul>
     <p>
-      greenOS rozporowadzany jest <strong>bez gwarancji przydatności</strong>.
+      greenOS rozprowadzany jest <strong>bez gwarancji przydatności</strong>.
       Autor nie ponosi odpowiedzialności za szkody wyrządone instalacją lub
       korzystaniem z greenOS. Miłej zabawy!
     </p>
