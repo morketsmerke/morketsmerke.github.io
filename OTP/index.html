@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<style>
+			.code-block {
+				display: block;
+				background-color: silver;
+				font-family: monospace;
+				font-weight: bolder;
+			}
+			.code-inline {
+				background-color: silver;
+				font-family: monospace;
+
+				font-weight: bolder;
+			}
+			p { text-align: justify; }
+		</style>
+	</head>
+	<body style="font-family: monospace;" >
+<pre>
+   ____  __    __   ______                    _             __
+  / __ \/ /___/ /  /_  __/__  _________ ___  (_)___  ____ _/ /
+ / / / / / __  /    / / / _ \/ ___/ __ `__ \/ / __ \/ __ `/ / 
+/ /_/ / / /_/ /    / / /  __/ /  / / / / / / / / / / /_/ / /  
+\____/_/\__,_/    /_/  \___/_/  /_/ /_/ /_/_/_/ /_/\__,_/_/   
+                                                              
+    ____               _           __ 
+   / __ \_________    (_)__  _____/ /_
+  / /_/ / ___/ __ \  / / _ \/ ___/ __/
+ / ____/ /  / /_/ / / /  __/ /__/ /_  
+/_/   /_/   \____/_/ /\___/\___/\__/  
+                /___/                
+</pre>
+	<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div style="margin-left: auto; margin-right: auto; width: 80%;">
+		<h1 style="text-align: center;">Old Terminal Project GNU/Linux (Wise choice)</h1>
+		<p>
+			OTP a właśc. <strong>Old Terminal Project GNU/Linux</strong> jest to lekka
+			dystrybucja oparta na dCore (port TinyCore-a) w wersji bazującej na
+			Ubuntu 18.04. Jej zadaniem jest przywrócenie świetności starym
+			terminalom, czy cienkim klientom produkowanym do 2010. System jest 
+			32-bitowy i nie wspiera UEFI, dlatego nie jest ondedykowany dla
+			wszystkich terminali. Dołączone do dystrybucji oprogramowanie
+			pozwala wykorzystać te urządzenia do celu w jakim zostały stworzone 
+			zarazem odnajdując się wśród współczesnych maszyn.
+		</p>
+		<p>
+			Zrzut ekranu przestawiający pulpit dystrybucji:
+			<a target="_blank" href="https://i.ibb.co/BqzpwLG/otp-ss.png">
+				<figure>
+					<img src="https://i.ibb.co/0mZFXD5/otp-ss-thubnail.png">
+					<figcaption>Kilknij obrazek, aby otworzyć w pełnym rozmiarze.</figcaption>
+				</figure>
+			</a> 
+    </p>
+		<p>
+			Oprogramowanie dołączone do OTP:
+		</p>
+		<ul>
+			<li><strong>Środowisko graficzne icedesk</strong>
+				<em>(on boot)</em> (Xorg, Xprogs, icewm, aterm,
+				adwaita-icon-theme, hicolor-icon-theme),</li>
+			<li><strong>Przeglądarka internetowa Arora</strong>
+				(<a href="https://github.com/Arora/arora">https://github.com/Arora/arora</a>) <em>(on boot)</em>,</li>
+			<li><strong>Klient OpenSSH</strong><em>(on boot)</em></li>
+			<li><strong>Remmina</strong> + RDP plugin + VNC plugin <em>(on demmand)</em></li>
+			<li><strong>virt-manager</strong><em>(on demmand)</em></li>
+		</ul>
+		<p>
+			Dystrybucja została oparta o jeden z portów TinyCore, przy czym port <strong>dCore</strong>
+			wykorzystuje pakiety <em>.deb</em> do konwersji ich na własne paczki zachowując
+			przy tym rozwiązania z TinyCore. W przypadku dCore pakiety mają rozszerzenie
+			<em>.sce</em> i działaja na dokładnie takiej samej zasadzie co pakiety <em>TCZ</em>. Są
+			to małe odwzorowania <em>rootfs</em> zamknięte w formacie <em>squashfs</em>. Pakiety mogą
+			być ładowane na żądanie (<em>on demmand</em>) lub pod czas uruchamiania systemu
+			(<em>on boot</em>), ze względu na małą wydajność tych starszych cienkich klientów
+			podczas rozruchu systemu ładowane są najczęściej używane rozszerzenia.
+			Rozszerzenia ładowane są za pomocą polecenia:
+		</p>
+<pre class="code-block">
+$ sce-load
+</pre>
+		<p>
+			Polecenie to musi zostać wydane przez zwykłego użytkownika bez uprawnień
+			administratora. Wyświetli ono menu z którego należy wybrać pakiet do 
+			załadowania.
+		</p>
+		<p>
+			Użytkownik może sam pobierać i ładować pakiety z Ubuntu 18.04. Do tej
+			czynności wymagana jest nazwa pakietu z Ubuntu. Pakiet pobierany i 
+			konwertowany jest za pomocą polecenia:
+		</p>
+<pre class="code-block">
+$ sce-import nazwa_pakietu
+</pre>
+		<p>
+			Ładowanie może następować tak jak we wcześniej wyjaśniony sposób lub 
+			"mniej interaktywny" podajac poleceniu nazwę pakietu:
+		</p>
+<pre class="code-block">
+$ sce-load nazwa_pakietu
+</pre>
+		<p>
+			Po instalacji pakietów, warto oczyścić katalog na dysku z pobranych
+			paczek <em>.deb</em>. Dokonuje się tego za pomocą rozszerzeia 
+			<em>sce-debpurge</em>. Jest
+			ono dostarczane wraz z dystrybucją, trzeba je tylko załadować.
+		</p>
+<pre class="code-block">
+$ sce-load sce-debpurge
+</pre>
+		<p>
+			Usunięcie wszystkich pakietów <em>.deb</em>:
+		</p>
+<pre class="code-block">
+$ sce-debpurge -a
+</pre>
+		<p>
+			Jeśli nie będziemy już potrzebować jakiegoś rozszerzenia możemy je usunąć
+			za pomocą polecenia <em>sce-remove</em>, które również jest dołączane do pakietów
+			dystrybucji, wymaga jedynie załadowania.
+		</p>
+<pre class="code-block">
+$ sce-load sce-remove
+$ sce-remove nazwa_pakietu
+</pre>
+		<p>
+			Pakiet zostanie usunięty przy zamykaniu systemu.
+		</p>
+		<p>
+			Jeśli chodzi o działanie samej dystrybucji to jest ono takie trochę
+			thin-klienckie. Ponieważ położono nacisk na to aby użytkownik logował
+			się do zdalnego systemu i to na nim pracował i nie pozostawiał po sobie
+			śladu na terminalu. System automatycznie loguje się na użytkownika po czym
+			uruchamiane jest środowisko graficzne. Wszelkie zamiany w systemie oraz
+			dane zapisane przez użytkownika nie zostaną zachowane po restarcie systemu.
+		</p>
+		<p>
+			System zainstalować można na dwa sposoby:
+		</p>
+		<ul>
+			<li>tylko do odczytu</li>
+			<li>instalacja typu frugal</li>
+		</ul>
+		<p>
+			Pierwszy z nich polega na wgraniu obrazu płyty do pamięci flash terminala.
+			Drugi przypomina normalną instalację jednak różni się od typowego procesu
+			instalacji znanego z innych dystrybucji. Polega on na skopiowaniu na dysk
+			zawartości płyty. Obie metody są opisane w 
+			<a href="https://morketsmerke.github.io/OTP/instalacja.html">poradniku instalacji</a> 
+			A link do obrazu LiveCD znajduje się poniżej:
+		</p>
+		<ul>
+			<li>
+				<a href="http://ftp.morketsmerke.net/OTP/OTP-hybrid.iso">
+					OTP-hybrid.iso
+				</a>
+			</li>
+		</ul>
+		<p>
+			Dostęp do przygotowanych pakietów z poziomu LiveCD wymaga 
+			specjalnego montowania:
+		</p>
+<pre class="code-block">
+$ sudo mount -B /mnt/sr0/cde/sce /tmp/tce/sce
+</pre>
+		<p>
+			Należy pamiętać, że Old Terminal Project GNU/Linux jest dystrybuowany
+			bez gwarancji przydatność. Oznacza to że system może w ogóle się nie
+			uruchomić Twoim sprzęcie. Autor nie ponosi odpowiedzialności za szkody
+			wyrządzone instalacją OTP. Miłej zabawy.
+		</p>
+		<p>
+			-- Changelog --
+		</p>
+		<p>
+			-- 06.12.2021 - Rozpoczęcie prac nad OTP.<br />
+			-- 12.12.2021 - Wydanie pierwszej wersji OTP o nazwie kodowej "Wise choice".<br />
+		</p>
+	</div>
+	<p style="margin: 15px; padding: 0; outline: 0;">
+	  2021; COPYLEFT; ALL RIGHTS REVERSED;
+	</p>
+
+</body>
+</html>
