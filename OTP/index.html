@@ -39,7 +39,7 @@
 	</p>
 	<div style="margin-left: auto; margin-right: auto; width: 80%;">
 		<h1 style="text-align: center;">Old Terminal Project GNU/Linux (Wise choice)</h1>
-		<p>
+    		<p>
 			OTP a właśc. <strong>Old Terminal Project GNU/Linux</strong> jest to lekka
 			dystrybucja oparta na dCore (port TinyCore-a) w wersji bazującej na
 			Ubuntu 18.04. Jej zadaniem jest przywrócenie świetności starym
@@ -58,26 +58,31 @@
 				</figure>
 			</a> 
     </p>
-		<p>
+    <p>
 			Oprogramowanie dołączone do OTP:
 		</p>
 		<ul>
 			<li><strong>Środowisko graficzne icedesk</strong>
-				<em>(on boot)</em> (Xorg, Xprogs, icewm, aterm,
+				<em>(on boot)</em> (Xorg-all, icewm, aterm,
 				adwaita-icon-theme, hicolor-icon-theme),</li>
 			<li><strong>Przeglądarka internetowa Arora</strong>
-				(<a href="https://github.com/Arora/arora">https://github.com/Arora/arora</a>) <em>(on boot)</em>,</li>
-			<li><strong>Klient OpenSSH</strong><em>(on boot)</em></li>
-			<li><strong>Remmina</strong> + RDP plugin + VNC plugin <em>(on demmand)</em></li>
-			<li><strong>virt-manager</strong><em>(on demmand)</em></li>
+				(<a href="https://github.com/Arora/arora">https://github.com/Arora/arora</a>)
+        <em>(on demand)</em>,</li>
+			<li><strong>Klient OpenSSH</strong><em>(on demand)</em></li>
+			<li><strong>Remmina</strong> + RDP plugin + VNC plugin + SPICE plugin
+        <em>(on boot)</em></li>
+			<li><strong>virt-manager</strong><em>(on demand)</em></li>
 		</ul>
+    <p>
+      <strong>Aktualna wersja: <span style="font-size: 20pt;">1.0.1</span></strong>
+    </p>
 		<p>
 			Dystrybucja została oparta o jeden z portów TinyCore, przy czym port <strong>dCore</strong>
 			wykorzystuje pakiety <em>.deb</em> do konwersji ich na własne paczki zachowując
 			przy tym rozwiązania z TinyCore. W przypadku dCore pakiety mają rozszerzenie
 			<em>.sce</em> i działaja na dokładnie takiej samej zasadzie co pakiety <em>TCZ</em>. Są
 			to małe odwzorowania <em>rootfs</em> zamknięte w formacie <em>squashfs</em>. Pakiety mogą
-			być ładowane na żądanie (<em>on demmand</em>) lub pod czas uruchamiania systemu
+			być ładowane na żądanie (<em>on demand</em>) lub pod czas uruchamiania systemu
 			(<em>on boot</em>), ze względu na małą wydajność tych starszych cienkich klientów
 			podczas rozruchu systemu ładowane są najczęściej używane rozszerzenia.
 			Rozszerzenia ładowane są za pomocą polecenia:
@@ -157,8 +162,8 @@ $ sce-remove nazwa_pakietu
 		</p>
 		<ul>
 			<li>
-				<a href="http://ftp.morketsmerke.net/OTP/OTP-hybrid.iso">
-					OTP-hybrid.iso
+				<a href="http://ftp.morketsmerke.net/OTP/OTP-hybrid-1.0.1.iso">
+					OTP-hybrid-1.0.1.iso
 				</a>
 			</li>
 		</ul>
@@ -181,6 +186,12 @@ $ sudo mount -B /mnt/sr0/cde/sce /tmp/tce/sce
 		<p>
 			-- 06.12.2021 - Rozpoczęcie prac nad OTP.<br />
 			-- 12.12.2021 - Wydanie pierwszej wersji OTP o nazwie kodowej "Wise choice".<br />
+      -- 22.12.2021 - <strong>Wydanie wersji 1.0.1</strong>, Zmiany w wersji: 
+      Zastąpiono podczas
+      ładowania <em>on boot</em> przeglądarkę internetową, programem "Remmina"
+      wraz ze wszystkimi pluginami; wyłączono z ładowania <em>on boot</em>
+      openssh-client. Przez co czas ładowania 
+      rozszerzeń został skrócony o 30 sekund.<br />
 		</p>
 	</div>
 	<p style="margin: 15px; padding: 0; outline: 0;">
