@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<style>
+			.code-block {
+				display: block;
+				background-color: silver;
+				font-family: monospace;
+				font-weight: bolder;
+			}
+			.code-inline {
+				background-color: silver;
+				font-family: monospace;
+
+				font-weight: bolder;
+			}
+			p { text-align: justify; }
+      td { border-bottom: 1px solid black; }
+      th {
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+      }
+		</style>
+	</head>
+	<body style="font-family: monospace;" >
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+	<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div style="margin-left: auto; margin-right: auto; width: 80%;">
+    <h1 style="text-align: center;">Szyfrowany rootfs na greenOS</h1>
+    <p>
+      Jeśli naszym głównym komputerem, z którego korzystamy na codzień jest
+      laptop, to zapewne dla własnej wygody mamy na nim wiele cennych danych,
+      których być może zniszczenie niebyło by aż tak bolesne jak dostanie się
+      tych informacji w niepowłone ręce. Temu właśnie ma służyć szyfrowanie
+      dysków. W tym przypadku będziemy szyfrować partycję zawierającą
+      główny system plików z wyłączeniem katalogu <em>/boot</em>. Z racji tego
+      iż greenOS nie korzysta z klasycznego debianowskiego programu 
+      <em>debian-installer</em> i instaluje się go ręcznie tak samo jak
+      <em>Arch Linux</em>. To instalacje z szyfrowaniem partycji z głównego
+      katalogu również musimy wykonać z ręki. Instalacje rozpoczynamy od
+      uruchomienia komputera z LiveCD. Możebyć to dowolny Debian lub greenOS.
+    </p>
+    <ol>
+      <li>Aktualizacja list pakietów dystrybucji.
+<pre class="code-block">
+# apt update
+</pre>
+      </li>
+      <li>Instalacja pakietu <strong>cryptsetup</strong> w środowisku LiveCD
+<pre class="code-block">
+# apt install cryptsetup
+</pre>
+      </li>
+      <li>
+          <p>
+          Partycjonowanie dysku. Tutaj jest to raczej sprawa indywidualna, ale
+          najbardziej klasyczny schemat partycjonowania została przestawiowy
+          w tabelce poniżej. Do partycjonowania dysku może służyć wbudowane
+          polecenie <em>fdisk</em>:
+          </p>
+<pre class="code-block">
+# fdisk /dev/sda
+</pre>
+        <table>
+          <tr>
+            <th>Urządzenie</th>
+            <th>Rozmiar</th>
+            <th>Punkt montowania</th>
+          </tr>
+          <tr>
+            <td>/dev/sda1</td>
+            <td>300M</td>
+            <td>/boot</td>
+          </tr>
+          <tr>
+            <td>/dev/sda2</td>
+            <td>-1G</td>
+            <td>/</td>
+          </tr>
+          <tr>
+            <td>/dev/sda5</td>
+            <td>1G</td>
+            <td>swap</td>
+          </tr>
+        </table>
+      </li>
+      <li>
+          <p>
+          Tworzymy system plików dla partycji przeznaczonej na katalog
+          <em>/boot</em>.
+          </p>
+<pre class="code-block">
+# mkfs.ext4 /dev/sda1
+</pre>
+      </li>
+      <li>
+          <p>
+          Tworzymy szyfrowany wolumin na partycji przeznaczonej na główny
+          system plików. Program poprosi o potwierdzenie
+          działania poprzez wpisane DUŻYMI literami słowa: <em>YES</em>.
+          Następnie poprosi o podanie klucza (hasła) do odszyfrowania woluminu.
+          </p>
+<pre class="code-block">
+# cryptsetup -y -v luksFormat /dev/sda2
+</pre>
+      </li>
+      <li>
+          <p>
+          Otwieramy szyfrowany wolumin. Program zapyta o klucz.
+          </p>
+<pre class="code-block">
+# cryptsetup open /dev/sda2 cryptroot
+</pre>
+        <p>
+        Ostatni argument jest nazwą, pod którą będzie odwoływać się do
+        odszyfrowanego woluminu. Mapowanie (nazwa) znajduje się w katalogu
+        <em>/dev/mapper</em>.
+        </p>
+      </li>
+      <li>
+          <p>
+          Tworzymy system plików na odszyfrowanym woluminie.
+          </p>
+<pre class="code-block">
+# mkfs.ext4 /dev/mapper/cryptroot
+</pre>
+      </li>
+      <li>
+          <p>
+          Montujemy system plików woluminu w katalogu <em>/mnt</em>.
+          </p>
+<pre class="code-block">
+# mount /dev/mapper/cryptroot /mnt
+</pre>
+      </li>
+      <li>
+          <p>
+          Tworzymy katalog <em>/mnt/boot</em>, dla oddzielnej partycji
+          <em>/boot</em>.
+          </p>
+<pre class="code-block">
+# mkdir /mnt/boot
+</pre> 
+      </li>
+      <li>
+          <p>
+          Montujemy partycje przeznaczoną na katalog <em>/boot</em> we
+          wcześniej utworzonym katalogu.
+          </p>
+<pre class="code-block">
+# mount /dev/sda1 /mnt/boot
+</pre>
+      </li>
+      <li>
+          <p>
+          Przechodzimy do katalogu <em>/mnt</em> i pobieramy paczkę z plikami
+          bazowymi dystrybucji.
+          </p>
+<pre class="code-block">
+# cd /mnt
+# wget http://ftp.morketsmerke.net/greenOS/rootfs.tgz
+</pre>
+      </li>
+      <li>
+          <p>
+          Rozpakowujemy pliki bazowe.
+          </p>
+<pre class="code-block">
+# tar -xzvf rootfs.tgz 
+</pre>
+      </li>
+      <li>
+          <p>
+          Tworzymy system plików dla partycji ze <em>swap</em>-em.
+          </p>
+<pre class="code-block">
+# cd
+# mkswap /dev/sda5
+</pre>
+      </li>
+      <li>
+          <p>
+          Przekierowujemy wyjście polecenia <em>blkid</em> do pliku
+          <em>/mnt/etc/fstab</em>. Musimy wyedytować zawartość tego pliku, aby
+          wyglądał mniej więcej tak:
+          </p>
+<pre class="code-block">
+# blkid &gt; /mnt/etc/fstab
+# vim /mnt/etc/fstab
+
+UUID="..."  /boot ext4  defaults  0 2
+UUID="..."  none  swap  sw  0 0
+/dev/mapper/cryptroot / ext4  defaults  0 1
+</pre>
+      </li>
+      <li>
+          <p>
+          Montujemy katalogi systemowe do podkatalogów w <em>/mnt</em> aby
+          widoczne były urządzenia komputera w środowisku <em>chroot</em>.
+          </p>
+<pre class="code-block">
+for i in /dev /dev/pts /proc /run /sys; do mount -B $i /mnt$i; done
+</pre>
+      </li>
+      <li>
+          <p>
+          Zmieniamy katalog główny na <em>/mnt</em>.
+          </p>
+<pre class="code-block">
+# chroot /mnt
+</pre>
+      </li>
+      <li>
+          <p>
+          Wykonujemy kilka czynności instalacyjnych, takich jak ustawienie
+          hasła dla użytkownika <em>root</em>, utworzenie nowego użytkownika 
+          oraz nadanie mu uprawnień administratora.
+          </p>
+<pre class="code-block">
+# passwd
+# adduser user
+# vim /etc/sudoers
+
+user  ALL=(ALL) NOPASSWD:ALL
+</pre>
+      </li>
+      <li>
+          <p>
+          W środowisku zmienionego katalogu podstawowego, odświerzamy listy
+          pakietów dystrybucji oraz instalujemy pakiet <em>cryptsetup</em>.
+          Podczas instalacji pakietu możemy zignorować błędy związane z 
+          mkinitramfs oraz cryptroot. Polecenie oświerzenia list może się
+          zawieść, w tym przypadku należy przerwać to polecenie i pobrać
+          konfigurację sieci z serwera dhcp.
+          </p>
+<pre class="code-block">
+# dhclient
+# apt update
+# apt install cryptsetup
+</pre>
+      </li>
+      <li>
+          <p>
+          Utworzenie wpisu w pliku <em>/etc/crypttab</em>. Plik zawiera
+          wystąpienia szyfrowanych woluminów w systemie. Definiuje odzorowania
+          nazw w katalogu /dev/mapper, plik klucza oraz opcje
+          <em>cryptsetup</em>. Wpis użyty tym przykładzie
+          będzie opierać, się na totalnym minimum konfiguracji. Jest on 
+          niezbędny do
+          wygenerowania odpowiednich procedur w <em>initramfs</em>. W skrócie
+          jest potrzebny aby w ogóle dało się odszyfrować wolumin. Pierwsze
+          polecenie służy zapisaniu UUID urządzania blokowego z szyfrowanym
+          woluminem w pliku (oczywiście w tylko i wyłacznie w tym przykładzie).
+          </p>
+<pre class="code-block">
+# blkid | grep "LUKS" | awk '{printf $2}' &gt;&gt; /etc/crypttab
+# vim /etc/crypttab
+
+cryptroot UUID="..."  none  luks
+</pre>
+          <p>
+          Gdzie: <code class="code-inline">cryptroot</code> jest to nazwa
+          odwzrowania, <code class="code-inline">UUID</code> wskazuje na 
+          urządzenie blokowe przechowywujące zaszyfrowany wolumin, 
+          <code class="code-inline">none</code> jest to wskazanie pliku klucz
+          w przypadku tej opcji, zostaniemy poproszeni o wprowadzenie klucza
+          podczas uruchamiania systemu, ostatnia opcja
+          <code class="code-inline">luks</code> spowoduje wymuszenie użycia 
+          trybu LUKS, który jest standardem wśród 
+          szyfrowanych woluminów na dystrybucjach Linux-a. Ten standard został
+          użyty także przez nas.
+          </p>
+        </li>
+        <li>
+            <p>
+            Wygenerowanie nowego dysku początkowego. Zwróćmy uwagę na to, iż
+            po zapisaniu wpisu w pliku <em>/etc/crypttab</em> nie pojawiają
+            pojawiają się żadne błędy podczas jego generowania. Tak jak miało
+            to miejsce podczas instalacji <em>cryptsetup</em> przy zmienionym
+            katalogu głównym.
+            </p>
+<pre class="code-block">
+# mkinitramfs -o /boot/initrd.img-4.19.0-18-amd64
+</pre>
+        </li>
+        <li>
+            <p>
+            Instalacja rekordu rozruchowego na dysku
+            </p>
+<pre class="code-block">
+# grub-install /dev/sda
+</pre>
+        </li>
+        <li>
+            <p>
+            Wygenerowanie pliku konfiguracyjnego dla programu rozruchowego.
+            </p>
+<pre class="code-block">
+# update-grub
+</pre>
+        </li>
+        <li>
+            <p>
+            Opuszczenie środowiska zmienionego katalogu głównego.
+            </p>
+<pre class="code-block">
+# exit
+</pre>
+        </li>
+        <li>
+            <p>
+            Odmontowanie wszystkich wcześniej montowanych systemów plików.
+            </p>
+<pre class="code-block">
+# umount -R /mnt
+</pre>
+        </li>
+        <li>
+           <p>
+           Zamknięcie szyfrowanego woluminu.
+           </p>
+<pre class="code-block">
+# cryptsetup close cryptroot
+</pre>
+        </li>
+        <li>
+            <p>
+            Zakończenie instalacji, restart systemu.
+            </p>
+<pre class="code-block">
+# reboot
+</pre>
+        </li>
+    </ol>
+    <p>
+    ~xf0r3m
+    </p>
+	</div>
+	<p style="margin: 15px; padding: 0; outline: 0;">
+		2021; COPYLEFT; ALL RIGHTS REVERSED;
+	</p>
+
+	</body>
+</html>
