@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<style>
+			.code-block {
+				display: block;
+				background-color: silver;
+				font-family: monospace;
+				font-weight: bolder;
+			}
+			.code-inline {
+				background-color: silver;
+				font-family: monospace;
+
+				font-weight: bolder;
+			}
+			p { text-align: justify; }
+      td { border-bottom: 1px solid black; }
+      th {
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+      }
+		</style>
+	</head>
+	<body style="font-family: monospace;" >
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+	<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div style="margin-left: auto; margin-right: auto; width: 80%;">
+    <h1 style="text-align: center;">Szyfrowany rootfs na greenOSTe</h1>
+    <p>
+      Chcąc przetestować <em>greenOSTe</em> na starym laptopie z Core2Duo 
+      stwierdziłem, że jeśli ma być to hackerska instalacja to dysk powinien 
+      być
+      szyfrowany. Z racji tego, że Trisquel jest oparty na Ubuntu, a Ubuntu na
+      Debianie, to może zadziała sposób wykorzystywany przy <em>greenOS</em>.
+      Niestety, nie. Podczas bootowania
+      właściwego systemu nie zostaliśmy zapytani o hasło, a system zatrzymywał
+      się przy próbie montowania głownego systemu plików, którego nie było bo 
+      dysk
+      nie został odszyfrowany. Program typu init przerwał ładowanie systemu
+      zrzucając tym samym powłokę <em>BusyBox</em> obrazu <em>initramfs</em>.
+    </p>
+    <p>
+      Problem leżał w tym, że do archiwum <em>initramfs</em>, nie został
+      skopiowany program <strong>cryptsetup</strong> mimo iż instalator pakietu
+      aktualizował to archiwum. Niezbędne jest również dopisanie
+      dwóch dodatkowych opcji w pliku <em>/etc/crypttab</em>. Najpierw musimy 
+      wymusić załadowanie programu <em>cryptsetup</em> do archiwum. W pliku
+      <em>/usr/share/initramfs-tools/conf-hooks.d/forcecryptsetup</em> 
+      zapisujemy poniższą linię:
+    </p>
+<pre class="code-block">
+export CRYPTSETUP=y
+</pre>
+    <p>
+      Teraz należy zaktualizować archiwum z <em>initramfs</em>, przy czym
+      zapiszemy zwracane przez polecenie informacje do pliku, dzięki czemu
+      będzie mogli się upewnić że program <em>cryptsetup</em> został
+      rzeczywiście dodany do archiwum.
+    </p>
+<pre class="code-block">
+# update-initramfs -c -k all -v &gt; ~/upd-initramfs.log
+# cat ~/upd-initramfs.log | grep "crypt"
+</pre>
+    <p>
+      Na wyściu drugiego polecenia należy szukać ścieżki
+      <strong>/sbin/cryptsetup</strong>, powinna być oznaczona komunikatem
+      <em>Adding binary</em>. Teraz możemy przejść do utworzenia
+      odpowiedniego wpisu w pliku <em>/etc/crypttab</em>. Podobnie jak w
+      materiale dotyczącym <em>greenOS</em>, jednak obecny wpis różni się od
+      poprzedniego materiału o podobnej tematyce. Ma dwie dodatkowe opcje 
+      oraz UUID nie może znajdować się między cudzysłowami. UUID najlepiej 
+      pobrać za pomocą powyższego polecenia:
+    </p>
+<pre class="code-block">
+# blkid | grep "LUKS" | awk '{printf $2}' &gt;&gt; /etc/crypttab
+</pre>
+    <p>
+      Z kolei wpis w pliku <em>/etc/crypttab</em> wygląda w następujący sposób
+    </p> 
+<pre class="code-block">
+cryptroot UUID=...  none  nofail,luks,initramfs
+</pre>
+    <p>
+      Po zapisaniu zmian, należy ponownie zaktualizować <em>initramfs</em> oraz
+      upewnić się <em>cryptsetup</em> nadal tam jest.
+    </p>
+<pre class="code-block">
+# update-initramfs -c -k all -v &gt; ~/upd-initramfs.log
+</pre>
+    <p>
+      Po wykonaniu tych czynności możemy powrócić do pozostałych standardowych
+      czynności instalacyjnych. <strong>Uwaga!</strong> po każdym
+      aktualizowaniu <em>initramfs</em>, należy jeszcze raz go zaktualizować
+      tak jak robiliśmy to w tym materiale, ponieważ może okazać się, że 
+      <em>cryptsetup</em> zostało usunięte z archiwum, co spowoduje
+      unieruchomienie systemu po restarcie.
+    </p>
+    <p>
+      Źródło:
+    </p>
+    <ol>
+      <li><a href="https://gist.github.com/gvtulder/881e9cce73758339bd25937c254f7960">Github Gist: gvtulder/encrypting-without-reinstalling-ubuntu.txt</a></li>
+    </ol>
+    <p>
+    ~xf0r3m
+    </p>
+	</div>
+	<p style="margin: 15px; padding: 0; outline: 0;">
+		2021; COPYLEFT; ALL RIGHTS REVERSED;
+	</p>
+
+	</body>
+</html>
