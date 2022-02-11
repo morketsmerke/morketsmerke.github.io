@@ -265,7 +265,7 @@ exec startxfce4
         <em>Polecenie</em> wpisujemy <em>/usr/bin/redshift</em>. Po ponownym
         zalogowaniu Redshift powinien zostać uruchomiony.
       </li>
-      <li>
+      <li><strike>
         Instalacja snap oraz ncspot. <em>Snap</em> jest rodzajem mendżera 
         pakietów
         dającym m.in. możliwość instalowania tego samego
@@ -311,7 +311,7 @@ przjeście do katalogu zawierającego pobrane pliki.
         polecenie i spróbować ponownie wydać polecenie instalacji.
 <pre class="code-block">
 [user@greenOSAE ~]$ sudo snap refresh
-</pre>
+</pre></strike>
       </li>
       <li>
         Ostatnią czynnościa do wykonania, pozostaje
@@ -383,15 +383,43 @@ maszyn wirtualnych jako zwykły użytkownik musimy dodać użytkownika do grupy
           <u>Dodanie programu do autostartu:</u>
           <a href="https://wiki.archlinux.org/title/XFCE#Autostart">https://wiki.archlinux.org/title/XFCE#Autostart</a>
         </li>
-        <li>
+        <li><strike>
           <u>Instalacja Snap na Arch Linux:</u>
-          <a href="https://snapcraft.io/docs/installing-snap-on-arch-linux">https://snapcraft.io/docs/installing-snap-on-arch-linux</a>
+          <a href="https://snapcraft.io/docs/installing-snap-on-arch-linux">https://snapcraft.io/docs/installing-snap-on-arch-linux</a></strike>
         </li>
         <li>
           <u>Instalacja KVM na Arch Linux:</u>
           <a href="https://linuxhint.com/install_configure_kvm_archlinux">https://linuxhint.com/install_configure_kvm_archlinux</a>
         </li>
       </ol>
+    </p>
+    <p>
+      Jeśli komuś nie chce się wykonywać powyższych czynności, to może pobrać
+      gotowe archiwum znajdujące się pod poniższym odnośnikiem.
+    </p>
+    <p>
+      <a href="https://sourceforge.net/projects/greenosae/files/rootfs/greenOSAE-2.0.2.tgz/download">https://sourceforge.net/projects/greenosae/files/rootfs/greenOSAE-2.0.2.tgz/download</a>
+    </p>
+    <p>
+      Procedura instalacji jest zgodna z greenOS, jedyną różnicą jest tworzenie
+      pliku konfiguracyjnego GRUB-a, do tego wykorzystujemy to polecenie:
+    </p>
+<pre class="code-block">
+# grub-mkconfig -o /boot/grub/grub.cfg
+</pre>
+    <p>
+      Zmiany, których dokonano na oryginalnym archiwum, aby można było je
+      upublicznić znajdują się <a href="https://github.com/xf0r3m/greenOSAE/blob/main/changelog_greenOSAE_2.0.1.txt">tutaj</a>. Z kolei lista zainstalowanych pakietów <a href="https://github.com/xf0r3m/greenOSAE/blob/main/greenOSAE_installed_packages.txt">tutaj</a>.
+    </p>
+    <p>
+      Changelog najnowszej wersji znajduje się <a href="https://github.com/xf0r3m/greenOSAE/blob/main/changelog_greenOSAE_2.0.2.txt">tutaj</a>.
+    </p>
+    <p>
+      -- Changelog --
+    </p>
+    <p>
+      -- 11.02.2022 - Aktualizacja oryginalnego archiwum i upublicznienie go<br />
+      -- 11.02.2022 - Nowa wersja archiwum, zamiany w changelog-u powyżej<br />
     </p>
     <p>
     ~xf0r3m
