@@ -63,9 +63,9 @@
       użytkownikowi. Nadal można ją uznać z hakerską.
     </p>
     <p>
-      Dystrybucja została ograniczona do jednej wersji <strong>Desktop</strong>.
+      <strike>Dystrybucja została ograniczona do jednej wersji <strong>Desktop</strong>.
       Patrząc na obecny sprzęt oraz zasoby jakimi operują współczesne komputery
-      ta sama wersja świetnie sprawdzi się na serwerze. 
+      ta sama wersja świetnie sprawdzi się na serwerze.</strike> 
       Dołączone oprogramowanie:
     </p>
     <ul>
@@ -97,8 +97,8 @@
    
     <ul>
       <li>Obraz płyty LiveCD: 
-        <a href="https://sourceforge.net/projects/greenos/files/iso/greenOS_1.1_amd64.iso/download">
-          greenOS_1.1_amd64.iso</a>
+        <a href="https://sourceforge.net/projects/greenos/files/iso/greenOS_1.2_amd64.iso/download">
+          greenOS_1.2_amd64.iso</a>
       </li>
     </ul>
     <p>
@@ -113,19 +113,19 @@
       posiłkując się <a href="instalacja_greenos.html">poradnikiem instalacji</a>.
     </p>
     <p>
-      Archiwa z dystrybucją w głównym wydaniu znajdują się poniżej oraz pod 
-      adresem:
-      <a href="https://sourceforge.net/projects/greenos/files/rootfs/rootfs_1.1.tgz/download">
-       https://sourceforge.net/projects/greenos/files/rootfs/rootfs_1.1.tgz/download</a>.
+      Archiwa z dystrybucją w głównym wydaniu (<strong>Main</strong>) znajdują 
+      się poniżej oraz pod adresem:
+      <a href="https://sourceforge.net/projects/greenos/files/rootfs/rootfs_1.2.tgz/download">
+       https://sourceforge.net/projects/greenos/files/rootfs/rootfs_1.2.tgz/download</a>.
     </p>
     <p>
       Inne wydania dystrybucji:
     </p>
     <ul>
       <li><strong>greenOS Ratpoison</strong> - 
-          <a href="https://sourceforge.net/projects/greenos/files/rootfs/rootfs_rp.tgz/download">
-          https://sourceforge.net/projects/greenos/files/rootfs/rootfs_rp.tgz/download</a><br />
-          Dystrybucja oparta na manedżerze okien <strong>ratpoison</strong>.
+          <a href="https://sourceforge.net/projects/greenos/files/rootfs/rootfs_rp_1.2.tgz/download">
+          https://sourceforge.net/projects/greenos/files/rootfs/rootfs_rp_1.2.tgz/download</a><br />
+          Wersja dystrybucji oparta na manedżerze okien <strong>ratpoison</strong>.
           Zainstalowane oprogramowanie:
           <ul>
             <li><strong>terminator</strong> - emulator terminala,</li>
@@ -140,7 +140,21 @@
           <strong>xdm</strong> oraz menedżerem kompzycji <strong>picom</strong>.
           Pełna lista pakietów znajduej się pod tym adresem:
           <a href="https://github.com/xf0r3m/greenOS/blob/main/rp_installed_packages.txt">
-            https://github.com/xf0r3m/greenOS/blob/main/rp_installed_packages.txt</a> 
+            https://github.com/xf0r3m/greenOS/blob/main/rp_installed_packages_1.2.txt</a> 
+      </li>
+      <li><strong>greenOS greenServer</strong> -
+          <a href="https://sourceforge.net/projects/greenos/files/rootfs/rootfs_gs_1.2.tgz/download">https://sourceforge.net/projects/greenos/files/rootfs/rootfs_gs_1.2.tgz/download</a><br />
+          Wersja dystrybucji przeznaczona to zastosowań serwerowych. W pełni
+          zgodna z GNU/Linux Debian 10 Buster. Zainstalowane oprogramowanie:
+          <ul>
+            <li><strong>OpenSSH</strong> - serwer dostępu do zdalnej powłoki
+              projektu OpenSSH, będącego podgrupą projektu OpenBSD.</li>
+            <li><strong>Vim</strong> - edytor tekstu</li>
+            <li><strong>ranger</strong> - menedżer plików</li>
+          </ul>
+          Pełna lista pakietów znajduje się pod tym adresem:
+          <a href="https://github.com/xf0r3m/greenOS/blob/main/gs_installed_packages_1.2.txt">
+            https://github.com/xf0r3m/greenOS/blob/main/gs_installed_packages_1.2.txt</a>
       </li>
     </ul>
     <p>
@@ -183,6 +197,16 @@ options snd_hda_intel index=N
 </pre>
           Za <code class="code-inline">N</code> wstawiamy pozycję karty na
           liście z poprzedniego polecenia.</li>
+      <li>W <strong>greenServer</strong> interfejsy sieciowe nie są zarządzane 
+          przez żaden
+          program, dlatego jeśli chcemy uzyskać połączenie sieciowe w tym
+          systemie to najprościej użyć polecenia:
+<pre class="code-block">
+# /sbin/dhclient
+</pre>
+          Możemy również od razu przejść do statycznej konfiguracji sieci lub
+          skonfigurować interfejsy sieciowe podczas instalacji systemu po
+          przełączeniu katalogu głównego.</li>
     </ul>
     <p>
       greenOS rozprowadzany jest <strong>bez gwarancji przydatności</strong>.
@@ -202,6 +226,9 @@ options snd_hda_intel index=N
       tutaj</a>, natomiast zmiany w archiwum
       <a href="https://github.com/xf0r3m/greenOS/blob/main/changelog_1.1_rootfs.txt">tutaj</a><br />
       -- 30.01.2022 - Wydanie wersji greenOS Ratpoison<br />
+      -- 27.03.2022 - Wydanie wersji greenOS 1.2, zmiany we wszystkich wersjach
+      dystrybucji znajdują się tutaj: <a href="https://github.com/xf0r3m/greenOS/blob/main/changelog_greenOS_1.2.txt">tutaj</a><br />
+      -- 27.03.2022 - Wydanie wersji greenOS greenServer<br />
     </p>
   </div>
   <p style="margin: 15px; padding: 0; outline: 0;">
