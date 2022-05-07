@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<style>
+			.code-block {
+				display: block;
+				background-color: silver;
+				font-family: monospace;
+				font-weight: bolder;
+			}
+			.code-inline {
+				background-color: silver;
+				font-family: monospace;
+
+				font-weight: bolder;
+			}
+			p { text-align: justify; }
+		</style>
+	</head>
+	<body style="font-family: monospace;" >
+<pre>
+                               ____  _____
+   ____ _________  ___  ____  / __ \/ ___/
+  / __ `/ ___/ _ \/ _ \/ __ \/ / / /\__ \ 
+ / /_/ / /  /  __/  __/ / / / /_/ /___/ / 
+ \__, /_/   \___/\___/_/ /_/\____//____/  
+/____/                                    
+
+</pre>
+	<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div style="margin-left: auto; margin-right: auto; width: 80%;">
+    <h1 style="text-align: center;">greenOS GNU/Linux 1.4 (btw i use Arch)</h1>
+    <p>
+      <strong>greenOS</strong> to póki co zdebrandowany Debian oldstable
+      zbudowany na minimalnej wersji bazowej (debootstap --variant=minbase).
+      Rozpowadzany w postaci obrazów LiveCD oraz archiwów z gotową hierarchią
+      katalogu głównego do rozpakowania na dysku. Instrukcja instalacji
+      znajduje się <a href="instalacja_greenos.html">tutaj</a>. 
+    </p>
+    <p>
+      Dane logowania do LiveCD to: <strong>root/toor</strong>.
+    </p>
+    <p>
+      Minimalna wersja bazowa została opatrzona następującymi pakietami:
+    </p>
+    <ul>
+      <li>net-tools</li>
+      <li>iproute2</li>
+      <li>wireless-tools</li>
+      <li>wget</li>
+      <li>openssh-client</li>
+      <li>vim</li>
+      <li>iputils-ping</li>
+      <li>man-db</li>
+      <li>texinfo</li>
+      <li>less</li>
+      <li>dosfstools</li>
+      <li>isc-dhcp-client</li>
+      <li>fdisk</li>
+      <li>whiptail</li>
+      <li>locales</li>
+      <li>keyboard-configuration</li>
+      <li>console-setup</li>
+      <li>rsync</li>
+      <li>git</li>
+      <li>neofetch</li>
+      <li>ntfs-3g</li>
+      <li>sudo</li>
+      <li>bash-completion</li>
+      <li>vrms</li>
+      <li>grub2 (tylko rootfs)</li>
+      <li>wpasupplicant</li> 
+    </ul>
+    <p>
+      Locales ustawione są en_US.UTF-8, układ klawiatury na Angielski (USA),
+      kodowanie konsoli na UTF-8 z domyślnymi wariantami. Serwer lustrzany
+      ustawiony jest na deb.debian.org. W dystrybucji nie znajduje się żadne
+      nie wolne oprogramowanie, i tak już zostanie. W oficjalnych wydaniach
+      gdy będzie to już dystrybucja i będzie ona posiadać własne
+      repozytorium, nie wolne oprogramowanie i jemu pochodne nie będą możliwe
+      do zainstalowania.
+    </p>
+    <p>
+      Obecnie wspierane są dwie ogólnodostępne architektury. Nie ma sensu
+      przenoszenie greenOS na inne bardziej egzotyczne, bo i tak prawdopodobnie
+      nie zostanie on na nich uruchomiony. Wspierane architektury to amd64 oraz
+      i386. Adresy do obrazów oraz archiwów znajdują się poniżej.
+    </p>
+    <ul>
+      <li>amd64 LiveCD:
+        <ul>
+          <li><a href="https://sourceforge.net/projects/greenos/files/iso/greenOS_1.4_amd64.iso/download">sourceforge.net</a></li>
+        </ul>
+      </li>
+      <li>i386 LiveCD:
+        <ul>
+          <li><a href="https://sourceforge.net/projects/greenos/files/iso/greenOS_1.4_i386.iso/download">sourceforge.net</a></li>
+        </ul>
+      </li>
+      <li>archiwum amd64:
+        <ul> 
+          <li><a href="https://sourceforge.net/projects/greenos/files/rootfs/rootfs_1.4_amd64.tgz/download">sourceforge.net</a></li>
+        </ul>
+      </li>
+      <li>archiwum i386:
+        <ul>
+          <li><a href="https://sourceforge.net/projects/greenos/files/rootfs/rootfs_1.4_i386.tgz/download">sourceforge.net</a></li>
+        </ul>
+      </li>
+    </ul>
+    <p>
+      Listy zmiany publikowane są na stronie projektu greenOS w serwisie git po
+      tym adresem: <a href="https://github.com/xf0r3m/greenOS">https://github.com/xf0r3m/greenOS</a>.
+    </p>   
+    <p>
+-- Changelog --
+    </p>
+    <p>
+      -- 18.06.2021 - Wydanie nieoficjalnej wersji greenOS oznaczonej nazwą kodową "first".<br />
+      -- 21.08.2021 - Wydanie pierwszej oficjalnej wersji greenOS oznaczonej nazwą kodową "one".<br />
+      -- 24.09.2021 - Zawieszenie wsparcia dla greenOS<br />
+      -- 05.12.2021 - Reaktywacja projektu greenOS<br />
+      -- 30.01.2022 - Wydanie greenOS wersji 1.1, zmiany w obrazie LiveCD
+      znajduje się <a href="https://github.com/xf0r3m/greenOS/blob/main/changelog_1.1_livecd.txt">
+      tutaj</a>, natomiast zmiany w archiwum
+      <a href="https://github.com/xf0r3m/greenOS/blob/main/changelog_1.1_rootfs.txt">tutaj</a><br />
+      -- 30.01.2022 - Wydanie wersji greenOS Ratpoison<br />
+      -- 27.03.2022 - Wydanie wersji greenOS 1.2, zmiany we wszystkich wersjach
+      dystrybucji znajdują się tutaj: <a href="https://github.com/xf0r3m/greenOS/blob/main/changelog_greenOS_1.2.txt">tutaj</a><br />
+      -- 27.03.2022 - Wydanie wersji greenOS greenServer<br />
+      -- 05.05.2022 - Zmiany w greenOS, wydanie greenOS w wersji 1.3<br />
+      -- 06.05.2022 - Wydanie greenOS w wersji 1.4<br />
+    </p>
+  </div>
+  <p style="margin: 15px; padding: 0; outline: 0;">
+	  2022; COPYLEFT; ALL RIGHTS REVERSED;
+  </p>
+
+</body>
+</html>

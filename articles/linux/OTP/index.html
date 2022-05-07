@@ -51,9 +51,9 @@
 		</p>
 		<p>
 			Zrzut ekranu przestawiający pulpit dystrybucji:
-			<a target="_blank" href="https://i.ibb.co/BqzpwLG/otp-ss.png">
+			<a target="_blank" href="https://i.ibb.co/JBdSPC6/OTP-1-0-4-ss.png">
 				<figure>
-					<img src="https://i.ibb.co/0mZFXD5/otp-ss-thubnail.png">
+					<img src="https://i.ibb.co/1KmgPd4/OTP-1-0-4-ss-thumbnail.png">
 					<figcaption>Kilknij obrazek, aby otworzyć w pełnym rozmiarze.</figcaption>
 				</figure>
 			</a> 
@@ -63,7 +63,7 @@
 		</p>
 		<ul>
 			<li><strong>Środowisko graficzne icedesk</strong>
-				<em>(on boot)</em> (Xorg-all, icewm, aterm,
+				<em>(on boot)</em> (Xorg-all, icewm, xterm,
 				adwaita-icon-theme, hicolor-icon-theme),</li>
 			<li><strong>Przeglądarka internetowa Arora</strong>
 				(<a href="https://github.com/Arora/arora">https://github.com/Arora/arora</a>)
@@ -74,7 +74,7 @@
 			<li><strong>virt-manager</strong><em>(on demand)</em></li>
 		</ul>
     <p>
-      <strong>Aktualna wersja: <span style="font-size: 20pt;">1.0.2</span></strong>
+      <strong>Aktualna wersja: <span style="font-size: 20pt;">1.0.5</span></strong>
     </p>
 		<p>
 			Dystrybucja została oparta o jeden z portów TinyCore, przy czym port <strong>dCore</strong>
@@ -157,26 +157,35 @@ $ sce-remove nazwa_pakietu
 			Drugi przypomina normalną instalację jednak różni się od typowego procesu
 			instalacji znanego z innych dystrybucji. Polega on na skopiowaniu na dysk
 			zawartości płyty. Obie metody są opisane w 
-			<a href="https://morketsmerke.github.io/OTP/instalacja.html">poradniku instalacji</a> 
+			<a href="instalacja.html">poradniku instalacji</a> 
 			A link do obrazu LiveCD znajduje się poniżej:
 		</p>
 		<ul>
 			<li>
-				<a href="https://sourceforge.net/projects/oldterminalproject/files/iso/OTP-hybrid-1.0.2.iso/download">
-					OTP-hybrid-1.0.2.iso
+				<a href="https://sourceforge.net/projects/oldterminalproject/files/iso/OTP-hybrid-1.0.5.iso/download">
+					sourceforge.net
 				</a>
 			</li>
 		</ul>
     <p>
       Poprzednie wersje OTP znajdują się pod tym adresem: <a href="https://sourceforge.net/projects/oldterminalproject/files/iso/">https://sourceforge.net/projects/oldterminalproject/files/iso/</a>.
     </p>
-		<p><strike>
+		<p>
 			Dostęp do przygotowanych pakietów z poziomu LiveCD wymaga 
-			specjalnego montowania:</strike>
+			specjalnego montowania:
 		</p>
 <pre class="code-block">
-<strike>$ sudo mount -B /mnt/sr0/cde/sce /tmp/tce/sce</strike>
-</pre></strike>
+$ sudo mount -B /mnt/sr0/cde/sce /tmp/tce/sce
+</pre>
+    <p><strike>
+      Od wersji 1.0.3 nie ma możliwości instalowania dodatkowych pakietów
+      w wersji LiveCD.</strike>
+    </p> 
+    <p>
+      Wszelkie szczegóły odnośnie zmian w kolejnych wydaniach dystrybucji 
+      znajdują się na stronie git projektu, pod poniższy adresem:
+        <a href="https://github.com/xf0r3m/OTP">https://github.com/xf0r3m/OTP</a>
+    </p>
 		<p>
 			Należy pamiętać, że Old Terminal Project GNU/Linux jest dystrybuowany
 			bez gwarancji przydatność. Oznacza to że system może w ogóle się nie
@@ -189,8 +198,11 @@ $ sce-remove nazwa_pakietu
 		<p>
 			-- 06.12.2021 - Rozpoczęcie prac nad OTP.<br />
 			-- 12.12.2021 - Wydanie pierwszej wersji OTP o nazwie kodowej "Wise choice".<br />
-      -- 22.12.2021 - Wydanie wersji 1.0.1, zmiany w wersji znajdują się <a href="https://github.com/xf0r3m/OTP/blob/main/changelog_1.0.1.txt">tutaj</a><br />
-      -- 13.02.2022 - Wydanie wersji 1.0.2, zmiany w wersji znajdują się <a href="https://github.com/xf0r3m/OTP/blob/main/changelog_1.0.2.txt">tutaj</a><br /> 
+      -- 22.12.2021 - Wydanie wersji 1.0.1.<br />
+      -- 13.02.2022 - Wydanie wersji 1.0.2.<br /> 
+      -- 16.04.2022 - Wydanie wersji 1.0.3.<br />
+      -- 17.04.2022 - Wydanie wersji 1.0.4.<br />
+      -- 27.04.2022 - Wydanie wersji 1.0.5.<br />
 		</p>
 	</div>
 	<p style="margin: 15px; padding: 0; outline: 0;">

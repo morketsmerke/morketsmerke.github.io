@@ -50,7 +50,8 @@
       <li>
         <p>
           Instalacja greenOS wymaga połączenia z Internetem, skądś należy 
-          pobrać paczkę z plikami katalogu głównego (rootfs). Połączenie
+          pobrać paczkę z plikami katalogu głównego (rootfs).</p> 
+          <!--<p>Połączenie
           sieciowe Ethernet odbywa się automatycznie, ze względu na
           NetworkManager, połączyć się z siecią bezprzewodową możemy za pomocą
           apletu konsoli NetworkManagera: <em>nmtui-connect</em>. W nim
@@ -60,10 +61,10 @@
         </p>
 <pre class="code-block">
 # nmtui-connect
-</pre>
-        <!--
+</pre>-->
+   
 <pre class="code-block">
-# dhclient enp0s3
+# dhclient $interface
 </pre>
         <p>
           gdzie <code class="code-inline">$interface</code> to nazwa interfejsu
@@ -141,7 +142,6 @@ iwconfig $interface
           powiodło to jedyne co nam pozostało w tym przypadku to pobrać adres
           IP z DHCP.
         </p>
-      -->
       </li>
       <li>
         <p>
@@ -197,7 +197,7 @@ iwconfig $interface
           <tr>
             <td>/dev/sda1</td>
             <td></td>
-            <td><em>nie mniej niż 512MB</em></td>
+            <td><em>nie mniej niż 100MB</em></td>
             <td>EFI (FAT-12/16/32)</td>
           </tr>
           <tr>
@@ -267,7 +267,7 @@ iwconfig $interface
           głównego systemu plików następnie wydajemy polecenie:
         </p>
 <pre class="code-block">
-/mnt# wget http://ftp.morketsmerke.net/greenOS/rootfs.tgz
+/mnt# wget http://ftp.morketsmerke.net/greenOS/archiwum_z_systemem.tgz
 </pre>
         <p>
           Po ściągnięciu archiwm należy je rozpakować, do tego wystarczy
