@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<style>
+			.code-block {
+				display: block;
+				background-color: silver;
+				font-family: monospace;
+				font-weight: bolder;
+			}
+			.code-inline {
+				background-color: silver;
+				font-family: monospace;
+
+				font-weight: bolder;
+			}
+			p { text-align: justify; }
+		</style>
+	</head>
+	<body style="font-family: monospace;" >
+		<pre>
+		<span style="color: green;">     .~~.   .~~.
+		    '. \ ' ' / .'</span>
+		<span style="color: red;">     .~ .~~~..~.</span>                       _                          _
+		<span style="color: red;">    : .~.'~'.~. :</span>      ___ ___ ___ ___| |_ ___ ___ ___ _ _    ___|_|
+		<span style="color: red;">   ~ (   ) (   ) ~</span>    |  _| .'|_ -| . | . | -_|  _|  _| | |  | . | |
+		<span style="color: red;">  ( : '~'.~.'~' : )</span>   |_| |__,|___|  _|___|___|_| |_| |_  |  |  _|_|
+		<span style="color: red;">   ~ .~ (   ) ~. ~</span>                |_|                 |___|  |_|
+		<span style="color: red">    (  : '~' :  )</span>
+		<span style="color: red;">     '~ .~~~. ~'
+			 '~'</span>
+		</pre>
+
+	<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+
+	<div style="margin-left: auto; margin-right: auto; width: 80%;">
+    <h1 style="text-align:center;">Podłączanie 7-calowego ekranu dotykowego (1024x600) do Raspberry Pi</h1>
+    <p>
+      W długi weekend majowy, kolega poprosił mnie podłączenie 7-calowego
+      wyświetlacza do Raspberry Pi. Oczywiście przez podłączenie należy
+      rozumieć fizczne podłączenie oraz skonfigurowanie systemu w taki sposób,
+      aby wyświetlał obraz, dopasowany do właściwości ekranu.
+      Mój zleceniodawca utknął przy ładowaniu środowiska
+      graficznego. Po powrocie do pracy, wziąłem od niego wyświetlacz i
+      przystąpiłem do działania, nie brałem jego maliny ponieważ chciałem
+      na początku sam dowiedzieć się jak to się podłącza. Na naprawę jego
+      konfiguracji przyjdzie jeszcze czas...
+    </p>
+    <p>
+      Jak każdą świeżą zabawę z malinką, rozpoczynam od pobrania najnowszego
+      obrazu i załadowania go na kartę microSD. Dla celów testowych, najlepiej
+      użyć obrazu z preinstalowanym środowiskiem graficznym, najlepiej bez
+      zbędnego (rekomendowanego) oprogramowania.
+    </p>
+<pre class="code-block">
+  $ wget https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2022-04-07/2022-04-04-raspios-bullseye-armhf.img.xz
+  $ unxz 2022-04-04-raspios-bullseye-armhf.img.xz
+  $ sudo dd if=2022-04-04-raspios-bullseye-armhf.img bs=1M of=/dev/sdX status=progress
+</pre>
+    <p>
+      Na powyższym listingu <code class="code-inline">/dev/sdX</code> jest 
+      plikiem urządzenia
+      reprezentującym podłączoną kartę microSD. Obraz po rozpakowaniu ma lekko
+      powyżej 4 gigabajtów. Po nagraniu obrazu, zanim włóżymy kartę do 
+      urządzenia
+      możemy dokonać niezbędnych modyfikacji, tak aby nie trzeba było się
+      przełączać między ekranami.
+    </p>
+    <p>
+      Zmian dokonujemy
+      w pliku <em>config.txt</em> na partycji <em>boot</em>. Na samym końcu 
+      pliku zapisujemy poniższe linie.
+    </p>
+<pre class="code-block">
+max_usb_current=1
+hdmi_group=2
+hdmi_mode=87
+hdmi_cvt=1024 600 60 6 0 0 0
+hdmi_ignore_edid=0xa5000080
+config_hdmi_boost=2
+</pre>
+    <ul>
+      <li><code class="code-inline">max_usb_current</code> - załączenie
+        maksymalnego możliwego natężenia prądu na USB. Normalnie jest 600 mA,
+        jednak przy użyciu tej opcji, prąd wzrasata do 1,2 A.</li>
+      <li><code class="code-inline">hdmi_group</code> - określa grupę
+        wyświetlaczy korzystających z HDMI. Na przykład telewizory oraz
+        monitory korzystają zupełnie innych standardów. Monitory podłączane
+        do komputerów jak i omawiany tutaj wyświetlacz należą do grupy
+        oznaczonej przez cyfrę <code class="code-inline">2</code>.</li>
+      <li><code class="code-inline">hdmi_mode</code> - definiuje domyślną
+        rodzielczość, odświeżanie oraz aspekt ekranu. Na stronie podanej
+        w źródłach znajduje się tabela z trybami HDMI dla grupy 2, nie ma tam 
+        trybu 87.
+        Nadanie tej opcji takiej wartości, pozwoli użyć stworzonego przez opcję
+        <code class="code-inline">hdmi_cvt</code> tryby w drugiej grupie.</li>
+      <li><code class="code-inline">hdmi_cvt</code> - umożliwia wpisanie
+        własnych ustawień standardu <em>VESA CVT</em>, dając możliwość 
+        zdefiniowania rozdzielczości,
+        częstotliwości obrazu oraz jego formatu. Pozostałe trzy zera odnoszą
+        się głównie do cech ekranów kineskopowych i mogą zostać pominięte,
+        ponieważ w naszym przypadku są to domyślne wartości. Użycie tej opcji
+        wiąże się ze wskazaniem nowego trybu z pomocą opcji
+        <code class="code-inline">hdmi_group</code> oraz
+        <code class="code-inline">hdmi_mode</code>.</li>
+      <li><code class="code-inline">hdmi_ignore_edid</code> - opcją załącza
+        ignorowanie danych identyfikacyjnych wyświetlacza, jeśli wyświetlacz
+        ich nie posiada. Użycie wartości <code class="code-inline">0xa5000080</code>
+        chroni tę opcję przed omyłkowym przełączeniem.</li>
+      <li><code class="code-inline">config_hdmi_boost</code> - złacza
+        wzmocnienie sygnału HDMI. Ta wartość jest ignorowana przez Raspberry
+        Pi 4. W źródle podano konkretne przypadki, który należy użyć
+        odpowiednich wartości tej opcji.</li>
+    </ul>
+    <p>
+      Zapisujemy zmiany w pliku. Teraz możemy włożyć kartę do maliny a
+      następnie podłączyć nasz wyświetlacz.
+    </p>
+    <p>
+      7-calowych wyświetlaczy do RPi jest
+      dostępnych na rynku bardzo wiele, różnią się one rodzielczością oraz 
+      ilością dostępnych złączy. Część z nich to po prostu chińskie klony
+      oryginalnego produktu marki <em>WaveShare</em>, i ja również otrzymałem
+      taki klon. Głowną różnicą są chyba złącza znajdujące się z tyłu
+      wyświetlacza. Wyświetlacz, który ja otrzymałem wyglądał mniej więcej 
+      tak:
+    </p>
+    <p>
+      <img src="https://i.ibb.co/h7RDQLh/7-inch-display.jpg" alt="7-inch-display" border="0" style="width: 100%;">
+    </p>
+    <p>
+      Mniej więcej, ponieważ zdjęcia nie zrobiłem, a obrazek powyżej jest tylko
+      zdjęciem poglądowym. Oryginalny wyświetlacz 7-calowy firmy
+      <em>WaveShare</em> został przedstawiony poniżej (przynajmniej jego tył).
+    </p>
+    <p>
+      <img src="https://i.ibb.co/tmPPRr0/7-inch-waveshare.jpg" alt="7-inch-waveshare" border="0" style="width: 100%;">
+    </p>
+    <p>
+      Istotną w naszym przypadku różnicą są złącza. W oryginalny wyświetlacz
+      mamy tylko jedno złącze USB, natomiast w klonie dwa i oba podpisane jako
+      "<em>touch</em>". Więc jeśli dysonujemy klonem <strong>Kabel USB 
+      podłączamy po <u>drugiego</u> portu USB, nad przełącznikiem 
+      "<em>Backlight</em>"</strong>. Z HDMI to chyba wiadomo. Po podłączeniu
+      możemy uruchomić Raspberry. Po nieco dłuższym procesie uruchamiania,
+      na wyświetlaczu pojawi się fragment obrazu. Obraz wyświetlany przez
+      system operacyjny jest w znaczanie większej rozdzielczości niż
+      obsługiwana przez wyświetlacz. Serwer X Window, nie był wstanie dobrać
+      odpowiedniej rozdzielczości dlatego też musimy ją wymusić. Aby to zrobić
+      tworzymy mały skrypt powłoki z poniższych poleceń. Jednak przed
+      przystąpieniem do pisania skryptu należy jeszcze poznać nazwę wyjścia
+      wideo jaka figuruje na serwerze X Window, za pomocą polecenia
+      <strong>xrandr</strong> jesteśmy w stanie wypisać dostępne w systemie
+      wyjścia wideo, nazwy znajdują się na początku linii nad listą dostępnych
+      rozdzielczości dla danego wyświetlacza. W moim przypadku było to 
+      <code class="code-inline">HDMI-2</code>.
+    </p>
+<pre class="code-block">
+#!/bin/bash
+
+xrandr --newmode "1024x600_60.00" 49.00 1024 1072 1168 1312 600 603 613 624 -hsync +vsync
+xrandr --addmode HDMI-2 1024x600_60.00
+xrandr --output HDMI-2 --mode 1024x60_60.00
+</pre>
+    <p>
+      Wartości użyte w poleceniu <code class="code-inline">xrandr --newmode</code>
+      zostały uzyskane za pomocą poniższego polecenia:
+    </p>
+<pre class="code-block">
+$ cvt 1024 600 60
+</pre>
+    <p>
+      Polecenie to generuje ustawienia obrazu w standardzie <em>VESA CVT</em>,
+      które są niezbędne przy tworzeniu niestandardowych trybów wyświetlania.
+      Niestety aby wyjaśnić kolejne wartości zwracane przez to polecenie,
+      trzeby by zagłegić się w lekturę standardu, co wykracza poza ramy tego
+      materiału. Najlepiej jest poprostu skopiować fragment wyjścia polecenia
+      <code class="code-inline">cvt</code>, do argumentu polecenia
+      <code class="code-inline">xrandr --newmode</code>.
+    </p>
+    <p>
+      Skrypt zapisujemy pod wygodną dla nas nazwą, w miejscu gdzie nie zostanie
+      przypadkowo usunięty. Następnie, musimy zmusić system do tego aby
+      uruchomił on ten skrypt przed wyświetleniem użytkownikowi pulpitu. Do
+      tego posłużymy się plikiem <em>/etc/xdg/lxsession/LXDE-pi/autostart</em>.
+      Nad linią <em>@xscreensaver -no-splash</em> zapisujemy poniższą linię:
+    </p> 
+<pre class="code-block">
+@lxterminal -e "&lt;ścieżka_do_skryptu&gt;"
+</pre>
+    <p>
+      Następnie zapisujemy zmiany, dla pewności możemy przekopiować również
+      ten plik do katalogu <em>/etc/xdg/lxsession/LXDE</em>, aby mieć pewność,
+      że na pewno się uruchomi.
+    </p>
+    <p>
+      Teraz moży uruchomić ponownie Raspberry. Po uruchomieniu pulpit powinien
+      być idealnie dopasowany do używanego przez nas wyświetlacza.
+    </p>
+    <p>
+      Źródła:
+      <ol>
+        <li><a href="https://www.youtube.com/watch?v=TYzOhgUmZcw">Konfiguracja wyświetlania obrazu w pliku config.txt</a></li>
+        <li><a href="https://www.raspberrypi.com/documentation/computers/config_txt.html">Dokumentacja opcji w pliku /boot/config.txt</a></li>
+        <li><a href="https://ronboelectronics.en.made-in-china.com/product/usynxqbMlFkW/China-Capacitive-Touch-7-0-Inch-1024X600-HDMI-LCD-Monitor-Panel-with-Driver-Board-for-Raspberry-Pi-PC-Monitor.html">Zdjęcie chińskiego klona wyświetlacza WaveShare</a></li>
+        <li><a href="https://allegro.pl/oferta/lcd-raspberry-pi-tft-7-c-ver-3-1-hdmi-7707088006">Zdjęcie przedstawiające tył oryginalnego wyświetlacza</a></li>
+        <li><a href="https://raspberrypi.stackexchange.com/questions/106569/where-to-put-pi-users-startup-scripts-raspbian-x11">Scieżka do pliku autostartu</a></li>
+        <li><a href="https://www.wikihow.com/Execute-a-Script-at-Startup-on-the-Raspberry-Pi#Using-the-Autostart-File">Co należy wpisać w pliku autostartu</a></li>
+      </ol>
+    </p>
+    <p>
+      ~xf0r3m
+    </p>
+	</div>
+		<p style="margin: 15px; padding: 0; outline: 0;">
+			2022; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+
+	</body>
+	</html>
