@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+			<style>
+				.code-block {
+					display: block;
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+				}
+				.code-inline {
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+				}
+				p { text-align: justify; }
+			</style>
+		</head>
+
+
+		<body style="font-family: monospace;" >
+<pre>
+  _______            ___   ______     _      __
+ /_  __(_)___  _____( _ ) /_  __/____(_)____/ /_______
+  / / / / __ \/ ___/ __ \/|/ / / ___/ / ___/ //_/ ___/
+ / / / / /_/ (__  ) /_/  &lt;/ / / /  / / /__/ ,&lt; (__  )
+/_/ /_/ .___/____/\____/\/_/ /_/  /_/\___/_/|_/____/
+     /_/
+</pre>
+
+		<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+			&#9760;&nbsp;<a href="https://morketsmerke.github.io/">morketsmerke</a>&nbsp;&#9760;
+		</p>
+
+		<div style="margin-left: auto; margin-right: auto; width: 80%;">
+      <h1 style="text-align: center;">Konfiguracja programu pocztowego MUTT</h1>
+      <p>
+  			Klient pocztowy <strong>MUTT</strong>, do proste w obsłudze narzędzie
+        umożliwiające korzystanie z popularnych skrzynek mailowych z poziomu
+        terminala czy konsoli serwera. Sprawdza się on wśród hackerów
+        (like a Stallman not Mitnick) oraz osób chcących odbierać powiadomienia
+        z serwera na swoją skrzynkę, ponieważ wysyłanie maili w skryptach w
+        przypadku MUTT jest bardzo proste. Tutaj pokaże wam jak wygląda
+        integracja z MUTT z GMail-em. Jednak na początku musimy na naszej
+        skrzynce.
+      </p>
+  		<ul>
+  			<li>Wyłączyć uwierzytelnianie dwuskładnikowe o ile mamy je włączone,</li>
+  			<li>Włączyć dostęp do skrzynki z mniej bezpiecznych aplikcji.</li>
+  		</ul>
+      <p>
+  			Przygotowując plik konfiguracyjny korzystałem z dystrybucji GNU/Linux
+        Debian, zatem instalacje przeprowadzę z poziomu managera pakietów tej
+        dystrybucji. Ten materiał mógł znajdować się w kategorii Linux, jednak
+        opiera się o program, który do zainstalowania jest na wiekszości
+        popularnych platform. Przed instalacją jakiego kolwiek oprogramowania
+        zawsze zalecam zaktualizować system.
+  		</p>
+<pre class="code-block">
+$ sudo apt update
+$ sudo apt upgrade
+$ sudo apt install mutt
+</pre>
+  		<p>
+  			Po zainstalowaniu upewnijmy się czy został stworzony ukryty katalog
+        <em>.mutt</em> na katalogu domowym użytkownika, w przeciwym wypadku
+        należy taki katalog stworzyć. Poniżej znajduje się plik konfiguracyjny.
+        Możemy go sobie skopiować do edytora, wpisać wymagane rzeczy ujęte w
+        ostre nawiasy (<strong>&lt; &gt;</strong>) i zapisać w
+        <em>$HOME/.mutt/.muttrc</em>. Pod wstawionym listingiem znajduje się
+        opis poszczególnych opcji.
+  		</p>
+<pre class="code-block">
+set ssl_starttls=yes
+set ssl_force_tls=yes
+set imap_user='&lt;nazwa_użytkownika&gt;@gmail.com'
+set imap_pass='&lt;hasło_do_konta&gt;'
+set from='&lt;nazwa_użytkownika&gt;@gmail.com'
+
+set realname='&lt;RN&gt;'
+set folder=imaps://imap.gmail.com/
+set spoolfile=imaps://imap.gmail.com/INBOX
+set postponed="imaps://imap.gmail.com/[Gmail]/Drafts"
+
+set header_cache="~/.mutt/cache/headers"
+set message_cachedir="~/.mutt/cache/bodies"
+set certificate_file="~/.mutt/certificates"
+
+set smtp_url="smtps://&lt;nazwa_użytkownika&gt;@gmail.com@smtp.gmail.com"
+set smtp_pass='&lt;hasło_do_konta&gt;'
+set move = no
+set imap_keepalive = 900
+</pre>
+  		<p>
+  			Warto zaznaczyć że przed pierszym uruchomieniem MUTT,
+        <code class="code-inline">header_cache, message_cachedir, certificate_file</code>
+        muszą istnieć w systemie.
+  		</p>
+  		<ul>
+  			<li><code class="code-inline">ssl_starttls</code> - wykorzystanie
+          STARTTLS,</li>
+  			<li><code class="code-inline">ssl_force_tls</code> - wymaganie
+          szyfrowania wszystkich połączeń pomiędzy serwerem a klientem,</li>
+  			<li><code class="code-inline">imap_user</code> - nazwa użytkownika
+          serwera IMAP,</li>
+  			<li><code class="code-inline">imap_pass</code> - hasło użytkownika
+          serwera IMAP,</li>
+  			<li><code class="code-inline">from</code> - domyślny adres email
+          nadawcy, będzie wyświetlał się w polu 'Od:' wiadomości,</li>
+  			<li><code class="code-inline">realname</code> - Nazwa personalna nadawcy,
+  				najczęściej imię i nazwisko, wykorzystywana w celu prezentacji nadawcy,
+          np. w skrzynce odbiorczej,</li>
+  			<li><code class="code-inline">folder</code> - domyślna lokalizacja
+          głównej skrzynki mailowej (jak katalog / [root]), w tym przypadku jest
+          serwer IMAP Gmaila.</li>
+  			<li><code class="code-inline">spoolfile</code> - lokalizacja skrzynki
+          odbiorczej,</li>
+  			<li><code class="code-inline">postponed</code> - lokalizacja skrzynki z
+          kopiami (wersjami) roboczymi,</li>
+  			<li><code class="code-inline">header_cache</code> - plik pamięć
+          podręcznej zawierający nagłówki wiadomości,</li>
+  			<li><code class="code-inline">message_cachedir</code> - katalog na
+          pamięć podręczną zawierającą wiadomości,</li>
+  			<li><code class="code-inline">certificate_file</code> - plik
+          zawierający zaakceptowane przez nas certyfikaty,</li>
+  			<li><code class="code-inline">smtp_url</code> - adres serwera SMTP,
+          w wewnątrz adresu zawarta jest już nazwa użytkownika,</li>
+  			<li><code class="code-inline">smtp_pass</code> - hasło do konta
+          użytkownika na serwerze SMTP.</li>
+  			<li><code class="code-inline">move</code> - przenoszenie przeczytanych
+          wiadomości ze skrzynki odbiorczej do skrzynki na przeczytane,</li>
+  			<li><code class="code-inline">imap_keepalive</code> - ilość czasu
+          (w sekundach) utrzymania połączenia z serwerem IMAP, stosowane aby
+          serwer przedwcześnie nie zamknął połączenia.</li>
+  		</ul>
+  		<p>
+  			Po skonfigurowaniu naszej skrzynki i pierwszym jej otwarciu w tym
+        programie, MUTT jest gotowy do wysyłania maili z poziomu wiersza poleceń.
+  		</p>
+<pre class="code-block">
+$ cat message.txt | mutt -s "To jest temat maila" adresat@example.com
+</pre>
+  		<p>
+  			Przekierowując zawartość pliku tekstowego tworzymy treść wiadomości,
+        którą wysyłamy na adres
+        <code class="code-inline">adresat@example.com</code>, opisując całość
+        tematem zawartym po przełączniku <code class="code-inline">-s</code>.
+  		</p>
+      <p>
+        Niestety ten artykuł należy uznać za przestarzały, ze względu na użyty
+        przypadek. Od 30 maja 2022 Google wyłączy możliwość logowania się
+        na konto Google aplikacjom innych firm, które używają wyłącznie loginu
+        i hasła. Mimo to sam sposób logowania do innych dostawców, którzy nadal
+        korzystają tradycyjnych metod powinien być jak najbardziej aktualny.
+      </p>
+      <p>
+        ~xf0r3m
+      </p>
+		</div>
+
+		<p style="margin: 15px; padding: 0; outline: 0;">
+			2022; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+
+		</body>
+	</html>

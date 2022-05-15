@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+			<style>
+				.code-block {
+					display: block;
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+				}
+				.code-inline {
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+				}
+				p { text-align: justify; }
+			</style>
+		</head>
+
+
+		<body style="font-family: monospace;" >
+<pre>
+  _______            ___   ______     _      __
+ /_  __(_)___  _____( _ ) /_  __/____(_)____/ /_______
+  / / / / __ \/ ___/ __ \/|/ / / ___/ / ___/ //_/ ___/
+ / / / / /_/ (__  ) /_/  &lt;/ / / /  / / /__/ ,&lt; (__  )
+/_/ /_/ .___/____/\____/\/_/ /_/  /_/\___/_/|_/____/
+     /_/
+</pre>
+
+		<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+			&#9760;&nbsp;<a href="https://morketsmerke.github.io/">morketsmerke</a>&nbsp;&#9760;
+		</p>
+
+		<div style="margin-left: auto; margin-right: auto; width: 80%;">
+      <h1 style="text-align: center;">Montowanie VirtualBox Shared Folder 
+        na Alpine Linux</h1>
+		  <p>
+			  Pierwszą rzeczą jaką należy wykonać jest włączenie repozytoriów 
+        społeczności, w pliku <em>/etc/apk/repositories</em> usuwamy znak 
+        komentarza na początku linii zawierającej taki ciąg znaków 
+        'v3.11/community', gdzie v3.11 to wersja systemu Alpine.
+		  </p>
+<pre class="code-block">
+#/media/cdrom/apks
+http://ftp.icm.edu.pl/pub/Linux/distributions/alpine/v3.11/main
+http://ftp.icm.edu.pl/pub/Linux/distributions/alpine/v3.11/community
+#http://ftp.icm.edu.pl/pub/Linux/distributions/alpine/edge/main
+#http://ftp.icm.edu.pl/pub/Linux/distributions/alpine/edge/community
+#http://ftp.icm.edu.pl/pub/Linux/distributions/alpine/edge/testing
+</pre>
+		  <p>
+			  Zapisujemy zmiany, następnie instalujemy niezbędne oprogramowanie.
+		  </p>
+<pre class="code-block">
+# apk add build-base virtualbox-guest-additions virtualbox-guest-modules-virt
+</pre>
+		  <p>
+			  Po instalacji restartujemy system.
+		  </p>
+<pre class="code-block">
+# reboot
+</pre>
+		  <p>
+			  Kiedy system się załaduje, możemy dodać moduł do jądra.
+		  </p>
+<pre class="code-block">
+# modprobe -a vboxsf
+</pre>
+		  <p>
+			  Jeśli dodanie modułu do jądra nie zwróci żadnych błędów, możemy przejść
+        do montowania folderu współdzielonego VirtualBox.
+		  </p>
+<pre class="code-block">
+# mount -t vboxsf vbox_share /media
+</pre>
+		  <p>
+			  Gdzie <code class="code-inline">vbox_share</code> to nazwa folderu 
+        współdzielonego.
+		  </p>
+      <p>
+        Źródła:
+        <ol>
+          <li><a href="https://wiki.alpinelinux.org/wiki/VirtualBox_shared_folders">
+            Folder współdzielony VirtualBox - Dokumentacja Alpine Linux</a></li>
+        </ol>
+      </p>
+      <p>
+        ~xf0r3m
+      </p>
+		</div>
+		<p style="margin: 15px; padding: 0; outline: 0;">
+			2022; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+		</body>
+	</html>

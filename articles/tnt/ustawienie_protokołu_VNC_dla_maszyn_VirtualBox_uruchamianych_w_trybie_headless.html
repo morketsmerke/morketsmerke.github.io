@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+			<style>
+				.code-block {
+					display: block;
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+				}
+				.code-inline {
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+				}
+				p { text-align: justify; }
+			</style>
+		</head>
+
+
+		<body style="font-family: monospace;" >
+<pre>
+  _______            ___   ______     _      __
+ /_  __(_)___  _____( _ ) /_  __/____(_)____/ /_______
+  / / / / __ \/ ___/ __ \/|/ / / ___/ / ___/ //_/ ___/
+ / / / / /_/ (__  ) /_/  &lt;/ / / /  / / /__/ ,&lt; (__  )
+/_/ /_/ .___/____/\____/\/_/ /_/  /_/\___/_/|_/____/
+     /_/
+</pre>
+
+		<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+			&#9760;&nbsp;<a href="https://morketsmerke.github.io/">morketsmerke</a>&nbsp;&#9760;
+		</p>
+		<div style="margin-left: auto; margin-right: auto; width: 80%;">
+      <h1 style="text-align: center;">Ustawienie protokołu VNC dla maszyn VirtualBox uruchamianych w trybie headless</h1>
+		  <p>
+			  W przypadku zdalnych ekranów maszyn <em>VirtualBox</em> najważniejsze 
+        to posiadać zainstalowany <strong>VNC Extension Pack</strong> na 
+        komputerze, który tą maszynę uruchomił. W przeciwym wypadku maszynę 
+        należy wyłączyć a następnie zainstalować paczkę rozszerzeń 
+        <strong>Oracle VM VirtualBox Extension Pack</strong> i użyć protoku 
+        RDP, który wymaga do konfiguracji jedynie dwóch pierwszych poleceń 
+        czyli włączenia samego zdalnego dostępu oraz wybrania portu, 
+        oczywiście istnieje możliwość zabezpieczenia dostępu hasłem, w 
+        przeciwnym wypadku uwierzytelnienie działa na zasadzie kto pierwszy 
+        ten lepszy.
+		  </p>
+<pre class="code-block">
+$ vboxmanage modifyvm &lt;nazwa_maszyny&gt; --vrde on
+$ vboxmanage modifyvm &lt;nazwa_maszyny&gt; --vrdeport &lt;port_rdp/vnc&gt;
+$ vboxmanage modifyvm &lt;nazwa_maszyny&gt; --vrdeproperty VNCPassword=&lt;hasło_dla_połaczenia&gt;
+</pre>
+		  <p>
+			  Po wykonaniu tych poleceń możemy uruchomić maszynę wirtualną. Do 
+        połączenia możemy wykorzystać np. program <em>Remmina</em>, który jest 
+        standardowym pakietem, odpowiedzialnym za połączenia RDP oraz VNC w 
+        systemach GNU/Linux. Wybieramy protokół, przez który będziemy się 
+        łączyć z maszyną. Następnie w adresie serwera podajemy adres IP, 
+        komputera który uruchomił maszynę lub localhost, po dwukropku 
+        (<strong>:</strong>) port. Podczas zestawiania połączenia zostaniemy 
+        zapytani o zdefiniowane w ostatnim poleceniu hasło, o ile użyliśmy VNC.
+		  </p>
+      <p>
+        Źródło: Internet
+      </p>
+      <p>
+        ~xf0r3m
+      </p>
+		</div>
+		<p style="margin: 15px; padding: 0; outline: 0;">
+			2022; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+		</body>
+	</html>

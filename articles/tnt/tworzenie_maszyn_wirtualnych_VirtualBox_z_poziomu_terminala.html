@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+			<style>
+				.code-block {
+					display: block;
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+				}
+				.code-inline {
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+				}
+				p { text-align: justify; }
+			</style>
+		</head>
+
+
+		<body style="font-family: monospace;" >
+<pre>
+  _______            ___   ______     _      __
+ /_  __(_)___  _____( _ ) /_  __/____(_)____/ /_______
+  / / / / __ \/ ___/ __ \/|/ / / ___/ / ___/ //_/ ___/
+ / / / / /_/ (__  ) /_/  &lt;/ / / /  / / /__/ ,&lt; (__  )
+/_/ /_/ .___/____/\____/\/_/ /_/  /_/\___/_/|_/____/
+     /_/
+</pre>
+
+		<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+			&#9760;&nbsp;<a href="https://morketsmerke.github.io/">morketsmerke</a>&nbsp;&#9760;
+		</p>
+
+		<div style="margin-left: auto; margin-right: auto; width: 80%;">
+      <h1 style="text-align: center;">Tworzenie maszyn wirtualnych VirtualBox z poziomu terminala</h2>
+		  <p>
+			  Wykonujemy poniższą sekwencje poleceń, aby utworzyć maszynę VirtualBox
+        poziomu terminala.
+		  </p>
+		  <p>
+			  Rozpoczniemy od utworzenia samej maszny, a następnie będziemy ją 
+        konfigurować.
+		  </p>
+<pre class="code-block">
+$ vboxmanage --createvm --name &lt;nazwa_maszyny&gt; --ostype &lt;goszczony_system_operacyjny&gt; --register
+</pre>
+		  <p>
+			  W katalogu maszyny <em>$HOME/VirtualBox VMs/&lt;nazwa_maszyny&gt;</em>, 
+        utworzymy dysk.
+		  </p>
+<pre class="code-block">
+$ vboxmanage createhd --filename &lt;nazwa_dysku&gt; --size &lt;rozmiar_dysku_w_MB&gt; --format VDI --variant Standard
+</pre>
+		  <p>
+			  Po utworzeniu dysku możemy przejść do utworzenia kontrolera dysków na 
+        maszynie.
+		  </p>
+<pre class="code-block">
+$ vboxmanage storagectl &lt;nazwa_maszyny&gt; --name SATA0 --add sata
+</pre>
+		  <p>
+			  Kiedy mamy już dodany kontroler, możemy załadować dysk oraz obraz płyty,
+        z którego będziemy instalować system.
+		  </p>
+<pre class="code-block">
+#DYSK:
+$ vboxmanage storageattach &lt;nazwa_maszyny&gt; --storagectl SATA0 --port 0 --type hdd --medium &lt;nazwa_pliku/scieżka dysku&gt;
+
+#OBRAZ PŁYTY
+$ vboxmanage storageattach &lt;nazwa_maszyny&gt; --storagectl SATA0 --port 1 --type dvddrive --medium &lt;ścieżka_do_iso&gt;
+</pre>
+		  <p>
+			  Teraz możemy ustawić ilość pamięci (pamięć jest wyrażana w megabajtach)
+        oraz interfejs sieciowy.
+		  </p>
+<pre class="code-block">
+#Pamięć RAM:
+$ vboxmanage modifyvm &lt;nazwa_maszyny&gt; --memory 2048
+
+#Sieć NAT (jest ustawiana domyślnie podczas tworzeznia maszyny):
+$ vboxmanage modifyvm &lt;nazwa_maszyny&gt; --nic1 nat
+
+#Sieć Bridged:
+$ vboxmanage modifyvm &lt;nazwa_maszyny&gt; --nic1 bridged
+$ vboxmanage modifyvm &lt;nazwa_maszyny&gt; --bridgedadapter1 &lt;interfejs_sieciowy_komputera&gt;
+</pre>
+		  <p>
+			  Jeśli uruchamiamy maszynę gdzieś na serwerze i nie mamy dostępu do 
+        środowiska graficznego, wtedy możemy skorzystać z RDP. Jednak wymaga 
+        ono zainstalowania <strong>Oracle VM VirtualBox Extension Pack</strong>.
+		  </p>
+<pre class="code-block">
+$ vboxmanage modifyvm &lt;nazwa_maszyny&gt; --vrde on
+$ vboxmanage modifyvm &lt;nazwa_maszyny&gt; --vrdeport &lt;port_dla_vrde&gt;
+</pre>
+		  <p>
+			  Teraz możemy wystartować maszynę, jeśli korzystamy z serwera to należy 
+        ją uruchomić w headless.
+		  </p>
+<pre class="code-block">
+#Serwer zdalny bez GUI:
+$ vboxmanage startvm &lt;nazwa_maszyny&gt; --type headless
+#Normalna stacja robocza:
+$ vboxmanage startvm &lt;nazwa_maszyny&gt;
+</pre>
+	    <p>
+		    Jeśli nie podamy goszczonego systemu podczas rejestracji (tworzenia
+        maszyny), to:
+      </p>
+		  <ul>
+			  <li>Dla systemu <strong>Windows</strong> należy ustawić te dwie rzeczy:
+<pre class="code-block">
+$ vboxmanage modifyvm &lt;nazwa_maszyny&gt; --chipset ich9
+$ vboxmanage modifyvm &lt;nazwa_maszyny&gt; --ioapic on
+</pre>
+			  </li>
+			    <li>Dla systemów <strong>BSD</strong> należy ustwić poniższą opcję:
+<pre class="code-block">
+$ vboxmanage modifyvm &lt;nazwa_maszyny&gt; --hwvirtex on
+</pre>
+			      Jednakże przy wirtualizcji sprzętowej należy pamiętać że, jeśli 
+            chcemy jej użyć musi być ona wspierana przez procesor oraz włączona
+            w BIOS.
+		      </li>
+		  </ul>
+      <p>
+      ~xf0r3m
+      </p>
+		</div>
+		<p style="margin: 15px; padding: 0; outline: 0;">
+			2022; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+		</body>
+	</html>

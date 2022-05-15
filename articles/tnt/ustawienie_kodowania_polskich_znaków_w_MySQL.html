@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+			<style>
+				.code-block {
+					display: block;
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+				}
+				.code-inline {
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+				}
+				p { text-align: justify; }
+			</style>
+		</head>
+
+
+		<body style="font-family: monospace;" >
+<pre>
+  _______            ___   ______     _      __
+ /_  __(_)___  _____( _ ) /_  __/____(_)____/ /_______
+  / / / / __ \/ ___/ __ \/|/ / / ___/ / ___/ //_/ ___/
+ / / / / /_/ (__  ) /_/  &lt;/ / / /  / / /__/ ,&lt; (__  )
+/_/ /_/ .___/____/\____/\/_/ /_/  /_/\___/_/|_/____/
+     /_/
+</pre>
+
+		<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+			&#9760;&nbsp;<a href="https://morketsmerke.github.io/">morketsmerke</a>&nbsp;&#9760;
+		</p>
+
+		<div style="margin-left: auto; margin-right: auto; width: 80%;">
+      <h1 style="text-align: center;">Ustawienie kodowanie polskich znaków w MySQL</h1>
+		  <p>
+			  Kodowanie polskich znaków możemy ustawić poprzez dopisanie kilku opcji 
+        w pliku konfiguracyjnym MySQL. Plik znajduje się na ścieżce 
+        <em>/etc/mysql/conf.d/mysql.conf</em>, oczywiście tam gdzie serwer baz 
+        danych to MySQL a nie MariaDB. W pliku dopisujemy następujące opcje.
+		  </p>
+<pre class="code-block">
+[mysql]
+default-character-set = utf8
+[mysqld]
+collation-server = utf8_polish_ci
+init-connect = 'SET NAMES utf8'
+character-ser-server = utf8
+</pre>
+		  <p>
+			  Restartujemy serwer.
+		  </p>
+<pre code="code-block">
+$ sudo systemctl restart mysql
+</pre>
+		  <p>
+			  Po zrestartowaniu serwera możemy sprawdzić ustawienia za pomocą dwóch 
+        poleceń.
+		  </p>
+<pre class="code-block">
+mysql&gt; SHOW VARIABLES LIKE 'char%'
+</pre>
+	    <p>
+	 	    Powinniśmy zobaczyć, że każda zmienna jest ustawiona na 
+        <code class="code-inline">utf8</code>, poza jedną - ustawioną na 
+        <code class="code-inline">binary</code>.
+	    </p>
+<pre class="code-block">
+mysql&gt; SHOW VARIABLES LIKE 'colla%'
+</pre>
+	    <p>
+		    Pierwsza zmienna powinna mieć wartość 
+        <code class="code-inline">utf8_general_ci</code>, natomiast pozostałe 
+        <code class="code-inline">utf8_polish_ci</code>. Te zmiany spowodują 
+        wyświetlanie polskich znaków w konsoli MySQL. Także pozwolną na użycie 
+        modyfikatorów <code class="code-inline">ORDER BY</code> z polskimi 
+        znakami w operandach.
+      </p>
+      <p>
+        Źródło: Internet.
+      </p>
+      <p>
+        ~xf0r3m
+      </p>
+		</div>
+		<p style="margin: 15px; padding: 0; outline: 0;">
+			2022; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+		</body>
+	</html>

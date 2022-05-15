@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+			<style>
+				.code-block {
+					display: block;
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+				}
+				.code-inline {
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+				}
+				p { text-align: justify; }
+			</style>
+		</head>
+
+
+		<body style="font-family: monospace;" >
+<pre>
+  _______            ___   ______     _      __
+ /_  __(_)___  _____( _ ) /_  __/____(_)____/ /_______
+  / / / / __ \/ ___/ __ \/|/ / / ___/ / ___/ //_/ ___/
+ / / / / /_/ (__  ) /_/  &lt;/ / / /  / / /__/ ,&lt; (__  )
+/_/ /_/ .___/____/\____/\/_/ /_/  /_/\___/_/|_/____/
+     /_/
+</pre>
+
+		<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+			&#9760;&nbsp;<a href="https://morketsmerke.github.io/">morketsmerke</a>&nbsp;&#9760;
+		</p>
+
+		<div style="margin-left: auto; margin-right: auto; width: 80%;">
+      <h1 style="text-align: center;">Automatyczne montowanie partycji podczas uruchamiania systemu</h1>
+		  <p>
+		    Dla takiego dysku należy utworzyć wpis w pliku 
+        <strong><em>/etc/fstab</em></strong>. Ten plik jest czytany podczas 
+        ładowania systemu, stąd wiadomo, który dysk należy podmontować jako "/"
+        (<em>root</em> - główny system plików). Bardzo rzadko występuje tam 
+        standardowe nazewnictwo dla dysków, takie jak na przykład 
+        <em>/dev/sda1</em>. Raczej występują tam UUID lub PARTUUID. Klasyczne 
+        oznaczenia bywają zwodniczne, mogą zmieniać się, kiedy podłączymy
+		    kolejny dysk. Dostęp do UUID oraz PARTUUID uzyskujemy za pomocą 
+        polecenia <code class="code-inline">blkid</code>. Wywołanie tego 
+        polecenia, w niektórych distro możemy wymagać uprawnień <em>roota</em>.
+		  </p>
+<pre class="code-block">
+$ sudo blkid
+/dev/sda1: UUID="240040b5-fda6-4540-95f2-ce02cfdc96b9" TYPE="ext4" PARTUUID="802e3498-01"
+...
+</pre>
+		  <p>
+		    Jeśli nie wiemy czy wybrać UUID lub PARTUUID, to spójrzmy na linię, 
+        która montuje glówny system plików. Na podstawie tego możemy zdecydować, 
+        którą z tych informacji należy umieścić. Sam wpis wygląda następująco:
+		  </p>
+<pre class="code-block">
+UUID="..."	/home	ext4	defaults	0	2
+</pre>
+		  <p>
+		    Gdzie:
+      </p>
+		  <ul>
+			  <li><code class="code-inline">UUID="..."</code> - UUID (identyfikator
+          urządzenia) sciągnięty z wyniku polecenia 
+				  <code class="code-inline">blkid</code>,</li>
+			<li><code class="code-inline">/home</code> - punkt montowania,</li>
+			<li><code class="code-inline">ext4</code> - montowany system plików</li>
+			<li><code class="code-inline">defaults</code> - opcje systemów plików, 
+        każdy system posiada swoje, <em>ext4</em> posiada opcję 
+				<em>defaults</em> dla domyślnego zestawu,</li>
+			<li><code class="code_inline">0</code> - oznacza ustawienie kopii 
+        zapasowej programu <em>dump</em>,</li>
+			<li><code class="code_inline">2</code> - oznacza ustawienie sprawdzania 
+        systemu plików przez program <em>fsck</em>. Wartość <em>2</em>
+				oznacza ze system będzie sprawdzany po głownym systemie plików.</li> 
+		  </ul>
+      <p>
+        ~xf0r3m
+      </p> 
+		</div>
+		<p style="margin: 15px; padding: 0; outline: 0;">
+			2022; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+		</body>
+	</html>

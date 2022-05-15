@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+			<style>
+				.code-block {
+					display: block;
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+				}
+				.code-inline {
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+				}
+				p { text-align: justify; }
+			</style>
+		</head>
+
+
+		<body style="font-family: monospace;" >
+<pre>
+  _______            ___   ______     _      __
+ /_  __(_)___  _____( _ ) /_  __/____(_)____/ /_______
+  / / / / __ \/ ___/ __ \/|/ / / ___/ / ___/ //_/ ___/
+ / / / / /_/ (__  ) /_/  &lt;/ / / /  / / /__/ ,&lt; (__  )
+/_/ /_/ .___/____/\____/\/_/ /_/  /_/\___/_/|_/____/
+     /_/
+</pre>
+
+		<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+			&#9760;&nbsp;<a href="https://morketsmerke.github.io/">morketsmerke</a>&nbsp;&#9760;
+		</p>
+
+		<div style="margin-left: auto; margin-right: auto; width: 80%;">
+      <h1 style="text-align: center;">Dowiązania symboliczne na udziale Samba</h1>
+		  <p>
+			  W tym celu w pliku konfiguracyjnym <em>/etc/samba/smb.conf</em>, 
+        wpisujemy sekcji globalnej
+		  </p>
+<pre class="code-block">
+allow insecure wide links = yes
+</pre>
+		  <p>
+			  Następnie przchodzimy do definicji udziału i dodajemy poniższe opcje.
+		  </p>
+<pre class="code-block">
+follow symlinks = yes
+wide links = yes
+</pre>
+		  <p>
+			  Zapisujemy i zamykamy plik, następnie restartujemy usługę.
+		  </p>
+<pre class="code-block">
+$ sudo systemctl restart smbd
+$ sudo systemctl restart nmbd
+</pre>
+		  <p>
+			  W sumie to tyle, jednak jeśli mamy zamiar wykorzystać nasz udział do 
+        tworzenia stron WWW, to warto dodać naszego użytkownika do grupy 
+        <em>www-data</em> i wymusić na udziale za pomocą poniższych opcji 
+        zmianę domyślnego właściciela oraz grupę dla nowo utworzonych plików.
+		  </p>
+<pre class="code-block">
+force user = www-data
+force group = www-data
+</pre>
+		  <p>
+			  Jeśli to ustawimy, to należy ustawić grupę oraz właściciela katalogu 
+        głównego serwera WWW <em>/var/www</em> na 
+        <em>www-data</em>:<em>www-data</em> oraz zmienić maski na udziale na 
+        <code class="code-inline">0775</code>.
+		  </p>
+      <p>
+        Źródła:
+        <ol>
+          <li><a href="https://unix.stackexchange.com/questions/5120/how-do-you-make-samba-follow-symlink-outside-the-shared-path">
+           Odpowiednie opcje oraz ich rozmieszczenie</a></li>
+        </ol>
+      </p>
+      <p>
+        ~xf0r3m
+      </p>
+		</div>
+		<p style="margin: 15px; padding: 0; outline: 0;">
+			2022; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+		</body>
+	</html>
