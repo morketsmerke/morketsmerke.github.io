@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+			<style>
+				.code-block {
+					display: block;
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+				}
+				.code-inline {
+					background-color: silver;
+					font-family: monospace;
+					font-weight: bolder;
+				}
+				p { text-align: justify; }
+			</style>
+		</head>
+
+
+		<body style="font-family: monospace;" >
+<pre>
+  _______            ___   ______     _      __
+ /_  __(_)___  _____( _ ) /_  __/____(_)____/ /_______
+  / / / / __ \/ ___/ __ \/|/ / / ___/ / ___/ //_/ ___/
+ / / / / /_/ (__  ) /_/  &lt;/ / / /  / / /__/ ,&lt; (__  )
+/_/ /_/ .___/____/\____/\/_/ /_/  /_/\___/_/|_/____/
+     /_/
+</pre>
+
+		<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+			&#9760;&nbsp;<a href="https://morketsmerke.github.io/">morketsmerke</a>&nbsp;&#9760;
+		</p>
+
+		<div style="margin-left: auto; margin-right: auto; width: 80%;">
+      <h1 style="text-align: center;">Przenoszenie systemu operacyjnego z
+        maszyny wirtualnej na fizyczny komputer</h1>
+      <p>
+        W zeszłym tygodniu na mój warsztat trafiły dwa laptopy. Jeden zupełnie
+        nowy, zakupiony na potrzeby programu diagnostycznego dla ciężarówek.
+        Drugi zaś nieco już zużyty. Wymieniony program diagnostyczny jest 
+        rozpowadzany na zasadzie
+        gotowego środowiska znajdującego się na maszynie wirtualnej VMware.
+        Mój zleceniodawca poprosił mnie abym oczyścił ten stary laptop i
+        generalnie przystosował go do tego aby działa na nim tylko ten program,
+        nic więcej. Starszy laptop to <em>Dell Inspiron 3542</em> z i3 czwartej
+        generacji, 4GB ramu oraz tradycjnym dyskiem talerzowym o pojemności
+        500GB. Szału nie ma, na VMware ten laptop jest za słaby. Sprawdziłem,
+        że sama maszyna ma przydzielone 3 GB pamięci operacyjnej, najwyraźniej 
+        tyle wymaga.
+      </p>
+      <p>
+        Do głowy przyszedł mi pomysł: a co jeśli by wyciągnąć obraz dysku z
+        maszyny. Na początku straciłem trochę czasu, na szukanie sprawdzonego
+        narzędzia, które musiało zginąć pod czas uszkodzenia przez mnie
+        LVM-u na serwerze plików w warsztacie. No cóż stwierdziłem, że jak
+        nie mam obrazu, to go zrobie. Niestety po odszukaniu na gryzoniu
+        programu w odpowiedniej wersji, nie byłem wstanie utworzyć obrazu płyty
+        gdyż ADK dla Windows 8.1, nie jest już dostępne. Microsoft radzi użycie
+        ADK dla Windows 10, ten program nie chce jednak tego przyjąć. 
+        Utworzone
+        na dysku usb oparte na Linuksie środowisko, nie miało w ogóle funkcji
+        utworzenia kopii zapasowej dysku. Więc zacząłem szukać jakiejś
+        alternatywy, najlepiej <em>open source</em> i do głowy wpadła mi
+        <strong>Clonezilla</strong> - to dystrybucja GNU/Linux oparta na
+        Debianie służąca tworzeniu kopii zapasowych partycji jak i całych 
+        dysków.
+      </p>
+      <p>
+        Obrazy przeznaczone dla i386 oraz amd64 znajdziemy na stronie projektu.
+        Tu warto zaznaczyć, że najlepiej jest wybrać jako mirror <em>OSDN</em>.
+        Dla celów testowych przedstawie przypadek, przeniesienia Windows 7 
+        Starter 32 bit na netbooka Acer Aspire One. Aby przenieść system z
+        maszyny wirtualnej dobrze jest operować udziałem <em>Samba</em>,
+        ponieważ łatwiej jest utworzyć obraz dysku maszyny wirtualnej na
+        udziale, a <em>Clonezilla</em> jest wstanie 
+        utworzyć backup dysku na udziale sieciowym. Tak wygląda maszyna
+        wirtualna, z której będziemy przenosić nasz system:
+      </p>
+      <p>
+        <img src="https://i.ibb.co/j5qWW3X/01-clonezilla-okno-z-maszyn.jpg" alt="01-clonezilla-okno-z-maszyn" border="0" style="width: 70%;">
+      </p>
+      <h2>Tworzenie obrazu</h2>
+      <p>
+        Pracę rozpoczynamy od załadowania do napędu maszyny wirtualnej obrazu 
+        płyty z <em>Clonezillą</em>, następnie uruchomiamy ją z niego. Z menu 
+        programu rozruchowego wybieramy pierwszą, domyślną opcję.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/5xK73fJ/02-clonezilla-uruchomienie-clonezilla.jpg" alt="02-clonezilla-uruchomienie-clonezilla" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Po uruchomieniu zostaniemy zapytani o ustawienia lokalizacyjne takiej
+        jak język (<em>Clonezilla</em> jest po polsku).
+      </p>
+      <p>
+        <img src="https://i.ibb.co/ThRn3FB/03-clonezilla-wybor-jezyka.jpg" alt="03-clonezilla-wybor-jezyka" border="0" style="width: 70%;">
+      </p>
+      <p>
+        oraz układ klawiatury (pozostawiamy go domyślnie).
+      </p>
+      <p>
+        <img src="https://i.ibb.co/HpFd5Wy/04-clonezilla-uklad-klawiatury.jpg" alt="04-clonezilla-uklad-klawiatury" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Nastepnie uruchamiamy już właściwy proces wybierając opcje 
+        <em>Start_Clonezilla</em>.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/tZwphZx/05-clonezilla-uruchomienie-clonezilla.jpg" alt="05-clonezilla-uruchomienie-clonezilla" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Program może pracować w wielu trybach, jednak nas będzie interesować
+        wyłącznie praca z obrazami dlatego w następnym oknie wybieramy opcje
+        <em>device-image</em>.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/zQD7hsk/06-clonezilla-praca-z-obrazami.jpg" alt="06-clonezilla-praca-z-obrazami" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Tak jak już wspomniałem na wstępnie, jako miejsca docelowego na obraz
+        wykorzystamy udział <em>Samba</em>. Tworząc obrazy na fizycznych maszynach
+        możemy użyć pendrive-a lub dysku zewnetrznego, jednak w naszym
+        przypadku potrzeba by nieco więcej zachodu aby przekazać maszynie dysk
+        zewnętrzny, a wydajność mogłaby być niezbyt zadowalająca. Dlatego też
+        teraz wybieramy opcje <em>samba_server</em>. 
+      </p>
+      <p>
+        <img src="https://i.ibb.co/d4Gjb4M/07-clonezilla-wybranie-miejsca-docelowego-dla-obrazow.jpg" alt="07-clonezilla-wybranie-miejsca-docelowego-dla-obrazow" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Przechodząc przez kolejne okna będziemy musieli podać wszystkie
+        parametry potrzebne do połączenia z udziałem. Jednak najpierw musimy
+        dokonać konfiguracji sieci środowiska <em>Clonezilla</em>. Możemy
+        pobrać ją z serwera DHCP, więc pozostawiamy domyślną opcję.
+        Po tej konfiguracji przyszła pora na podanie parametrów
+        do połączenia się z udziałem.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/gV1M288/08-clonezilla-konfiguracja-karty-sieciowej.jpg" alt="08-clonezilla-konfiguracja-karty-sieciowej" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Podajemy adres ip serwera <em>Samba</em>.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/KNnGdJ2/09-clonezilla-wskazujemy-nazwe-lub-ip-serwera-samba.jpg" alt="09-clonezilla-wskazujemy-nazwe-lub-ip-serwera-samba" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Następnie domenę (jeśli domena nie jest ustawiona na serwerze, 
+        wybieramy przycisk "Anuluj").
+      <p>
+        <img src="https://i.ibb.co/R9K6K4Q/10-clonezilla-domena-na-serwerze-samba.jpg" alt="10-clonezilla-domena-na-serwerze-samba" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Teraz podajemy nazwę użytkownika mającego uprawnienia do zapisu na 
+        docelowym udziale.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/Yyq2yQ0/11-clonezilla-uzytkownik-udzialu-na-serwerze.jpg" alt="11-clonezilla-uzytkownik-udzialu-na-serwerze" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Nazwę udziału (uwaga), podajemy po <em>slashu</em> - jak by to był 
+        folder, ale to nazwa udziału.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/6gZjZ9j/12-clonezilla-wskazanie-nazwy-udzialu.jpg" alt="12-clonezilla-wskazanie-nazwy-udzialu" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Po podaniu ostatniej informacji, zostaniemy poproszeni o wybór wersji
+        protokołu SMB. Mój serwer to <em>Samba</em> postawiona na Debian 10, 
+        więc pozostawiam tę wartość domyślnie.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/BNggDmq/13-clonezilla-wybranie-wersji-protokolu.jpg" alt="13-clonezilla-wybranie-wersji-protokolu" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Kolejną jest "tryb bezpieczestwa", jeśli udział nie stoi na jakimś 
+        archaiczym Windowsie pozostawiamy <em>auto</em>.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/0fpRTKk/14-clonezilla-wybor-trybu-bezpieczenstwa.jpg" alt="14-clonezilla-wybor-trybu-bezpieczenstwa" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Po zatwierdzeniu tej opcji, zostanie nam wyświetlony monit o potrzebie 
+        podania hasła do udziału. Polecenie pokazane w oknie jest tylko 
+        poglądowe i nie ma nic wspólnego z właściwym poleceniem montującym 
+        udział.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/MVRPh8h/15-clonezilla-monit-o-podaniu-hasla.jpg" alt="15-clonezilla-monit-o-podaniu-hasla" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Po wybraniu "OK" zostanie zwrócony znak zachęty proszący o hasło aby 
+        podmontować udział. Każdy kto kiedyś montował udział SMB za pomocą 
+        wiersza poleceń będzie znać ten symbol.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/VH2yG42/16-clonezilla-wpisywanie-hasla-do-udzialu.jpg" alt="16-clonezilla-wpisywanie-hasla-do-udzialu" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Po prawidłowym podłączeniu udziału, <em>Clonezilla</em> zwróci nam
+        tabelę z informacjami na temat udziału (dostępna przestrzeń dysku,
+        punkt montowania).
+      </p>
+      <p>
+        <img src="https://i.ibb.co/g4KqMTL/17-clonezilla-informacja-zwrotna-o-zamontowanym-udziale.jpg" alt="17-clonezilla-informacja-zwrotna-o-zamontowanym-udziale" border="0" style="width: 70%;"> 
+      </p>
+      <p>
+        Po zamontowaniu miejsca docelowego
+        w <em>/home/partimag</em>, pora wybrać tryb pracy programu
+        <em>Clonezilla</em>. Do wyboru będziemy mieli tryb <em>Beginner</em> -
+        początkujący lub <em>Expert</em>. Jako iż jest to moja druga w ogóle
+        styczność z tym narzędziem, sam wybrałem tryb dla początkujących. 
+      </p>
+      <p>
+        <img src="https://i.ibb.co/K5DvrWm/18-clonezilla-tryb-beginner.jpg" alt="18-clonezilla-tryb-beginner" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Po uruchomieniu programu w trybie dla początkujących, musimy określić 
+        sposób
+        tworzenia kopii. <em>Clonezilla</em> może tworzyć kopie całych dysków 
+        lub
+        poszczególnych partycji. Dla rozpatrywanego przypadku najlepszym
+        rozwiązaniem jest zapisanie całego dysku. Instalacja najnowszych
+        systemów Windows jest zazwyczaj rozbijana na kilka partycji. Zatem
+        wybieramy opcje <em>savedisk</em>.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/0cFDrzh/19-clonezilla-zapisujemy-lokalny-dysk-jako-obraz.jpg" alt="19-clonezilla-zapisujemy-lokalny-dysk-jako-obraz" border="0" style="width: 70%;">
+      </p>
+      <p>
+        W następnym oknie zostaniemy poproszeni o podanie nazwy dla katalogu,
+        w którym przechowywany będzie obraz. To dobry i jedyny moment, aby go
+        opisać.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/9ZWCF2Q/20-clonezilla-nazwa-dla-katalogu-obrazu.jpg" alt="20-clonezilla-nazwa-dla-katalogu-obrazu" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Po utworzeniu odpowiedniego katalogu, pora na wybór dysku źródłowego.
+        Zaznaczamy dysk z listy, przechodzimy na przycisk "OK" i klikamy Enter.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/BVrCsnX/21-clonezilla-wybieramy-zrodlo-dla-naszego-obrazu.jpg" alt="21-clonezilla-wybieramy-zrodlo-dla-naszego-obrazu" border="0" style="width: 70%;">
+      </p>
+      <p>
+        W kolejnym pytaniu program za sugeruje man sprawdzenie i ewenualną
+        naprawę systemu plików. Jednak dla systemów takich jak NTFS jest to 
+        nie możliwe, więc wybieramy opcje <em>-sfsck</em> (pominięcie
+        sprawdzenia systemu plików).
+      </p>
+      <p>
+        <img src="https://i.ibb.co/MMPfNYn/22-clonezilla-sprawdzenie-systemow-plikow-przed-stworzenien-obrazu-dla-ntfs-mozna-pominac.jpg" alt="22-clonezilla-sprawdzenie-systemow-plikow-przed-stworzenien-obrazu-dla-ntfs-mozna-pominac" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Domyślnie <em>Clonezilla</em> chce sprawdzić
+        poprawność zapisanego obrazu. W tym przypadku zostawiam pełną
+        dowolność. Ja, aby nie przedłużać tworzenia obrazu, czy zakończenia
+        procesu pominąłem sprawdzanie obrazu. 
+      </p>
+      <p>
+        <img src="https://i.ibb.co/bLXd6fT/23-clonezilla-czy-sprawdzic-zapisany-obraz.jpg" alt="23-clonezilla-czy-sprawdzic-zapisany-obraz" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Kolejne okno zawiera pytanie o
+        szyforwanie obrazu, tutaj również pozostawiam dowolność, jednak jeśli
+        tworzymy obraz zaszyfrowanego dysku, to sam obraz również dobrze jest
+        zaszyfrować.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/fq7qS8p/24-clonezilla-pytanie-o-szyfrowanie-obrazu.jpg" alt="24-clonezilla-pytanie-o-szyfrowanie-obrazu" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Przed wykonaniem obrazu należy zdefiniować jeszcze
+        czynność wykonywaną po ukończeniu tego procesu. Co ma zrobić 
+        <em>Clonezilla</em>. Może przejść do wiersza poleceń, wyłączyć lub
+        zrestartować komputer. Może również przjeść do menu, z którego 
+        wybierzemy inną czynność. Jest to przydatne kiedy chcemy utworzyć obrazy 
+        większej ilości dysków, ponieważ będziem mogli uruchomić program od 
+        pewnego momentu, pomijąjąc część konfiguracji. Tutaj też możemy wybrać 
+        dowolnie. Ja wybrałem opcję <em>-choose</em> uruchamiającą owe menu.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/LtxbYMF/25-clonezilla-akcja-do-wykonania-po-stworzeniu-obrazu.jpg" alt="25-clonezilla-akcja-do-wykonania-po-stworzeniu-obrazu" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Teraz kiedy wszystkie ustawienia zostały przyjęte. <em>Clonezilla</em>
+        wyświetli polecenie, którego możemy użyć korzystając z wiersza poleceń,
+        aby utworzyć obraz ponownie bez przechodzenia przez te wszystkie okna. 
+        Klikamy "Enter" w celu kontynuowania działania programu.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/2nxbM9Z/26-clonezilla-informacja-o-zapisaniu-uzytego-polecenia.jpg" alt="26-clonezilla-informacja-o-zapisaniu-uzytego-polecenia" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Po przetworzeniu kilku informacji o dysku źródłowym, program wyświetli
+        informacje o tym, że zostanie utworzony obraz źródłowego dysku oraz
+        pytanie czy chcemy kontynuować. Potwierdzamy odpowiadając na pytanie
+        <em>y</em> i klikając "Enter".
+      </p>
+      <p>
+        <img src="https://i.ibb.co/vdt3ByS/27-clonezilla-consent-o-utworzenie-obrazu.jpg" alt="27-clonezilla-consent-o-utworzenie-obrazu" border="0" style="width: 70%;">
+      </p>
+      <p>
+        W tym momencie rozpoczyna pracę już właściwy program <strong>Partclone</strong>
+        znany między innymi z projektu FOG (Free Open-source Ghost - ma podobne
+        zastosowanie co <em>Clonezilla</em>, jednak jest bardziej ukierunkowny
+        na wykorzystanie sieciowe oraz masowe. Przydaje się przy reinstalacji
+        systemów operacyjnych w szkolnych salach komputerowych).
+      </p>
+      <p>
+        <img src="https://i.ibb.co/3RX1pMC/28-clonezilla-tworzenie-obrazu.jpg" alt="28-clonezilla-tworzenie-obrazu" border="0" style="width: 70%;">
+      </p>
+      <p>
+        O zakończonym procesie tworzenia obrazu zostaniemy poinformowani.
+        Pozostało nam tak naprawdę tylko kliknąć klawisz "Enter". Po tym
+        nastąpi akcja, którą wcześniej wybraliśmy.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/dM1RT1C/29-clonezilla-informacja-zwrotna-po-utworzeniu-obrazu.jpg" alt="29-clonezilla-informacja-zwrotna-po-utworzeniu-obrazu" border="0" style="width: 70%;">
+      </p>
+      <h2>Przywracanie obrazu</h2>
+      <p>
+        Początkowe fazy przywracania obrazu, są identyczne jak przy jego
+        tworzeniu. Po zamontowaniu miejsca, w którym składowane są obrazy,
+        podczas wybierania trybu wybieramy <em>restoredisk</em>, przywracając
+        tym samym stan zapisany w obrazie na dysk. 
+      </p>
+      <p>
+        <img src="https://i.ibb.co/9gmfp17/01-clonezilla2-przywracanie-dysku.jpg" alt="01-clonezilla2-przywracanie-dysku" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Program przeszuka teraz magazyn w poszukiwaniu obrazów i zostaną one
+        wyświetlone w menu do wyboru. Naszym zadanie jest wybrać obraz jaki
+        ma zostać przywrócony na tym komputerze.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/brNj40B/02-clonezilla2-wybor-pliku-obrazu.jpg" alt="02-clonezilla2-wybor-pliku-obrazu" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Dla wybranego obrazu musimy teraz wskazać docelowy dysk. Środowisko
+        <em>Clonezilli</em> przeszuka komputer pod względem dysków i zostaną one
+        wyświetlone w menu do wyboru. 
+      </p>
+      <p>
+        <img src="https://i.ibb.co/JQc1t15/03-clonezilla2-wybor-dysku-docelowego-dla-obrazu.jpg" alt="03-clonezilla2-wybor-dysku-docelowego-dla-obrazu" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Teraz program zapyta o to czy sprawdzić obraz przed przywróceniem.
+        Jeśli jest to dla nas ważne, możemy go sprawdzić. Jednak jeśli
+        testujemy <em>Clonezillę</em>. Możemy sobie darować, stracimy tylko
+        czas.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/k22S8Rk/04-clonezilla2-pominiecie-sprawdzania-obrazu.jpg" alt="04-clonezilla2-pominiecie-sprawdzania-obrazu" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Tak jak i w przypadku tworzenia obrazu, należy wskazać czynność jaka
+        zostanie wykonana po przywróceniu.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/k4kK2LH/05-clonezilla2-akcja-po-zakonczeniu-przywracania-obrazu.jpg" alt="05-clonezilla2-akcja-po-zakonczeniu-przywracania-obrazu" border="0" style="width: 70%";>
+      </p>
+      <p>
+        Następnie zostanie nam zwrócone
+        polecenie użyte do przywrócenia, mamy szanse je zapisać, aby
+        zaoszczędzić te kilka chwil spędzonych na pytaniach programu
+        przywracając ten obraz ponownie w tych samych okolicznościach.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/HnkNTxm/06-clonezilla2-zapisanie-polecenia-przywracania.jpg" alt="06-clonezilla2-zapisanie-polecenia-przywracania" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Po naciśnięciu klawisza "Enter", narzędzie zapyta nas dwukrotnie, czy
+        chcemy kontynuować przywracanie obrazu, ponieważ ta czynność nadpisze
+        wszelkie dane znajdujące się na dysku.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/5kDqLJY/08-clonezilla2-drugi-z-dwoch-consentow-o-nadpisanie-danych-na-dysku.jpg" alt="08-clonezilla2-drugi-z-dwoch-consentow-o-nadpisanie-danych-na-dysku" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Po potwierdzeniu, rozpoczyna się już właściwa procedura przywracania
+        realizowana przez program <em>Partclone</em>. Po jej zakończniu zostanie
+        wykonana czynność wybrana przed przywracaniem.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/hH1GLHq/11-clonezilla2-przywracanie-obrazu-na-fizycznym-komputerze.jpg" alt="11-clonezilla2-przywracanie-obrazu-na-fizycznym-komputerze" border="0" style="width: 70%;">
+      </p>
+      <p>
+        Poniżej znajduje się zdjęcie przedstawiające pulpit laptopa, na którego
+        system został przeniesiony z maszyny wirtualnej. Powyższe zdjęcie
+        również pochodzi z procedury przywracania systemu na tym sprzęcie.
+        Jak widać system się uruchomił, pozostało tylko zainstalować
+        sterowniki i można działać. Przenoszenie powiodło się zarówno w moim
+        jak i testowym przypadku. Póki co czekam na <em>feedback</em> czy
+        program działa.
+      </p>
+      <p>
+        <img src="https://i.ibb.co/JsvTFPY/12-clonezilla2-gotowy-pulpit-na-fizycznym-komputerze.jpg" alt="12-clonezilla2-gotowy-pulpit-na-fizycznym-komputerze" border="0" style="width: 70%">
+      </p> 
+      <p>
+        Część rysunków w podczas przywracania to zrzuty ekranu z maszyny
+        wirtualnej, dlatego iż były prostsze do zarejestrowania niż robienie
+        zdjęć błyszczącej matrycy.
+      </p>
+      <p>
+       ~xf0r3m
+      </p> 
+		</div>
+		<p style="margin: 15px; padding: 0; outline: 0;">
+			2022; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+
+		</body>
+	</html>
