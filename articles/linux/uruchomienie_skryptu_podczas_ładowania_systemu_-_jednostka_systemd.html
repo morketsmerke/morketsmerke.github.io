@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<style>
+			.code-block {
+				display: block;
+				background-color: silver;
+				font-family: monospace;
+				font-weight: bolder;
+			}
+			.code-inline {
+				background-color: silver;
+				font-family: monospace;
+
+				font-weight: bolder;
+			}
+			p { text-align: justify; }
+		</style>
+	</head>
+	<body style="font-family: monospace;" >
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+	<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div style="margin-left: auto; margin-right: auto; width: 80%;">
+		<h1 style="text-align: center;">Uruchominie skryptu podczas ładowania systemu - jednostka systemd</h1>
+    <p>
+      Wykonanie skryptu w trakcie uruchamiania systemu, do bardzo stary
+      problem wielu administratorów oraz entuzjastów systemu Linuks. Wraz ze
+      zmianianą <em>mainstreamowego</em> programu typu <em>init</em> problem
+      ten stał się wręcz trywialny, bo można użyć jednostki <em>systemd</em>,
+      jednak nie którzy nie więdzą jak się do tego zabrać.
+    </p>
+    <p>
+      Każda jednostka <em>systemd</em> to plik tekstowy składający się z
+      minimum dwóch sekcji. Pierwszą z nich jest sekcja <em>Unit</em> opisująca
+      jednostkę. W wewnątrz niej mogą znajdować się takie informacje jak opis,
+      kiedy ma zostać uruchomiona oraz jej ewentualne zależności. Druga
+      sekcja jest już zależna od jednostki. Wśród jedenastu typów jednostek
+      najbardziej odpowiednim jest jednostka usługi, ponieważ
+      odpowiada ona poniękąd za uruchomienie programu, a tym w mniejszym lub
+      większym stopniu jest nasz skrypt. W sekcji jednostki znajdują się
+      dyrektywy są specyficzne dla tego typu jednostki. Opcjonalnie w pliku
+      jednostki może znaleźć się sekcja <em>Install</em>, w której deklaruje
+      się zależności wsteczne (inna jednostka może wymagać lub chcieć aktywacji
+      tej jednostki podczas swojej aktywacji). Zależności wsteczne pozwalają
+      na włączenie lub wyłączenie aktywacji jednostki w systemie.
+    </p>
+    <p>
+      Po scharakteryzowaniu pliku jednostki możemy przejść ustalania 
+      potrzebnych
+      dyrektyw budując pliki jednostki. W sekcji <em>Unit</em> na pewno
+      powinna znaleźć się dyrektywa <em>Description</em>, w której zawierany
+      jest krótki opis jednostki. Jest on wyświetlany podczas uruchamiania
+      jednostki w trakcie uruchamiania systemu. Za pewne chcielibyśmy aby
+      skrypt był uruchamiany w takim samym środowisku jak byś uruchamiali go
+      z poziomu wiersza polecenia, zatem należy opóźnić aktywacje jak tylko się
+      da. Do tego posłuży nam dyrektywa <em>After</em>, która wskazuje
+      <em>systemd</em> aby aktywował jednostkę <strong>po</strong> aktywacji
+      jednostki zapisanej w tej dyrektywie. Najpóźniej aktywowaną jednostką
+      w dystrybucjach Linuksa opartych o <em>systemd</em> jest
+      <em>default.target</em>, po aktywacji której zazwyczaj uznaje się, że
+      system jest już gotowy do pracy. Ta jednostka jest dowiązaniem
+      symbolicznym do innej właściwej dla konfiguracji systemu jednostki.
+      Następnie już w sekcji <em>Service</em>, za pomocą
+      dyrektywy <em>ExecStart</em> wskazujemy ścieżkę do pliku skryptu, w tym
+      przypadku jest to jedyna dyrektywa w tej sekcji. Abyśmy mogli włączać i
+      wyłączać jednostkę powinniśmy dodać także sekcje <em>Install</em> a 
+      wewntąrz niej zależność zwrotną typu <em>WantedBy</em> wskazującą również
+      na <em>default.target</em>. Spowoduje to automatyczne uruchomienie
+      tej jednostki w momencie uruchomienia celu <em>default.target</em>, z
+      opóźnieniem wynikającym z dyrektywy <em>After</em>. Zależność typu
+      <em>WantedBy</em>, nie spowoduje problemów z jednostką 
+      <em>default.target</em> gdy uruchomienie jednostki ze skryptem
+      nie powiedzie się. Zawartość pliku jednostki powinna wyglądać mniej
+      więcej jak na poniższym przykładzie.
+    </p>
+<pre class="code-block">
+xf0r3m@wyse3040:~$ cat /etc/systemd/system/ssh_tunnel.service 
+[Unit]
+Description=SSH Tunnel for remote access
+After=default.target
+[Service]
+ExecStart=/home/xf0r3m/tunnel.sh
+[Install]
+WantedBy=default.target
+</pre>
+    <p>
+      W moim przypadku jest to skrypt który uruchamia tunel SSH z 
+      przekazywaniem
+      portów oraz zajmuję się jego utrzymaniem. Zwróćmy uwagę na lokalizacje
+      pliku jednostki. Jest ona jak najbardziej odpowiednia. Po utworzeniu
+      pliku możemy, przystąpić do włączenia jednostki w celu 
+      <em>default.target</em>.
+    </p>
+<pre class="code-block">
+xf0r3m@wyse3040:~$ sudo systemctl enable ssh_tunnel.service
+</pre>
+    <p>
+      Po jej włączeniu możemy ją aktywować.
+    </p>
+<pre class="code-block">
+xf0r3m@wyse3040:~$ sudo systemctl start ssh_tunnel.service
+</pre>
+    <p>
+      Za pomocą podpolecenia <em>status</em> polecenia <em>systemctl</em>
+      możemy sprawdzić stan uruchomionej jednostki.
+    </p>
+<pre class="code-block">
+      xf0r3m@wyse3040:~$ sudo systemctl status ssh_tunnel.service 
+● ssh_tunnel.service - SSH Tunnel for remote access
+     Loaded: loaded (/etc/systemd/system/ssh_tunnel.service; enabled; vendor preset: enabled)
+     Active: active (running) since Sun 2022-07-24 10:12:42 CEST; 2s ago
+   Main PID: 1246 (tunnel.sh)
+      Tasks: 2 (limit: 2235)
+     Memory: 1.2M
+        CPU: 164ms
+     CGroup: /system.slice/ssh_tunnel.service
+             ├─1246 /bin/bash /home/xf0r3m/tunnel.sh
+             └─1247 ssh -p 2022 -i /home/xf0r3m/.ssh/id_rsa -o StrictHostKeyChecking=no xf0r3m@... -R ...:127.0.0.1:22 while [ true ...
+
+lip 24 10:12:42 wyse3040 systemd[1]: Started SSH Tunnel for remote access.
+</pre>
+    <p>
+      Oczywiście statusy nie wszystkich jednostek, które uruchamiają skrypty
+      będą wyglądać tak samo, nie które z nich mogą się dezaktywować się po
+      zakończeniu działania skryptu. Moj skrypt działa ponieważ jego trzonem
+      jest nieskończona pętla, która sprawia, że jeśli dojdzie do zerwania
+      tunelu, zostanie on za 30 sekund zestawiony ponownie.
+    </p>
+    <p>
+      Źródła:
+    </p>
+    <ol>
+      <li><a href="https://linuxhint.com/run-script-debian-11-boot-up/">How to Run Script on Boot Up in Debian 11</a></li>
+    </ol>
+		<p>
+			~xf0r3m
+		</p>
+    </div>
+		<p style="margin: 15px; padding: 0; outline: 0;">
+			2022; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+	</body>
+</html>
