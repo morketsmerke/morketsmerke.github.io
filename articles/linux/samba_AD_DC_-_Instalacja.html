@@ -3,23 +3,9 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
-		<style>
-			.code-block {
-				display: block;
-				background-color: silver;
-				font-family: monospace;
-				font-weight: bolder;
-			}
-			.code-inline {
-				background-color: silver;
-				font-family: monospace;
-
-				font-weight: bolder;
-			}
-			p { text-align: justify; }
-		</style>
+		<link rel="stylesheet" type="text/css" href="/style.css">
 	</head>
-	<body style="font-family: monospace;" >
+	<body>
 <pre>
   _____ _   _ _    _    ___      _
  / ____| \ | | |  | |  / / |    (_)
@@ -28,11 +14,11 @@
 | |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
  \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
 </pre>
-	<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+	<p class="header_link">
 		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
 	</p>
-	<div style="margin-left: auto; margin-right: auto; width: 80%;">
-		<h1 style="text-align: center;">Samba AD DC - Instalacja</h1>
+	<div class="main">
+		<h1 class="title">Samba AD DC - Instalacja</h1>
         <p>
             <strong>Samba Active Directory</strong> może być nieco lżejszą implementacją od usługi Active Directory oferowanej przez system Windows, jednak jego instalacja nie jest już taka prosta jak ma to miejsce w przypadku rozwiązań firmy Microsoft. Przedstawiona tutaj operacja będzie składać się z dwóch części, pierwsza z nich to właściwa instalacja usługi Samba AD DC, a drugą to <strong>instalacja usługi NTP, która jest niezbędną do prawidłowego funkcjonowania. Właśnie jest róźnica pomiędzy dwoma wyżej wymienionymi implementacjami, przy SAMBA AD jeśli zegar na komputerze klienta spóźnia się choćby o 5 minut to zalogowanie się na komputerze za pomocą użytkownika owej usługi może być już niemożliwe</strong>. Zatem przed przyłączeniem komputera do domeny, warto na początek ustawić serwer czasu na nasz kontroler domeny, a teraz zabierzemy się do właściwej instalacji. Na swój serwer wybrałem dystrybucje GNU/Linux Debian.
         </p>
@@ -206,7 +192,7 @@ $ klist
             ~xf0r3m
         </p>
     </div>
-		<p style="margin: 15px; padding: 0; outline: 0;">
+		<p class="footer">
 			2021; COPYLEFT; ALL RIGHTS REVERSED;
 		</p>
 </body>

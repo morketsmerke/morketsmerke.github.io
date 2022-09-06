@@ -3,22 +3,9 @@
 		<head>
 			<meta charset="utf-8" />
 			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
-			<style>
-				.code-block {
-					display: block;
-					background-color: silver;
-					font-family: monospace;
-					font-weight: bolder;
-				}
-				.code-inline {
-					background-color: silver;
-					font-family: monospace;
-					font-weight: bolder;
-				}
-				p { text-align: justify; }
-			</style>
+			<link rel="stylesheet" type="text/css" href="/style.css">
 		</head>
-		<body style="font-family: monospace;" >
+		<body>
 <pre>
 88                             88
 88                             88
@@ -30,12 +17,11 @@
 8Y"Ybbd8"'  `"YbbdP"'  `"8bbdP"Y8
 </pre>
 
-		<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+		<p class="header_link">
 			&#9760;&nbsp;<a href="https://morketsmerke.github.io/">morketsmerke</a>&nbsp;&#9760;
 		</p>
-<div style="margin-left: auto; margin-right: auto; width: 80%;">
-<h1 style="text-align: center;">Instalacja OpenBSD</h1>
-<br />
+		<div class="main">
+<h1 class="title">Instalacja OpenBSD</h1>
 <p>
 Eksperymentując długo przed poznaniem <strong>OpenBSD</strong> z GNU/Linux-owymi dystrybucjami przeznaczonymi na routery, głównie z <em>IPCop</em>, poźniej <em>IPFire</em>, następnie przesiadłem się na <em>PFsense</em>, który był oparty o firewall <strong>PF</strong>. Utworzywszy w PFsense kilka reguł okazało się że żadna z nich nie działa. Porzuciłem routery. Przyszedł czas mojej pierwszej pracy. Po ogarnięciu bałaganu sieciowego, firmowy router zaczał się wieszać... Wziąłem go na warsztat, był dosć ciekawie skonfigurowany, serwerowa płyta Intela  z socketem 478. Był tak zakurzony, że po rozkręceniu było tyle syfu że można było pomyśleć że ktoś tam piachu nasypał, ale płyta cała. Wszystkie kondestatory sprawne, ram testowany memtestem - sprawny. Dobra, czyli zmieniamy system. Tylko jakoś niechciałem GNU/Linuxa i iptables. Przypomniałem sobie o  PF. Wpisując "PF packet filter" w wyszukiwarkę, znalazłem na oficjalnej stronie OpenBSD świetną dokumentację PF, to pomyślałem o OpenBSD jako docelowym systemie. Można spróbować. Mam system operacyjny wraz z pakietem firewalla. Dokumentacja na stronie projektu była pierwszym moim przeczytanym ze zrozumieniem anglojęzycznym, technicznym tekstem. Po zapoznaniu się z PF trzeby by zainstalować sobie OpenBSD i trochę po go testować.
 </p>
@@ -253,7 +239,7 @@ Odnośnie instalacji OpenBSD, to nie zawsze wszystko wygląda tak różowo. Inst
 	~xf0r3m
 </p>
 </div>
-<p style="margin: 15px; padding: 0; outline: 0;">
+<p class="footer">
 	2021; COPYLEFT; ALL RIGHTS REVERSED;
 </p>
 		</body>

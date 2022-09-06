@@ -3,23 +3,9 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
-		<style>
-			.code-block {
-				display: block;
-				background-color: silver;
-				font-family: monospace;
-				font-weight: bolder;
-			}
-			.code-inline {
-				background-color: silver;
-				font-family: monospace;
-
-				font-weight: bolder;
-			}
-			p { text-align: justify; }
-		</style>
+		<link rel="stylesheet" type="text/css" href="/style.css">
 	</head>
-	<body style="font-family: monospace;" >
+	<body>
 <pre>
   _____ _   _ _    _    ___      _
  / ____| \ | | |  | |  / / |    (_)
@@ -28,11 +14,11 @@
 | |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
  \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
 </pre>
-	<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+	<p class="header_link">
 		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
 	</p>
-	<div style="margin-left: auto; margin-right: auto; width: 80%;">
-        <h1 style="text-align: center;">Instalacja kontenerów LXD/LXC</h1>
+	<div class="main">
+        <h1 class="title">Instalacja kontenerów LXD/LXC</h1>
         <p>
             Kontenery <strong>LXD/LXC</strong> są kompromisem pomiędzy konternerami aplikacji takimi jak <em>Docker</em> oraz maszyna wirtualnymi <em>kvm</em> czy <em>xen</em>. Po ściągnięciu obrazu dostajemy czysty system operacyjny tak jakby to była świeżo zainstalowana maszyna wirtualna, ale to nadal przestrzeń użytkowa (userspace) ze współdzielonym wraz z hostem jądrem - kontener. Kontener będzie posiadać oddzielne wszystko to co kojarzy nam się z system operacyjnym, z tym elementami, których możemy hipotetycznie dotknąć. Do instalacji wybrałem serwer z system Ubuntu Server 18.04, ponieważ akurat taki miałem od ręką.
         </p>
@@ -239,7 +225,7 @@ $ lxc launch images:debian/10/amd64 c1
             ~xf0r3m
         </p>
     </div>
-		<p style="margin: 15px; padding: 0; outline: 0;">
+		<p class="footer">
 			2021; COPYLEFT; ALL RIGHTS REVERSED;
 		</p>
 </body>

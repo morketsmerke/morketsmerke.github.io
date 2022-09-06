@@ -3,23 +3,9 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
-		<style>
-			.code-block {
-				display: block;
-				background-color: silver;
-				font-family: monospace;
-				font-weight: bolder;
-			}
-			.code-inline {
-				background-color: silver;
-				font-family: monospace;
-
-				font-weight: bolder;
-			}
-			p { text-align: justify; }
-		</style>
+		<link rel="stylesheet" type="text/css" href="/style.css">
 	</head>
-	<body style="font-family: monospace;" >
+	<body>
 <pre>
   _____ _   _ _    _    ___      _
  / ____| \ | | |  | |  / / |    (_)
@@ -28,11 +14,11 @@
 | |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
  \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
 </pre>
-	<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+	<p class="header_link">
 		&#9760;&nbsp;<a href="https://morketsmerke.net">morketsmerke</a>&nbsp;&#9760;
 	</p>
-	<div style="margin-left: auto; margin-right: auto; width: 80%;">
-        <h1 style="text-align: center;">Generowanie certyfikatu SSL Self-Signed za pomocą pakietu OpenSSL</h1>
+	<div class="main">
+        <h1 class="title">Generowanie certyfikatu SSL Self-Signed za pomocą pakietu OpenSSL</h1>
         <p>
             <strong>Jednym z założeń używania certyfikatów SSL jest uwierzytelnienie serwera przed klientem</strong>, innymi słowy - przedstawienie podmiotu zarządzającego maszyną, po to aby klient miał pewność że połączył się z właściwym serwerem. Takie certyfikaty są wydawane przez firmy trzecie, które są w stanie poświadczyć że witryna www.example.com należy do firmy Example Inc. Wydanie takiego certyfikatu może kosztować grube pieniądze w zależności od tego co dany certyfikat oferuje. Komercyjny certyfikat często wyświetla się w przeglądarce jako zielona kłódka przy adresie strony. W dziesiejszych czasach wystarczy dysponować domeną, aby móc posiadać "zieloną kłódkę" na swojej stronie. Takie certyfikaty wystawiane są przez <strong>Let's Encrypt</strong> i każdy, dosłonie każdy może sobie taki certyfikat wyrobić. A co jeśli nie posiadamy żadnej domeny i chcemy np. zabezpieczyć nasz serwer www, za pomocą <strong>certyfikatu SSL</strong> (protokołu HTTPS, certyfikat jest tylko narzędziem), którego zawsze pierwszorzędnym celem jest zabezpieczenie transmisji pomiędzy klientem a serwerem. Możemy:
         </p>
@@ -60,7 +46,7 @@ $ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/priv
     </p>
     <p>~xf0r3m</p>
     </div>
-		<p style="margin: 15px; padding: 0; outline: 0;">
+		<p class="footer">
 			2021; COPYLEFT; ALL RIGHTS REVERSED;
 		</p>
 

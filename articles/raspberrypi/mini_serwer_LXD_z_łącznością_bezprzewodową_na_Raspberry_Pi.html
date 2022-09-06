@@ -3,23 +3,9 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
-		<style>
-			.code-block {
-				display: block;
-				background-color: silver;
-				font-family: monospace;
-				font-weight: bolder;
-			}
-			.code-inline {
-				background-color: silver;
-				font-family: monospace;
-
-				font-weight: bolder;
-			}
-			p { text-align: justify; }
-		</style>
+		<link rel="stylesheet" type="text/css" href="/style.css">
 	</head>
-	<body style="font-family: monospace;" >
+	<body>
 		<pre>
 		<span style="color: green;">     .~~.   .~~.
 		    '. \ ' ' / .'</span>
@@ -33,11 +19,11 @@
 			 '~'</span>
 		</pre>
 
-	<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+	<p class="header_link">
 		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
 	</p>
-	<div style="margin-left: auto; margin-right: auto; width: 80%;">
-    <h1 style="text-align: center">Mini serwer LXD z łącznością bezprzewodową na Raspberry Pi</h1>
+	<div class="main">
+    <h1 class="title">Mini serwer LXD z łącznością bezprzewodową na Raspberry Pi</h1>
     <p>
       Kiedy nie mamy miejsca w domu na prawdziwy serwer, a chcemy pobawić się kontenerami, to jako alternatywy możemy użyć <strong>Raspberry Pi</strong>. Po poza samą usługą <strong>LXD/LXC</strong> do dałem jeszcze funkcję <em>AP</em>, aby można było podłączyć się do niego bez kabli.
     </p>
@@ -326,7 +312,7 @@ $ lxc launch ubuntu:18.04 &lt;nazwa kontenera&gt;
 			~xf0r3m
 		</p>
 	</div>
-		<p style="margin: 15px; padding: 0; outline: 0;">
+		<p class="footer">
 			2021; COPYLEFT; ALL RIGHTS REVERSED;
 		</p>
 

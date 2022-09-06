@@ -3,23 +3,9 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
-		<style>
-			.code-block {
-				display: block;
-				background-color: silver;
-				font-family: monospace;
-				font-weight: bolder;
-			}
-			.code-inline {
-				background-color: silver;
-				font-family: monospace;
-
-				font-weight: bolder;
-			}
-			p { text-align: justify; }
-		</style>
+		<link rel="stylesheet" type="text/css" href="/style.css">
 	</head>
-	<body style="font-family: monospace;" >
+	<body>
 <pre>
   _____ _   _ _    _    ___      _
  / ____| \ | | |  | |  / / |    (_)
@@ -28,11 +14,11 @@
 | |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
  \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
 </pre>
-	  <p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+	  <p class="header_link" >
 		  &#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
 	  </p>
-	  <div style="margin-left: auto; margin-right: auto; width: 80%;">
-      <h1 style="text-align: center;">Własne LiveCD z GNU/Linux Debian</h1>
+	  <div class="main">
+      <h1 class="title">Własne LiveCD z GNU/Linux Debian</h1>
       <p>
         Czasami może zadarzyć się taka sytuacja, że będziemy korzystać z wielu
         różnych maszyn co jakiś czas. Jak pewnie zdajemy sobie sprawę z tego
@@ -295,11 +281,13 @@ configfile /boot/grub/grub.cfg
       </p>
       <p><u>64-bit EFI</u></p>
 <pre class="code-block">
-# grub-mkstandalone --format=x86_64-efi --output=/root/customDebianLiveCD/staging/EFI/boot/bootx64.efi --locales="" --fonts="" "/boot/grub/boot.cfg=/root/customDebianLiveCD/tmp/grub-standalone.cfg"
+# grub-mkstandalone --format=x86_64-efi --output=/root/customDebianLiveCD/staging/EFI/boot/bootx64.efi --locales="" --fonts="" \ 
+"/boot/grub/boot.cfg=/root/customDebianLiveCD/tmp/grub-standalone.cfg"
 </pre>
       <p><u>32-bit EFI</u></p>
 <pre class="code-block">
-# grub-mkstandalone --format=i386-efi --output=/root/customDebianLiveCD/staging/EFI/boot/bootia32.efi --locales="" --fonts="" "/boot/grub/boot.cfg=/root/customDebianLiveCD/tmp/grub-standalone.cfg"
+# grub-mkstandalone --format=i386-efi --output=/root/customDebianLiveCD/staging/EFI/boot/bootia32.efi --locales="" --fonts="" \
+"/boot/grub/boot.cfg=/root/customDebianLiveCD/tmp/grub-standalone.cfg"
 </pre>
       <p>
         Wszystkie bootowalne obrazy LiveCD obsługujące UEFI posiadają
@@ -331,9 +319,10 @@ configfile /boot/grub/grub.cfg
         dołączona zostanie również partycja EFI.
       </p>
 <pre class="code-block">
-# xorriso -as mkisofs -iso-level 3 -o "custom_debian.iso" -full-iso9660-filenames -volid "CUSTOM_DEBIAN" -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin -eltorito-boot isolinux/isolinux.bin -no-emul-boot \
--boot-load-size 4 -boot-info-table --eltorito-catalog isolinux/isolinux.cat-eltorito-alt-boot -e /boot/grub/efiboot.img -no-emul-boot -isohybrid-gpt-basdat \
--append_partition 2 0xef /root/customDebianLiveCD/staging/boot/grub/efiboot.img "/root/customDebianLiveCD/staging"
+# xorriso -as mkisofs -iso-level 3 -o "custom_debian.iso" -full-iso9660-filenames -volid "CUSTOM_DEBIAN" \ 
+-isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin -eltorito-boot isolinux/isolinux.bin -no-emul-boot \
+-boot-load-size 4 -boot-info-table --eltorito-catalog isolinux/isolinux.cat-eltorito-alt-boot -e /boot/grub/efiboot.img -no-emul-boot \ 
+-isohybrid-gpt-basdat -append_partition 2 0xef /root/customDebianLiveCD/staging/boot/grub/efiboot.img "/root/customDebianLiveCD/staging"
 </pre>
       <p>
         Tak wygenerowany obraz możemy śmiało załadować na pendrive-a lub
@@ -353,7 +342,7 @@ configfile /boot/grub/grub.cfg
          ~xf0r3m
       </p>
     </div>
-		<p style="margin: 15px; padding: 0; outline: 0;">
+		<p class="footer">
 			2021; COPYLEFT; ALL RIGHTS REVERSED;
 		</p>
   </body>

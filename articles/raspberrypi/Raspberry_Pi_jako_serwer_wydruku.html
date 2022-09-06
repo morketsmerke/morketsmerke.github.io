@@ -3,23 +3,9 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
-		<style>
-			.code-block {
-				display: block;
-				background-color: silver;
-				font-family: monospace;
-				font-weight: bolder;
-			}
-			.code-inline {
-				background-color: silver;
-				font-family: monospace;
-
-				font-weight: bolder;
-			}
-			p { text-align: justify; }
-		</style>
+		<link rel="stylesheet" type="text/css" href="/style.css">
 	</head>
-	<body style="font-family: monospace;" >
+	<body>
 		<pre>
 		<span style="color: green;">     .~~.   .~~.
 		    '. \ ' ' / .'</span>
@@ -33,12 +19,12 @@
 			 '~'</span>
 		</pre>
 
-	<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+	<p class="header_link">
 		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
 	</p>
 
-	<div style="margin-left: auto; margin-right: auto; width: 80%;">
-    <h1 style="text-align: center;">Raspberry Pi jako serwer wydruku</h1>
+	<div class="main">
+    <h1 class="title">Raspberry Pi jako serwer wydruku</h1>
     <p>
       Jak to się mówi... Potrzeba jest matką wynalazków. W moim przypadku był to problem takiego rodzaju że na dwa komputery w biurze miałem jedną drukarkę. Dość starą drukarkę bo to <em>HP LaserJet 1010</em> wydana w wrześniu 2003. Drukarka nie ma żadnych innych portów niż USB type B, i stała daleko od komputera a ja nie miałem tak długiego kabla żeby ją podłączyć. Więc wpadłem na pomysł aby podłączyć ją do Raspberry i zrobić z RPI serwer wydruku. Poniżej znajdują się czynność, które wykonywałem aby to skonfigurować.
     </p>
@@ -142,7 +128,7 @@ $ sudo systemctl restart cups
         ~xf0r3m
       </p>
 	</div>
-		<p style="margin: 15px; padding: 0; outline: 0;">
+		<p class="footer">
 			2021; COPYLEFT; ALL RIGHTS REVERSED;
 		</p>
 

@@ -3,23 +3,9 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
-		<style>
-			.code-block {
-				display: block;
-				background-color: silver;
-				font-family: monospace;
-				font-weight: bolder;
-			}
-			.code-inline {
-				background-color: silver;
-				font-family: monospace;
-
-				font-weight: bolder;
-			}
-			p { text-align: justify; }
-		</style>
+		<link rel="stylesheet" type="text/css" href="/style.css">
 	</head>
-	<body style="font-family: monospace;" >
+	<body>
 <pre>
   _____ _   _ _    _    ___      _
  / ____| \ | | |  | |  / / |    (_)
@@ -28,11 +14,11 @@
 | |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
  \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
 </pre>
-	<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+	<p class="header_link">
 		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
 	</p>
-	<div style="margin-left: auto; margin-right: auto; width: 80%;">
-		<h1 style="text-align: center;">Tworzenie woluminów logicznych - LVM</h1>
+	<div class="main">
+		<h1 class="title">Tworzenie woluminów logicznych - LVM</h1>
     <p>
       Czasami może zajść taka przeba że trzeba wykorzystać dwa fizyczne dyski, jednak nie w taki prosty sposób jakby się mogło wydawać. Na dyskach będzie przechowywane bardzo dużo danych i te dane muszą być w jednym katalogu ale nie zmieszczą się na jednym dysku. Opcje są dwie, oddać te zakupione dyski do sklepu i kupić większe o ile dyski są nowe lub podłączyć je do serwera i konfigurować na nich <strong>wolumin logiczny</strong>.
     </p>
@@ -93,7 +79,7 @@ $ sudo mount /dev/mapper/vg0-lvol0 /mnt
         ~xf0r3m
     </p>
   </div>
-	<p style="margin: 15px; padding: 0; outline: 0;">
+	<p class="footer">
 		2021; COPYLEFT; ALL RIGHTS REVERSED;
 	</p>
 </body>

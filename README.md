@@ -1,4 +1,3 @@
-# morketsmerke.net
+# morketsmerke-dev
 
-Moja strona, na której wrzucam notatki oraz HOWTO, czasem dłuższe formy wypowiedzi na konkretny temat.
-
+morketsmerke.github.io w wersji rozwojowej.

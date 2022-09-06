@@ -3,22 +3,9 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
-		<style>
-			.code-block {
-				display: block;
-				background-color: silver;
-				font-family: monospace;
-				font-weight: bolder;
-			}
-			.code-inline {
-				background-color: silver;
-				font-family: monospace;
-				font-weight: bolder;
-			}
-			p { text-align: justify; }
-		</style>
+		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
-	<body style="font-family: monospace;">
+	<body>
 <pre>
 			 __        __                           __
    ____ ___  ____  _____/ /_____  / /__________ ___  ___  _____/ /_____
@@ -27,8 +14,8 @@
 /_/ /_/ /_/\____/_/  /_/|_|\___/\__/____/_/ /_/ /_/\___/_/  /_/|_|\___/
 
 </pre>
-		<div style="margin-left: auto; margin-right: auto; width: 80%;">
-			<p style="margin: 0; padding: 0; outline: 0;">
+		<div class="main">
+			<p class="links">
 				<a href="articles/linux/index.html">linux</a>
 				<a href="articles/bsd/index.html">bsd</a>
 				<a href="articles/raspberrypi/index.html">raspberry pi</a>
@@ -37,7 +24,31 @@
         <a href="https://github.com/xf0r3m">git</a>
         <a href="https://github.com/xf0r3m/immudex">immudex</a>
 			</p>
-			<p style="text-align: justify;">
+      <p>
+        <strong>O mnie</strong><br />
+      </p>
+      		<div>
+		<img src="https://i.ibb.co/D9CYmS5/mm-lb.png" style="display: block; float: left;" />
+		<p> 
+	Cześć mam imię Jakub i jestem entuzajstą systemów uniksopodobnych,
+        serwerów zarówno fizycznych maszyn jak i demonów oraz różnych dziwnych
+        rozwiązań komputerowych jak np. cienkie klienty. Żaden ze mnie
+        <em>sysadmin</em>. Ta strona jest przedłużeniem mojej pamięci i
+        powstała w jednym celu - zapisać wszystko z czym miałem styczność
+        podczas moich zabaw z komputerami (if u know what i mean ;)). Często
+        korzystałem z różnych źródeł próbując coś sobie skonfigurować na
+        Linuksie czy innym Uniksie i zawarte tam informacje nie zawsze były 
+        trafne, akurat w moim przypadku (oczywiście!). Dlatego też zamiast
+        spędzić 15 minut, nad jedną rzeczą spędzałem nad nią kilka godzin.
+        Kiedy już osiągnąłem cel, doszedłem do wniosku że tyle pracy nie może
+        przecież pójść na marne i zacząłem te swoje rozwiązania spisywać
+        do plików .txt. Później wpadłem na pomysł, że przecież mogę utworzyć
+        bloga i tam wszystko zapisywać. Ta strona miała kilka wersji,
+        charakteryzujących się różnorakim <em>designem</em>,<em>layoutem</em>. 
+	czy rozwiązaniem. Ta jest wersją 6, czy ostateczną tego niewiadomo.
+        Sądząc po tym jak szybko się nudze i jak bardzo nie służy mi stagnacja
+        z dużym prawdopodobieństwem chyba nie.
+      <!--
                 Po chyba pięciu wersjach jest... Najbardziej hakerska wersja tej strony. 
                 Wygląda jakby autorowi ewidentnie się nie chciało. Chociaż dzisiaj w 
                 czasach ogólnej, ekscytującej brzydoty design ukradziony z pierwszych 
@@ -50,10 +61,37 @@
                 Lorem Ipsum. Tutaj wpisz przykładowy tekst.<br />
                  <br />
                 ~xf0r3m
+      -->
 			</p>
+		</div>
+      <p>
+        Materiały tutaj zamieszczone, tworzę wyłącznie z myślą o sobie samym.
+        Materiały są pełne literówek, błędów językowych, gramatycznych czy 
+        ortograficznych (spędzając wiecej czasu w książkach o Linuksie czy
+        jezykach oprogramowania nabawiłem się chyba jakiejś dysleksji, może te
+        akapity uda się napisać poprawnie).
+        Te można sobie darować, jednak pracuje nad tym aby każdy materiał był
+        jak najbardziej merytoryczny i zwierał jak najmniej tego typu błędów.
+        Jedym słowem grafomania. Materiały zawarte na tej stronie są publikowne
+        w oparciu o <em>copyleft</em>. (Nie chce mi się przytaczać pełnej nazwy
+        tej licencji. Nawet jej nie znam. W kwestajach licencyjnych jestem
+        straszym ignoratem, liczą się tylko te najbardziej liberalne jak
+        <em>GPL</em> [zaraz i tak się dowiem, że GPL nie jest, aż tak mocno
+        liberalna], zatem moją licencje mogę określić mianem JCh - "Bierzcie i
+        korzystajcie z tego wszyscy, to jest moja praca wydana na wieki 
+        wieków", wszystkie inne licencje ograniczające użytkownika to ściek.)
+        Dlatego też śmiało można korzystać, ze wszystkich materiałów tutaj
+        zawartych. Nie obiecuje, że ta strona będzie komukolwiek przydatna, ale
+        jak już jesteście to siadajcie. Brawo dotarłeś do końca internetu.
+      </p>
+      <p>
+      	Jakby ktoś potrzebował kontaktu ze mną, to znajdzie go pod tym
+	adresem mailowm: <a href="mailto:xf0r3m@gmail.com">itaktegonieodczytam@gmail.com</a>.
+      </p>
 			<p>&nbsp;</p>
 			<p>
-				Oznaczenia tekstu stosowane w materiałach:
+				Oznaczenia tekstu stosowane w materiałach (autor zastrzega sobie
+				możliwość niestosowania się do poniższych reguł):
 			</p>
 			<ul>
 				<li>
@@ -87,83 +125,78 @@
 <pre>
 -- Changelog --
 </pre>
-			<p style="text-aling: justify;" >
-				-- 14.10.2020 - Rozpoczęcie tworzenia nowej odsłony
-				strony morketsmerke.net.<br />
-				-- 15.10.2020 - Utworznie statycznych podstron dla
-				katalogów.<br />
-				-- 16.10.2020 - Rozpoczęcie przenoszenia treści na nową
-				wersję strony.<br />
-				-- 19.10.2020 - Rozpoczęcie redagowania artykułu Bash Bushido
-				dla terminallog.<br />
-				-- 28.10.2020 - Rozpoczęcie przenosin na inny sprzęt.<br />
-				-- 01.11.2020 - Przenosiny zakończone, utworzenie frontpage-a
-				morketsmerke.net.<br />
-				-- 26.03.2021 - Zakończenie przenoszenia treści na nową wersję strony.<br />
-				-- 04.04.2021 - Zakończenie prac nad obecną formą strony.<br />
-				-- 11.04.2021 - Dodanie "Dziennika OpenBSD".<br />
-				-- 30.04.2021 - Dodanie "Instalacja NetBSD".<br />
-				-- 02.05.2021 - Dodanie "20 letni Sun Netra T1 jako serwer mailowy z wykorzystaniem NetBSD".<br />
-				-- 03.05.2021 - Zmiany w "lost+found".<br />
-				-- 05.05.2021 - Aktualizacja FAQ.<br />
-				-- 07.05.2021 - Dodanie "Konfiguracja HAProxy dla HTTP oraz HTTPS" na terminallog.<br />
-        -- 15.05.2021 - Dodanie "Sieci VPN" na terminallog.<br />
-        -- 15.05.2021 - Uaktualnienie "Laboratorium sieci VPN".<br />
-        -- 08.06.2021 - Rozpoczęcie serii materiałów "Jak działa Linux?"<br />
-	-- 12-13.06.2021 - Rozpoczęcie prac nad greenOS<br />
-	-- 30.06/01.07.2021 - Uruchomienie mirroru Debiana dla stable, oldstable dla architektur amd64 oraz i386<br />
-        -- 29.07.2021 - Dodanie "Raspberry Pi jako serwer poczty"<br />
-        -- 30.07.2021 - Dodanie "GNU mailutils jako program mailowy"<br />
-        -- 21.08.2021 - Wydanie pierwszej oficjalnej wersji greenOS<br />
-        -- 02.09.2021 - Dodanie "Własne LiveCD z Debianem"<br />
-        -- 03.09.2021 - Dodanie "Instalacja systemu z własnego obrazu LiveCD z Debianem"<br />
-        -- 05.09.2021 - Dodanie "Raspberry Pi jako przekaźnik bluetooth"<br />
-        -- 19.09.2021 - Dodanie "greenOSAE"<br />
-        -- 24.09.2021 - Zwieszenie wsparcia dla greenOS<br />
-				-- 26.09.2021 - Przeniesie morketsmerke.net na morketsmerke.github.io<br />
-				-- 03.10.2021 - Dodanie kolejnego rozdziału do serii "Jak działa Linux?"<br />
-        -- 15.10.2021 - Dodanie kolejnego rozdziału do serii "Jak działa Linux?"<br />
-        -- 28.10.2021 - Dodanie kolejnego rozdziału do serii "Jak działa Linux?"<br />
-        -- 12.11.2021 - Dodanie "Parabola GNU/Linux-libre"<br />
-        -- 14.11.2021 - Update materiału "Parabola GNU/Linux-libre"<br />
-        -- 18.11.2021 - Dodanie kolejnego rodziału do serii "Jak działa Linux?"<br />
-        -- 05.12.2021 - Reaktywacja projektu greenOS (Wydanie wersji 1 [Torwards the sun])<br />
-        -- 06.12.2021 - Rozpoczęcie prac nad OTP.<br />
-		    -- 12.12.2021 - Wydanie pierwszej wersji OTP o nazwie kodowej "Wise choice".<br />
-        -- 19.12.2021 - Dodanie kolejnego rozdziału do serii "Jak działa Linux?"<br />
-        -- 22.12.2021 - Wydanie OTP w wersji 1.0.1<br />
-        -- 23.12.2021 - Dodanie "Szyfrowany rootfs na greenOS"<br />
-        -- 30.12.2021 - Wydanie pierwszej wersji greenOS Trisquel edition (Torwards the sun)<br />
-        -- 04.01.2022 - Dodanie "linux/Szyfrowany rootfs na greenOSTe"<br />
-        -- 07.01.2022 - Dodanie kolejnego rozdziału do serii "Jak działa Linux?"<br />
-        -- 22.01.2022 - Dodanie kolejnego rozdziału do serii "Jak działa Linux?"<br />
-        -- 30.01.2022 - Wydanie greenOS 1.1<br />
-        -- 30.01.2022 - Wydanie greenOS Ratpoison<br />
-        -- 11.02.2022 - Przeniesienie danych z ftp.morketsmerke.net na serwis sourceforge.net oraz aktualizacja adresów odnośników na stronie greenOS<br />
-        -- 11.02.2022 - Upublicznienie archiwum z greenOSAE<br />
-        -- 13.02.2022 - Wydanie greenOSTe 9.0.1<br />
-        -- 13.02.2022 - Wydanie OTP w wersji 1.0.2<br />
-        -- 27.02.2022 - Usunięcie dotychczasowej serii "Jak działa Linux". Wymaga ona przeredagowania.<br />
-        -- 27.03.2022 - Wydanie wersji greenOS 1.2<br />
-        -- 27.03.2022 - Wydanie greenOS greenServer<br />
-        -- 29.03.2022 - Test GitHub CLI<br />
-        -- 31.03.2022 - Przeniesienie strony na inny serwer. Powrót do domeny morketsmerke.net. Home Sweet Home.<br />
-        -- 16.04.2022 - Wydanie OTP w wersji 1.0.3<br />
-        -- 17.04.2022 - Wydanie OTP w wersji 1.0.4<br />
-        -- 27.04.2022 - Wydanie OTP w wersji 1.0.5<br />
-        -- 05.05.2022 - Zmiany w greenOS. Wydanie wersji greenOS 1.3 (btw i use Arch)<br />
-        -- 06.05.2022 - Wydanie greenOS 1.4<br />
-        -- 07.05.2022 - Przeniesienie strony na adres https://morketsmerke.github.io<br />
-        -- 13.05.2022 - Dodanie "Podłączanie 7-calowego ekranu dotykowego (1024x600) do Raspberry Pi"<br />
-        -- 15.05.2022 - Zmiana FAQ na Tips&amp;Tricks<br />
-        -- 20.05.2022 - Dodanie "Przenoszenie systemu operacyjnego z maszyny wirtualnej na fizyczny komputer"<br />
-        -- 24.07.2022 - Dodanie "Uruchomienie skryptu podczas ładowania systemu - jednostka systemd"<br />
+			<p>
+	-- 01.09.2022 - Wydanie immudex w wersji 0.0.0<br />
         -- 01.09.2022 - Dodanie "Red Hat Enterprise Linux 9 - RHCSA" na terminallog<br />
-        -- 01.09.2022 - Wydanie immudex w wersji 0.0.0<br />
+        -- 24.07.2022 - Dodanie "Uruchomienie skryptu podczas ładowania systemu - jednostka systemd"<br />
+        -- 20.05.2022 - Dodanie "Przenoszenie systemu operacyjnego z maszyny wirtualnej na fizyczny komputer"<br />
+        -- 15.05.2022 - Zmiana FAQ na Tips&amp;Tricks<br />
+        -- 13.05.2022 - Dodanie "Podłączanie 7-calowego ekranu dotykowego (1024x600) do Raspberry Pi"<br />
+        -- 07.05.2022 - Przeniesienie strony na adres https://morketsmerke.github.io<br />
+        -- 06.05.2022 - Wydanie greenOS 1.4<br />
+        -- 05.05.2022 - Zmiany w greenOS. Wydanie wersji greenOS 1.3 (btw i use Arch)<br />
+        -- 27.04.2022 - Wydanie OTP w wersji 1.0.5<br />
+        -- 17.04.2022 - Wydanie OTP w wersji 1.0.4<br />
+        -- 16.04.2022 - Wydanie OTP w wersji 1.0.3<br />
+        -- 31.03.2022 - Przeniesienie strony na inny serwer. Powrót do domeny morketsmerke.net. Home Sweet Home.<br />
+        -- 29.03.2022 - Test GitHub CLI<br />
+        -- 27.03.2022 - Wydanie greenOS greenServer<br />
+        -- 27.03.2022 - Wydanie wersji greenOS 1.2<br />
+        -- 27.02.2022 - Usunięcie dotychczasowej serii "Jak działa Linux". Wymaga ona przeredagowania.<br />
+        -- 13.02.2022 - Wydanie OTP w wersji 1.0.2<br />
+        -- 13.02.2022 - Wydanie greenOSTe 9.0.1<br />
+        -- 11.02.2022 - Upublicznienie archiwum z greenOSAE<br />
+        -- 11.02.2022 - Przeniesienie danych z ftp.morketsmerke.net na serwis sourceforge.net oraz aktualizacja adresów odnośników na stronie greenOS<br />
+        -- 30.01.2022 - Wydanie greenOS Ratpoison<br />
+        -- 30.01.2022 - Wydanie greenOS 1.1<br />
+        -- 22.01.2022 - Dodanie kolejnego rozdziału do serii "Jak działa Linux?"<br />
+        -- 07.01.2022 - Dodanie kolejnego rozdziału do serii "Jak działa Linux?"<br />
+        -- 04.01.2022 - Dodanie "linux/Szyfrowany rootfs na greenOSTe"<br />
+        -- 30.12.2021 - Wydanie pierwszej wersji greenOS Trisquel edition (Torwards the sun)<br />
+        -- 23.12.2021 - Dodanie "Szyfrowany rootfs na greenOS"<br />
+        -- 22.12.2021 - Wydanie OTP w wersji 1.0.1<br />
+        -- 19.12.2021 - Dodanie kolejnego rozdziału do serii "Jak działa Linux?"<br />
+	-- 12.12.2021 - Wydanie pierwszej wersji OTP o nazwie kodowej "Wise choice".<br />
+        -- 06.12.2021 - Rozpoczęcie prac nad OTP.<br />
+        -- 05.12.2021 - Reaktywacja projektu greenOS (Wydanie wersji 1 [Torwards the sun])<br />
+        -- 18.11.2021 - Dodanie kolejnego rodziału do serii "Jak działa Linux?"<br />
+        -- 14.11.2021 - Update materiału "Parabola GNU/Linux-libre"<br />
+        -- 12.11.2021 - Dodanie "Parabola GNU/Linux-libre"<br />
+        -- 28.10.2021 - Dodanie kolejnego rozdziału do serii "Jak działa Linux?"<br />
+        -- 15.10.2021 - Dodanie kolejnego rozdziału do serii "Jak działa Linux?"<br />
+	-- 03.10.2021 - Dodanie kolejnego rozdziału do serii "Jak działa Linux?"<br />
+	-- 26.09.2021 - Przeniesie morketsmerke.net na morketsmerke.github.io<br />
+        -- 24.09.2021 - Zwieszenie wsparcia dla greenOS<br />
+        -- 19.09.2021 - Dodanie "greenOSAE"<br />
+        -- 05.09.2021 - Dodanie "Raspberry Pi jako przekaźnik bluetooth"<br />
+        -- 03.09.2021 - Dodanie "Instalacja systemu z własnego obrazu LiveCD z Debianem"<br />
+        -- 02.09.2021 - Dodanie "Własne LiveCD z Debianem"<br />
+        -- 21.08.2021 - Wydanie pierwszej oficjalnej wersji greenOS<br />
+        -- 30.07.2021 - Dodanie "GNU mailutils jako program mailowy"<br />
+        -- 29.07.2021 - Dodanie "Raspberry Pi jako serwer poczty"<br />
+	-- 30.06/01.07.2021 - Uruchomienie mirroru Debiana dla stable, oldstable dla architektur amd64 oraz i386<br />
+	-- 12-13.06.2021 - Rozpoczęcie prac nad greenOS<br />
+        -- 08.06.2021 - Rozpoczęcie serii materiałów "Jak działa Linux?"<br />
+        -- 15.05.2021 - Uaktualnienie "Laboratorium sieci VPN".<br />
+        -- 15.05.2021 - Dodanie "Sieci VPN" na terminallog.<br />
+	-- 07.05.2021 - Dodanie "Konfiguracja HAProxy dla HTTP oraz HTTPS" na terminallog.<br />
+	-- 05.05.2021 - Aktualizacja FAQ.<br />
+	-- 03.05.2021 - Zmiany w "lost+found".<br />
+	-- 02.05.2021 - Dodanie "20 letni Sun Netra T1 jako serwer mailowy z wykorzystaniem NetBSD".<br />
+	-- 30.04.2021 - Dodanie "Instalacja NetBSD".<br />
+	-- 11.04.2021 - Dodanie "Dziennika OpenBSD".<br />
+	-- 04.04.2021 - Zakończenie prac nad obecną formą strony.<br />
+	-- 26.03.2021 - Zakończenie przenoszenia treści na nową wersję strony.<br />
+	-- 01.11.2020 - Przenosiny zakończone, utworzenie frontpage-a morketsmerke.net.<br />
+	-- 28.10.2020 - Rozpoczęcie przenosin na inny sprzęt.<br />
+	-- 19.10.2020 - Rozpoczęcie redagowania artykułu Bash Bushido dla terminallog.<br />
+	-- 16.10.2020 - Rozpoczęcie przenoszenia treści na nową wersję strony.<br />
+	-- 15.10.2020 - Utworznie statycznych podstron dla katalogów.<br />
+	-- 14.10.2020 - Rozpoczęcie tworzenia nowej odsłony strony morketsmerke.net.<br />
 			</p>
 			</div>
 			<p>&nbsp;</p>
-			<p style="margin: 15px; padding: 0; outline: 0;">
+			<p class="footer">
 				2022; COPYLEFT; ALL RIGHTS REVERSED;
 			</p>
 

@@ -3,23 +3,9 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
-		<style>
-			.code-block {
-				display: block;
-				background-color: silver;
-				font-family: monospace;
-				font-weight: bolder;
-			}
-			.code-inline {
-				background-color: silver;
-				font-family: monospace;
-
-				font-weight: bolder;
-			}
-			p { text-align: justify; }
-		</style>
+		<link rel="stylesheet" type="text/css" href="/style.css">
 	</head>
-	<body style="font-family: monospace;" >
+	<body>
 <pre>
   _____ _   _ _    _    ___      _
  / ____| \ | | |  | |  / / |    (_)
@@ -28,11 +14,11 @@
 | |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
  \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
 </pre>
-	<p style="margin: 15px; padding: 0; outline: 0; font-size: 18pt;">
+	<p class="header_link">
 		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
 	</p>
-	<div style="margin-left: auto; margin-right: auto; width: 80%;">
-		<h1 style="text-align: center;">Tworzenie RAID programowych w systemach GNU/Linux</h1>
+	<div class="main">
+		<h1 class="title">Tworzenie RAID programowych w systemach GNU/Linux</h1>
     <p>
       <strong>RAID programowe</strong> są innym sposóbem na zarządzanie dyskami na systemach GNU/Linux. Dzięki temu rozwiązaniu nie musimy już kupować drogich dedykowanych kontrolerów do naszego budżetowego serwera. Oprogramowanie odpowiedzialne za konfigurowanie RAID wspiera wszystkie powszechnie używane poziomy 0,1,5,6,0+1,1+0.
     </p>
@@ -92,7 +78,7 @@ $ sudo mount /dev/md0p1 /mnt
         ~xf0r3m
     </p>
   </div>
-	<p style="margin: 15px; padding: 0; outline: 0;">
+	<p class="footer">
 		2021; COPYLEFT; ALL RIGHTS REVERSED;
 	</p>
 </body>
