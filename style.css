@@ -69,3 +69,45 @@ a:link {
 	padding: 0;
 	outline: 0;
 }
+
+.toc {
+  list-style-type: none;
+}
+
+.mainToc {
+  padding-left: 0;
+}
+
+#tableOfContent {
+  width: 38%;
+  height: 100vh;
+  float: left;
+  overflow: scroll;
+  padding-right: 1%;
+  margin-left: 1%;
+}
+
+#content {
+  width: 56%;
+  height: 100vh;
+  float: left;
+  overflow: scroll;
+  margin-left: 2%;
+  padding-right: 1%;
+}
+
+#contentHeader {
+  width: 100%;
+  float: left;
+}
+
+#contentHeaderLink {
+  float: left;
+  padding-left: 5%;
+  padding-top: 5%;
+}
+
+#divisionBaner {
+  font-size: 9pt;
+  float: left;
+}  

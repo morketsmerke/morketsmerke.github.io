@@ -11,32 +11,25 @@
 			ul {
 				text-align: left;
 			}
-      .toc {
-        list-style-type: none;
-      }
       p {
         text-align: justify;
       }
       .exam_tip {
         border: solid 1px black;
       }
+      body {
+        width: 99%;
+        height: 100vh;
+      }
+      .main {
+        width: 100%;
+      }
 		</style>
 	</head>
 	<body>
-<pre>
- ____          _ _   _       _   
-|  _ \ ___  __| | | | | __ _| |_ 
-| |_) / _ \/ _` | |_| |/ _` | __|
-|  _ &lt;  __/ (_| |  _  | (_| | |_ 
-|_| \_\___|\__,_|_| |_|\__,_|\__|
-                                 
-</pre>
-    <p class="header_link">
-	    &#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
-    </p>
 		<div class="main">
-      <h1 class="title">Red Hat Enterprise Linux 9 - Red Hat Certified System Administrator</h1>
-      <h2>Spis treści</h2>
+    <div id="tableOfContent">
+      <h1>Red Hat Enterprise Linux 9 - Red Hat Certified System Administrator</h1>
       <ul class="toc">
         <li><a href="#1.introduction">1. Wstęp</a>
           <ul class="toc">
@@ -677,8 +670,37 @@
             <li><a href="#ch23summary">Podsumowanie</a></li>
           </ul>
         </li>
-        <li><a href="#sources">Źródła</a></li>
       </ul>
+      <p>
+        Źródła:
+      </p>
+      <ol>
+        <li><strong>RHCSA® Red Hat® Enterpise Linux® 8 (UPDATED)</strong>.
+          Training and Exam Preparation Guide. Second Edition. 
+          <em>Asghar Ghori</em></li>
+        <li><a href="https://access.redhat.com/solutions/6809311">How to configure a storage device to use VDO deduplication and compression in RHEL 9?</a></li>
+        <li><a href="https://www.redhat.com/en/blog/rhel-9-networking-say-goodbye-ifcfg-files-and-hello-keyfiles">RHEL 9 networking: Say goodbye to ifcfg-files, and hello to keyfiles </a></li>
+        <li>Strony podręcznika Red Hat Enterprise Linux 9</li>
+      </ol>
+    <p class="footer">
+        ~xf0r3m<br />
+				2022; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+      </div>
+      <div id="content">
+      <div id="contentHeader">
+<pre id="divisionBaner">
+ ____          _ _   _       _   
+|  _ \ ___  __| | | | | __ _| |_ 
+| |_) / _ \/ _` | |_| |/ _` | __|
+|  _ &lt;  __/ (_| |  _  | (_| | |_ 
+|_| \_\___|\__,_|_| |_|\__,_|\__|
+                                 
+</pre>
+        <p id="contentHeaderLink" class="header_link">
+	    &#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+        </p>
+      </div>
       <h1 id="1.introduction">1. Wstęp</h1>
       <p>
         Chcąc zmienić coś w swoim życiu postanowiłem, że zacznę od pracy.
@@ -17635,21 +17657,7 @@ CONTAINER ID  IMAGE                                   COMMAND     CREATED       
         technologii <em>Red Hat</em>, możemy przystąpić
         kolejnego certyfikatu po zdaniu <em>RHCSA</em>. Powodzenia!
       </p>
-      <h1 id="sources">Źródła:</h1>
-      <ol>
-        <li><strong>RHCSA® Red Hat® Enterpise Linux® 8 (UPDATED)</strong>.
-          Training and Exam Preparation Guide. Second Edition. 
-          <em>Asghar Ghori</em></li>
-        <li><a href="https://access.redhat.com/solutions/6809311">How to configure a storage device to use VDO deduplication and compression in RHEL 9?</a></li>
-        <li><a href="https://www.redhat.com/en/blog/rhel-9-networking-say-goodbye-ifcfg-files-and-hello-keyfiles">RHEL 9 networking: Say goodbye to ifcfg-files, and hello to keyfiles </a></li>
-        <li>Strony podręcznika Red Hat Enterprise Linux 9</li>
-      </ol>
-      <p>
-        ~xf0r3m
-      </p>
+      </div>
     </div>
-    <p class="footer">
-				2022; COPYLEFT; ALL RIGHTS REVERSED;
-		</p>
-	</body>
+      	</body>
 </html>

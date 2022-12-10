@@ -9,10 +9,38 @@
           text-align: left;
         }
         ul { text-align: left; }
+        body {
+          width: 99%;
+          height: 100vh;
+        }
+        .main {
+          width: 100%;
+        }
       </style>
     </head>
     <body>
-<pre>
+      <div class="main">
+      <div id="tableOfContent">
+	      <h1>Sieci VPN</h1>
+        <ol>
+          <li><a href="#wstep">Wstęp</a></li>
+          <li><a href="#slabosc_protokolow">Słabość protokołów sieciowych i
+              związane z tym problemy</a></li>
+          <li><a href="#ssl">SSL jako standard bezpiecznego przesyłania danych
+              </a></li>
+          <li><a href="#tunel">Tunelowanie portów</a></li>
+          <li><a href="#openvpn">OpenVPN - praktyczne implementacja tuneli VPN
+              </a></li>
+          <li><a href="#ipsec">IPSec</a></li>
+          <li><a href="#ipsec_linux">IPSec w systemie Linux</a></li>
+        </ol>
+        <p class="footer">
+          2021; COPYLEFT; ALL RIGHTS REVERSED;
+        </p>
+        </div>
+        <div id="content">
+        <div id="contentHeader">
+<pre id="divisionBaner">
  _                      _             _ _
 | |_ ___ _ __ _ __ ___ (_)_ __   __ _| | | ___   __ _
 | __/ _ \ '__| '_ ` _ \| | '_ \ / _` | | |/ _ \ / _` |
@@ -20,11 +48,10 @@
  \__\___|_|  |_| |_| |_|_|_| |_|\__,_|_|_|\___/ \__, |
 			                        |___/
 </pre>
-      <p class="header_link">
+      <p id="contentHeaderLink" class="header_link">
       	&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
       </p>
-      <div class="main">
-	      <h1 class="title">Sieci VPN</h1>
+        </div>
         <p>
           <strong>VPN</strong> (ang. Virtual Private Network) - Wirtualna Sieć
           Prywatna jest to usługa sieciowa, która pozwala na bezpieczne i
@@ -42,21 +69,6 @@
           technologią VPN.
           </strong>
         </p>
-        <p>
-          <u>Spis treści: </u>
-        </p>
-        <ol>
-          <li><a href="#wstep">Wstęp</a></li>
-          <li><a href="#slabosc_protokolow">Słabość protokołów sieciowych i
-              związane z tym problemy</a></li>
-          <li><a href="#ssl">SSL jako standard bezpiecznego przesyłania danych
-              </a></li>
-          <li><a href="#tunel">Tunelowanie portów</a></li>
-          <li><a href="#openvpn">OpenVPN - praktyczne implementacja tuneli VPN
-              </a></li>
-          <li><a href="#ipsec">IPSec</a></li>
-          <li><a href="#ipsec_linux">IPSec w systemie Linux</a></li>
-        </ol>
         <h3 id="wstep">Wstęp</h3>
         <p>
           Żyjemy w czasach ogromnej informatyzacji przedsiębiorstw. Trudno
@@ -3330,10 +3342,7 @@ include /etc/ipsec.d/examples/no_oe.conf
 </pre>
       </li>
 </ol>
-
 </div>
-<p class="footer">
-2021; COPYLEFT; ALL RIGHTS REVERSED;
-</p>
+</div>
 </body>
 </html>
