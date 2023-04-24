@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+ _                               _           
+(_)_ __ ___  _ __ ___  _   _  __| | _____  __
+| | '_ ` _ \| '_ ` _ \| | | |/ _` |/ _ \ \/ /
+| | | | | | | | | | | | |_| | (_| |  __/>  < 
+|_|_| |_| |_|_| |_| |_|\__,_|\__,_|\___/_/\_\
+</pre>
+	  <p class="header_link">
+		  &#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	  </p>
+	  <div class="main">
+		  <h1 class="title">Aktualizacja immudex</h1>
+		  <p>
+        <em>Immudex</em> ze względu na to, że jest system wydawanym na zasadzie
+        LiveCD, jego najważniejsze elementy jak: jądro, <em>initrd</em> oraz
+        archiwum <em>squashfs</em> pozostają stałe. Aktualizacji dokonuje
+        się poprzez ich wymianę na miejscu docelowym. W zależności 
+        od rodzaju instalacji można wgrać nowy obraz na dysk lub zmienić te 
+        pliki na partycji utworzonej podczas instalacji.
+      </p>
+      <p>
+        <em>Immudex</em> w wersji stablinej nie jest wydawany regularnie.
+        Posiada on trzy powody do wydania nowej wersji: Aktualizacja jądra,
+        poważna zmiana (potrzeba dołączenia jakiegoś narzędzia/programu,
+        wykrycie/naprawa błędu w jednym z narzędzi) lub
+        duża ilość pakietów do aktualizacji. Inaczej jest w przypadku wersji
+        testowej, gdzie wydania publikowane są regularnie co tydzień w sobotę.
+      </p>
+      <p>
+        Aktualizacji możemy dokonać dwa sposób albo ręcznie, albo automatycznie
+        wykorzystując do tego narzędzie <strong>immudex_upgrade</strong>.
+        Warto jednak zaznaczyć, że wybierając opcją automatyczą to może ona
+        się nie powieźć, jeśli używaliśmy autorskiego archiwum 
+        <em>squashfs</em> i jego wielkość przekracza 2GB. Wówczas należy
+        dokonać ręcznie poprzez uruchomienie komputera z pamięci USB.
+      </p>
+      <p>
+        Po zalogowaniu się użytkownika do systemu zostanie wyświetlone mu
+        powiadomienie o tym czy jest dostępna nowa wersja <em>immudex</em>.
+        Dostępność nowej sprawdzana jest na zasadzie wersji zapisanej w
+        aktualizacji na serwerze dystrybującym system. Porównywane są
+        wartości z pliku lokalnego (na dysku) i pliku zadalnego (na serwerze).
+      </p>
+      <h2>Aktualizacja ręczna</h2>
+      <p>
+        W przypadku ręcznej aktualizacji należy pobrać obraz z jednego z
+        serwerów:
+      </p>
+      <ul>
+        <li><a href="https://ftp.morketsmerke.org/immudex">https://ftp.morketsmerke.org/immudex</a></li>
+        <li><a href="https://sourceforge.net/project/immudex">https://sourceforge.net/project/immudex</a></li>
+      </ul>
+      <p>
+        Załadować go na pamięć USB lub wypalić na płycie.
+      </p>
+<pre class="code-block">
+$ sudo dd if=immudex64.iso bs=1M of=/dev/sdX status=progress
+</pre>
+      <p>
+        Po załadowaniu obrazu na nośnik, uruchamiamy z niego komputer. Po
+        uruchomieniu systemu musimy podmontować partycję z systemem. Przeważnie
+        jest pierwsza partycja lub druga partycja na dysku (w trybie UEFI)
+      </p>
+<pre class="code-block">
+$ sudo mount /dev/sdX1 /mnt
+</pre>
+      <p>
+        Następnie usuwamy zawartość katalogu <em>live</em>.
+      </p>
+<pre class="code-block">
+sudo rm -rf /mnt/live/*
+</pre>
+      <p>
+        Teraz należy skopiować zawartość katalogu <em>live</em> na obrazie.
+        Katalog ten jest montowany w dwóch miejscach: <em>/run/live/medium/live</em>
+        lub <em>/usr/lib/live/mount/medium/live</em>.
+      </p>
+<pre class="code-block">
+sudo cp /run/live/medium/live/* /mnt/live;
+</pre>
+      <p>
+        Po wykonaniu tych czynności możemy odmontować partycję z system a
+        następnie zrestartować komputer. System uruchomi się ponownie, ale już
+        za pomocą <em>immudex</em> w najnowszej wersji.
+      </p>
+      <h2>Aktualizacja automatyczna</h2>
+      <p>
+        Aktualizacja automatyczna sprowadza się w zasadzie do jednego
+        polecenia. Bowiem narzędzie <strong>immudex_upgrade</strong> posiada
+        opcję <em>--upgrade</em>, która sprawdzi dostępność nowej wersji, a
+        następnie po potwierdzeniu przez użytkownika rozpocznie proces
+        aktualizacji.
+      </p>
+<pre class="code-block">
+xf0r3m@immudex:~$ immudex_upgrade --upgrade
+New version (0.1.9) of immudex is available.
+Warning, reboot maybe necessary to continue work on this machine
+Do you want upgrade this system? (y/n): y
+Upgrading immudex to the newest version...[ OK ]
+</pre>
+      <p>
+        Po wykonaniu tej czynności najlepiej jest wykonać ponowny rozruch
+        komputera.
+      </p>
+      <p>
+        <span class="warn-sign warning">&#9888;</span>
+        Uwaga! Próba automatycznej aktualizacji może się zakończyć
+        niepowodzeniem jeśli korzystamy z niestandardowego obrazu, którego
+        rozmiar przekaracza 2GB.
+      </p> 
+      <p>
+        ~xf0r3m
+      </p>
+			<p class="footer">
+				2023; COPYLEFT; ALL RIGHTS REVERSED;
+			</p>
+    </div>
+  </body>
+</html>

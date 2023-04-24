@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+ _                               _           
+(_)_ __ ___  _ __ ___  _   _  __| | _____  __
+| | '_ ` _ \| '_ ` _ \| | | |/ _` |/ _ \ \/ /
+| | | | | | | | | | | | |_| | (_| |  __/>  < 
+|_|_| |_| |_|_| |_| |_|\__,_|\__,_|\___/_/\_\
+</pre>
+	  <p class="header_link">
+		  &#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	  </p>
+	  <div class="main">
+		  <h1 class="title">Instalacja immudex</h1>
+		  <p>
+        Mimo tego, iż <em>immudex</em> jest wydawany jako <em>Live CD</em>, to
+        można go z powodzeniem zainstalować na dysku. Nawet jest to zalecane
+        dla tych, którzy chcą korzystać z niego w codziennym użytku. Obecnie
+        dostępne są dwa rodzaje instalacji:  
+      </p>
+      <h2>Instalacja obrazu LiveCD</h2>
+      <p>
+        Ten rodzaj instalacji świetnie sprawdzi się w przypadku cienkich
+        klientów oraz uruchamiania komputerów z sieci. Polega on na załadowaniu
+        na dysk obrazu płyty tak jak byśmy wgrywali go na pamięć USB.
+      </p>
+<pre class="code-block">
+$ curl https://ftp.morketsmerke.org/immudex/testing/iso/0.1.9/immudex-testing64.iso | sudo dd bs=1M of=/dev/sdX
+</pre>
+      <p>
+        Warto pamiętać o tym, że przy tego typu instalacjach reszta dysku
+        staje się bezużytczna.
+      </p>
+      <h2>Instalacja immudex na dysku</h2>
+      <p>
+        Jeśli chcemy na przykład wykorzystać <em>immudex</em> na laptopie,
+        gdzie potrzebujemy miejsca na dane. To dobry rozwiązaniem jest
+        instalacja systemu na dysku. <em>Immudex</em> póki co alokuje na pliki
+        systemowe 4 GB miejsca na dysku. Reszta pozostaje do naszej
+        dyspozycji.
+      </p>
+      <p>
+        Instalacji na dysku należy dokonać poprzez skrypt
+        <strong>immudex_install</strong>, skrypt zapyta nas o docelowy
+        dysk, jeśli będą więcej niż dwa. Przy uruchomieniu komputera z pamięci
+        USB jest to niemal pewne. Wybieramy konkretny dysk z listy i już,
+        system instaluje się.
+      </p>
+<pre class="code-block">
+xf0r3m@immudex:~$ immudex_install 
+This script will install immudex on first disk on your machine.
+It could be destructive for data placed on this disk
+Are you sure that you want contiune? (y/n): y
+Installation immudex in BIOS mode ... 1) vda
+2) vdb
+#? 1
+</pre>
+      <p>
+        Instalator sam na podstawie dostępności zmiennych oprogramowania
+        układowego UEFI ustali czy komputer działa w trybie BIOS czy UEFI
+        (w przypadku uruchomienia komputera w trybie BIOS, zmienne UEFI,
+        mimo że ten tryb jest dostępny, są niedostępne), następnie dobierze
+        odpowiedni zestaw poleceń. Nie będę przytaczać całego procesu
+        instalacji, ponieważ jest on rozpisany w narzędziu 
+        <em>immudex_install</em>, które można sobie przeanalizować pod tym
+        adresem: <a href="https://github.com/xf0r3m/immudex/blob/main/tools/010/immudex_install">https://github.com/xf0r3m/immudex/blob/main/tools/010/immudex_install</a>.
+      </p>
+      <p>
+        Inną kwestią pozostaje odmienność wersji UEFI. Obecnie mamy doczynienia
+        z 32-bitowym oraz 64-bitowym oprogramowanie układowym tego typu.
+        Skrypt <em>immudex-install</em> wspiera instalację na maszynach z
+        32-bitowym UEFI, jednak wymaga to specjalnego dysku USB. Na szczeście
+        istnieje narzędzie <strong>create_media</strong>, który posiada
+        specjalnego wgrania obrazu z <em>immudex</em> na pamięć USB, aby była
+        możliwość uruchomienia go na tych specyficznych komputerach.
+      </p>
+<pre class="code-block">
+$ create_media --i386-efi /dev/sdb ~/Pobrane/immudex-testing64.iso
+</pre>
+      <p>
+        ~xf0r3m
+      </p>
+			<p class="footer">
+				2023; COPYLEFT; ALL RIGHTS REVERSED;
+			</p>
+    </div>
+  </body>
+</html>

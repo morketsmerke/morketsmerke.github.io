@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+ _                               _           
+(_)_ __ ___  _ __ ___  _   _  __| | _____  __
+| | '_ ` _ \| '_ ` _ \| | | |/ _` |/ _ \ \/ /
+| | | | | | | | | | | | |_| | (_| |  __/>  < 
+|_|_| |_| |_|_| |_| |_|\__,_|\__,_|\___/_/\_\
+</pre>
+	  <p class="header_link">
+		  &#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	  </p>
+	  <div class="main">
+		  <h1 class="title">Transformacja GNU/Linux Debian w immudex - Budowanie</h1>
+		  <p>
+        Chcąc podnieść swój poziom bezpieczeństwa na nieco wyżej,
+        uznałem, że dobry pomysłem będzie użycie systemu, który jest niezmienny.
+        Za najprostszą formę niezmienności uznałem systemy uruchamiane z
+        poziomu <em>LiveCD</em>. Gdy taki system się uruchamia, zostaje
+        uruchomione jądro oraz <em>initrd</em>, montowane jest
+        archiwum <em>squashfs</em>, a dysk na którym są zapisane te elementy
+        pozostaje w trybie tylko do odczytu. Uruchamiając komputer ponownie
+        wszystko powróci do swojej pierwotnej formy. Tę dystrybucję oparłem 
+        o GNU/Linux Debian z dwóch powodów. Pierwszym z nich jest 
+        doświadczenie. Otóż
+        już wcześniej zajmowałem się dystrybucją pochodną od Debiana oraz
+        stabliność, GNU/Linux Debian to bardzo stablina dystrybucja. Ten
+        materiał ma za zadnie przedstawić w jaki sposób można utworzyć obraz
+        płyty z niezmiennym systemem operacyjnym.
+      </p>
+      <p>
+        Do budowy <em>immudex</em> potrzebujemy kilku pakietów do utworzenia
+        końcowego obrazu płyty oraz plików, które on będzie zawierać.
+      </p>
+<pre class="code-block">
+$ sudo apt install -y debootstrap squashfs-tools xorriso isolinux syslinux-efi\
+grub-pc-bin grub-efi-amd64-bin mtools dosfstools git vim
+</pre>
+      <p>
+        Teraz możemy utworzyć katalog przeznaczony na nasz system, jeśli
+        będziemy obsługiwać obie architektury komputerów klasy PC tj.
+        <em>amd64</em> lub <em>i386</em>, to wypadało by utworzyć podkatalogi
+        dla obu.
+      </p>
+<pre class="code-block">
+$ mkdir -p immudex/{64,32};
+</pre>
+      <p>
+        Po utworzeniu początkowych katalogów, możemy pobrać czysty obraz
+        katalogu głównego z jednego z dostępnych serwerów lustrzanych.
+      </p>
+<pre class="code-block">
+$ sudo /sbin/debootstrap --arch=amd64 bullseye ~/immudex/64/chroot http://ftp.icm.edu.pl/debian
+</pre>
+      <p>
+        Polecenie <code class="code-inline">debootstrap</code> służy do pobrania
+        oraz instalacji obrazu we wskazane miejsce
+        (<code class="code-inline">~/immudex/64/chroot</code>). Wersja stablina
+        <em>immudex</em> jest analogiczna do Debiana więc jako nazwę kodową
+        wersji podajemy <code class="code-inline">bullseye</code> (wersja
+        stablilna na czas pisania tego materiału). Tak samo jest z wersją 
+        testową. Ostatni argument to adres najszybszego dla nas serwera
+        lustrzanego z repozytorium Debiana. Dla mnie jest SunSITE ICM UW.
+      </p>
+      <p>
+        Na chwilę opuszczamy utworzony wcześniej katalog <em>~/immudex</em>,
+        aby pobrać pliku projektu z serwisu GitHub: <a href="https://github.com/xf0r3m/immudex">https://github.com/xf0r3m/immudex</a>.
+        Do tego celu najlepiej wybrać takie miejsce, w którym możemy pozostawić
+        po sobie bałagan. Katalog <em>~/Pobrane</em> świetnie się do tego
+        nadaje.
+      </p>
+<pre class="code-block">
+$ if [ ! -d ~/Pobrane ]; then mkdir ~/Pobrane; fi
+$ cd ~/Pobrane
+$ git clone https://github.com/xf0r3m/immudex.git;
+</pre>
+      <p>
+        Pośród pobranych plików projektu znajduje się 
+        <strong>bazowy plik wersji</strong> (<em>versions/base.sh</em>), który
+        wykorzystywany jest do budowania <em>immudex</em> od zera. Od czystej
+        wersji Debiana. Ten plik musimy skopiować do katalogu, w którym 
+        <em>debootstrap</em> wypakował obraz Debiana.
+      </p>
+<pre class="code-block">
+$ sudo cp -v ~/Pobrane/immudex/version/bash.sh ~/immudex/64/chroot;
+</pre>
+      <p>
+        Plik ten musi zostać uruchomiony przez powłokę w zmienionym katalogu
+        głównym. Skrypt aby mógł prawidłowo określić pakiety jakie trzeba
+        pobrać (na przykład jądro) oczekuje również na podanie architektury 
+        (w tym przypadku jest to 64 dla <em>amd64</em> lub 32 dla 
+        <em>i386</em>),
+      </p>
+<pre class="code-block">
+$ sudo chroot ~/immudex/64/chroot bash base.sh 64
+</pre>
+      <p>
+        Program zainstaluje wszystkie pakiety oferowane przez pierwszą wersję
+        <em>immudex</em>, uzupełni system o kilka autorskich narzędzi
+        ułatwiających pracę z dystrybucją zgodnie z jej koncepcją
+        (oczywiście wszystko zostało stworzone, w taki sposób aby niczego
+        nie narzucać. Wszystko można w łatwy sposób obejść) oraz skonfiguruje
+        środowisko graficzne. Wszystkie czynności można sprawdzić analizując
+        plik, który znajduje się w repozytorium: <a href="https://github.com/xf0r3m/immudex/blob/main/versions/base.sh">https://github.com/xf0r3m/immudex/blob/main/versions/base.sh</a>
+      </p>
+      <p>
+        Po zakończeniu wykonywania czynności przez skrypt, możemy go usunąć,
+        aby nie zaśmiecać obrazu.
+      </p>
+<pre class="code-block">
+$ sudo rm -f ~/immudex/64/chroot/base.sh;
+</pre>
+      <p>
+        Teraz kiedy <em>rootfs</em> jest gotowy. Możemy zająć się pozostałymi
+        plikami do okoła niego. Wrócimy jeszcze do niego, tworząc z katalogu
+        archiwum <em>squashfs</em>. Nasze czynności rozpoczniemy od utworzenia
+        struktury katalogowej, której część znajdzie się na obrazie płyty.
+      </p>
+<pre class="code-block">
+$ mkdir -p ~/immudex/64/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
+</pre>
+      <p>
+        Po tym jak utworzyliśmy odpowiednie miejsce w strukturze, możemy teraz
+        wygenerować z katalogu <em>chroot</em> archiwum <em>squashfs</em>. Ten
+        proces może trochę potrwać w zależności od mocy naszego komputera.
+        Istotnym faktem tutaj jest nazwa pliku archiwum <em>squashfs</em>.
+        Nie jest ona przypadkowa, pod tą nazwą program <em>live-boot</em>
+        odpowiedzialny za obsługę środowiska LiveCD będzie domyślnie szukać
+        pliku o nazwa <strong>filesystem.squashfs</strong> i będzie próbować
+        użyć go jako katalogu głównego. Wcześniej montując archiwum.
+      </p>
+<pre class="code-block">
+$ sudo mksquashfs ~/immudex/64/chroot ~/immudex/64/staging/live/filesystem.squashfs -e boot
+</pre>
+      <p>
+        Przygotowując <em>squashfs</em> nie możemy zapomnieć o jądrze oraz
+        <em>initrd</em>. Nazwy plików jądra oraz <em>initrd</em>, zostały 
+        dobrane pod istniejące już pliki konfiguracyjne programów rozruchowych.
+      </p>
+<pre class="code-block">
+$ cp -v $(ls -v ~/immudex/64/chroot/boot/vmlinuz-* | tail -1) ~/immudex/64/staging/live/vmlinuz
+$ cp -v $(ls -v ~/immudex/64/chroot/boot/initrd.img-* | tail -1) ~/immudex/64/staging/live/initrd
+</pre>
+      <p>
+        Już tłumaczę skąd wzięło się te podstawienia. Otóż, czasami może się
+        zdarzyć, że katalog <em>/boot</em> będzie zawierał dwa jądra. Ponieważ
+        przeważnie w dystrybucjach Linuksa tak jest. Jest "nowe" domyślne jądro
+        oraz "stare" zapasowe wrazie gdy to nowe okaże się wadliwe. Wyżej
+        wymienione podstawienia, uzupełnią polecenie nazwami plików nowszych
+        wersji.
+      </p>
+      <p>
+        Po skopiowaniu plików jądra. Możemy zająć teraz kwestią uruchomienia
+        systemu, a co za tym idzie - instalacja oraz konfiguracja programów
+        rozruchowych. <em>Immudex</em> wspiera dwa tryby rozruchu: rozruch w
+        trybie BIOS oraz w trybie UEFI (ale tylko UEFI 64-bitowe, domyślnie.
+        Gdyż można przystosować pamięc USB do uruchomienia na komputerach z
+        32-bitowym UEFI - narzędzie <em>create_media</em>). Konfiguracja
+        tych programów nie jest trudna, wystarczy kilka poleceń. Na początek
+        zaczniem od załadowania do struktury katalogowej plików
+        konfiguracyjnych. Za rozruch w trybie BIOS odpowiada program
+        <strong>isolinux</strong>, część projektu <em>syslinux</em>, który
+        będzie odpowiadać za rozruch już zainstalowanego <em>immudex</em> na
+        dysku (o tym w innym materiale). Natomiast za rozruch w trybie UEFI
+        odpowiada GRUB w wersji 2. Pliki konfiguracyjne znajdują się wśród
+        plików projektu <em>immudex</em>.
+      </p>
+<pre class="code-block">
+$ cp -v immudex/isolinux/amd64/* ~/immudex/64/staging/isolinux;
+$ cp -v immudex/grub/amd64/* ~/immudex/64/staging/boot/grub
+</pre>
+      <p>
+        Następną czynnością jest utworzenie pliku konfiguracyjnego dla
+        samodzielnego pliku GRUB-a. W tym pliku wskazane jest
+        katalog główny, ustalenie <em>prefiksu</em> dla ścieżek, oraz wskazanie
+        pliku konfigracyjnego dla GRUB-a.
+      </p>
+<pre class="code-block">
+$ cat &gt;&gt; ~/immudex/64/tmp/grub-standalone.cfg &lt;&lt;EOF
+search --set=root --file /DEBIAN
+set prefix=(\$root)/boot/grub
+configfile /boot/grub/grub.cfg
+EOF
+</pre>
+      <p>
+        Pierwsza linia na powyższym przykładzie powoduje ustawienie zmiennej
+        <code class="code-inline">root</code> scieżki dysku zawierającego plik
+        <code class="code-inline">DEBIAN</code>. Więc, aby GRUB ustawił katalog
+        główny obrazu jako swój główny katalog, musi się na nim znajdować
+        "luzem" plik o nazwie <code class="code-inline">DEBIAN</code>. 
+      </p>
+<pre class="code-block">
+$ touch ~/immudex/${arch}/staging/DEBIAN;
+</pre>
+      <p>
+        Aby programy rozruchowe mogły prawidło działać potrzebują plików
+        pomocniczych. Te pliki są instalowane wraz z pakietami, które 
+        dostarczają do naszych systemów te programy. Poniżej znajdują się
+        polecenia, których zadaniem jest skopiowanie plików pomocniczych
+        programów rozruchowych do struktury katalogowej obrazu płyty.
+      </p>
+<pre class="code-block">
+$ cp -v /usr/lib/ISOLINUX/isolinux.bin ~/immudex/64/staging/isolinux;
+$ cp -v /usr/lib/syslinux/modules/bios/* ~/immudex/64/staging/isolinux;
+$ cp -rv /usr/lib/grub/x86_64-efi/* ~/immudex/64/staging/boot/grub/x86_64-efi
+</pre>
+      <p>
+        Teraz możemy utworzyć plik wykonywalny GRUB, który następnie zostanie 
+        załadowany do partycji UEFI:
+      </p>
+<pre class="code-block">
+$ grub-mkstandalone --format=x86_64-efi\
+--output=${HOME}/immudex/64/staging/EFI/boot/bootx64.efi --locales=""\
+--fonts="" "boot/grub/grub.cfg=${HOME}/immudex/64/tmp/grub-standalone.cfg";
+</pre>
+      <p>
+        Ciekawym argumentem jest tutaj ostatni argument, gdyż zawiera on 
+        mapowania plików. W przypadku tego pliku konfiguracyjnego GRUB-a jego
+        plikiem jest plik <em>~/immudex/64/tmp/grub-standalone.cfg</em>, 
+        o którym już wspomniałem. Tamten zaś
+        wskazuje na właściwy już plik, w którym widnieją wpisy rozruchowe.
+      </p>
+      <p>
+        Tak utworzony plik możemy skopiować do partycji EFI, która w przypadku
+        obrazów płyt jest plkiem. Poniżej znajdują polecenia, które tworzą
+        plik partycji.
+      </p>
+<pre class="code-block">
+$ cd ~/immudex/64/staging/boot/grub
+$ dd if=/dev/zero bs=1M of=efiboot.img count=20
+$ sudo mkfs.vfat efiboot.img
+$ sudo mmd -i efiboot.img efi efi/boot
+</pre>
+      <p>
+        Po utworzeniu pliku partycji oraz utworzeniu na nim odpowiednich
+        folderów (ostatnie polecenie). Możemy skopiować nasz plik GRUB-a.
+      </p>
+<pre class="code-block">
+$ sudo mcopy -vi efiboot.img ~/immudex/64/staging/EFI/boot/bootx64.efi ::efi/boot 
+</pre>
+      <p>
+        Po wykonaniu tej czynności obraz w postacji struktury katalogów i
+        plików jest gotowy. Pozostała do wykonania jedna czynność. Zmiana tej
+        struktury w jeden plik, który będzie mógł być zapisany na płycie lub
+        nośniku USB, a następnie komputer będzie mógł być z niego uruchomiony.
+      </p>
+<pre class="code-block">
+cd ~/immudex/64;
+xorriso as mkisofs -iso-level 3 -o "immudex64.iso" -full-iso9660-filenames\
+-volid "immudex64" -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin\
+-eltorito-boot isolinux/isolinux.bin -no-emul-boot -boot-load-size 4\
+-boot-info-table --eltorito-catalog isolinux/isolinux.cat -eltorito-alt-boot\
+-e /boot/grub/efiboot.img -no-emul-boot -isohybrid-gpt-basdat\
+-append_partition 2 0xef ~/immudex/${arch}/staging/boot/grub/efiboot.img\
+~/immudex/64/staging
+</pre>
+      <p>
+        Poszczególne opcje polecenie <code class="code-inline">xorriso</code>
+        ustawiają odpowiednio programy rozruchowe, aby były one uruchamiane
+        podczas uruchamiana komputera z róznym rodzajem oprogramowania
+        układowego. Obraz jest również ustawiony tak, aby hybrydą obrazu płyty
+        oraz obrazu dysku, przez co może być załadowany bezpośrednio do pamięci
+        USB. Dzięki tej czynności jesteśmy w stanie uruchomić komputer z
+        pendrive-a.
+      </p>
+      <p>
+        Podsumowując dużą role w transformacji Debiana w <em>immudex</em>
+        odgrywa bazowy plik wersji. Po za kilkoma szczegółami, prowadzona
+        przeze mnie dystrybucja Linuksa dalej pozostaje Debianem. Nie chciałem
+        tworzyć nowego bytu, a raczej dostoswać obecny byt do swoich potrzeb.
+        Wiele z technik rekomendowanych to tworzenia obrazów z Debianem nie
+        zostało tutaj użytych.
+      </p>
+      <p>
+        ~xf0r3m
+      </p>
+			<p class="footer">
+				2023; COPYLEFT; ALL RIGHTS REVERSED;
+			</p>
+    </div>
+  </body>
+</html>

@@ -110,4 +110,11 @@ a:link {
 #divisionBaner {
   font-size: 9pt;
   float: left;
-}  
+}
+
+.warn-sign {
+  font-weight: bold;
+}
+
+.notice { color: black; }
+.warning { color: red; }  

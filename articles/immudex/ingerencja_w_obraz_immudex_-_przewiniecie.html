@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+ _                               _           
+(_)_ __ ___  _ __ ___  _   _  __| | _____  __
+| | '_ ` _ \| '_ ` _ \| | | |/ _` |/ _ \ \/ /
+| | | | | | | | | | | | |_| | (_| |  __/>  < 
+|_|_| |_| |_|_| |_| |_|\__,_|\__,_|\___/_/\_\
+</pre>
+	  <p class="header_link">
+		  &#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	  </p>
+	  <div class="main">
+		  <h1 class="title">Ingerencja w obraz immudex - przewinięcie</h1>
+		  <p>
+        Ze względu na specyfikę systemu immudex, może zajść potrzeba ingerencji
+        w jego obraz. Możemy dodać swoje ulubione oprogramowanie lub sterowniki
+        niezbędne do wygodnego korzystania z tej dystrybucji na naszym
+        komputerze. Przewinięcie głownie skupia się na ingerencji w archiwum
+        <strong>squashfs</strong>, które zawiera <em>rootfs</em> dystrybucji.
+      </p>
+      <p>
+        <span class="warn-sign notice">&#9888;</span>
+        Pro tip! Przewinięcia najlepiej dokonywać na systemie uruchomionym z 
+        pamięci USB lub płyty. Ponieważ zamontowane archiwum <em>squashfs</em>
+        nadal będzie zajmować miejsce na partycji mimo jego usunięcia, i nowe
+        archiwum może się nie skopiować ze względu na mała ilość miejsca na
+        dysku. Głównie będzie to mieć miejsce jeśli dotychczasowe archiwum
+        waży ponad 2GB.
+      </p>
+      <p>
+        Obsługa tego formatu plików, wymaga zainstalowanego w systemie
+        oprogramowania. Wersje <em>immudex</em> są w nie domyślnie wyposażone.
+        Więc czynności sprowadzają się głównie do wybrania dogodnego miejsca
+        (może być potrzebna większa ilość wolnego miejsca na dysku) i operacja
+        kilkoma poleceniami. Aby rozpocząć wprowadzanie zmian do obrazu musimy
+        go najpoczątku wypakować. Do wypakowania posłużymy się poleceniem
+        <strong>unsquashfs</strong>. 
+      </p>
+<pre class="code-block">
+$ sudo unsquashfs -d chroot /run/live/medium/live/filesystem.squashfs
+</pre>
+      <p>
+        Opcja <code class="code-inline">-d</code> służy wskazaniu katalogu, do
+        którego należy wypakować <em>rootfs</em>, jeśli folder nie istnieje to
+        zostanie utworzony. Następnie wskazujemy ścieżkę do archiwum
+        <em>squashfs</em>. Jeśli z jakiegoś powodu musimy nadpisać zawartość
+        istniejącego już katalogu, należy dodać opcję <strong>-f</strong>.
+      </p>
+      <p>
+        Aby rozpocząć wprowadzanie zmian do <em>rootfs</em>, należy zmienić
+        katalog główny obecnie uruchomionej powłoki. Tutaj warto się zatrzymać
+        i zastanować na tym jakie zmiany chcemy wprowadzić. Jesli jest to
+        dodanie jakiś pliku, instalacja dodatkowych pakietów. To zwykłe
+        przełączenie katalogu głównego powinno wystarczyć. Jednak jeśli w grę
+        wchodzi instalacja sterownika lub kompilacja nie których pakietów to
+        może być wymagana obecność interfejsów systemowych takich jak
+        <em>/dev</em>, <em>/proc</em> i tak dalej. Dlatego trzeba je
+        podmotować przed przełączeniem katalogu głównego.
+      </p>
+<pre class="code-block">
+/* w niektórych specyficznych przypadkach
+$ for i in /dev /dev/pts /proc /sys /run; do sudo mount -B chroot${i}; done
+*/
+$ sudo chroot chroot/ bash
+</pre>
+      <p>
+        Po zmianie katalogu głównego możemy dokonywać dowolnych zmian. Gdy
+        zakończymy już ich wprowadzanie, warto pamiętać o kilku czynnościach:
+      </p>
+      <ol>
+        <li>Utrzymaniu porządku w pakietach, za pomocą podpoleceń narzędzia
+          <strong>apt-get</strong>: <em>clean</em>, <em>autoremove</em> oraz
+          <em>autoclean</em> (głownie chodzi o pozbycie się pobranych pakietów
+          oraz tych już nie potrzebnych).</li>
+        <li>Usunięciu wszystkich plików roboczych (tych, które nie są już
+          potrzebne).</li>
+        <li>Usunięcie historii wprowadzanych poleceń. Jeśli przewaliśmy
+          działanie powłoki, to historia trafiła już do pliku, więc pomoć nam
+          może polecenie <code class="code-inline">echo &gt; ~/.bash_history</code>.
+          Gdy sesja powłoki jeszcze działa możemy wydać polecenie
+          <code class="code-inline">history -c</code>.</li>
+      </ol>
+      <p>
+        Oczywiście to tylko rady. Jeśli nie chcemy się do nich stosować nie
+        musimy. Ja stosuje je podczas wydawania nowych wersji <em>immudex</em>
+        (a przynajmnie staram się stosować).
+      </p>
+      <p>
+        Jeśli skończyliśmy wprowadzanie zmian, możemy spakować <em>rootfs</em>
+        do nowego pliku archiwum. Do tej czynności wykorzystamy polecenie
+        <strong>mksquashfs</strong>.
+      </p>
+<pre class="code-block">
+$ sudo mksquashfs chroot filesystem.squashfs -e boot
+</pre>
+      <p>
+        <span class="warn-sign warning">&#9888;</span>
+        Tutaj istotne jest aby archwium <em>squashfs</em> nazwywało się tak
+        jak podano na przykładzie <code class="code-inline">filesystem.squashfs</code>.
+        Program odpowiedzialny za obsługę sesji LiveCD <strong>live-boot</strong>
+        domyślnie szuka archiwym <em>squashfs</em> o takiej nazwie. Inne nazwy
+        <strong>nie będą</strong> działać.
+      </p>
+      <p>
+        Pierwszym argumentem jest wskazanie katalogu zawierającego 
+        <em>rootfs</em>, następnie podajemy nazwę archiwum. Podczas budowania
+        <em>immudex</em> wykorzystuje opcję <code class="code-inline">-e</code>,
+        aby program nie pakował plików jądra (one są potrzebne na zewnątrz).
+      </p>
+      <p>
+        Tak przygotowane archiwum może skopiować na dysk. Pamiętajmy jednak
+        o tym, że jeśli instalowane były dodatkowe modułu jądra 
+        (np. sterowniki), aktualizowane było jądro lub instalacje pakietów
+        mogły wpłynąć na obraz ram dysku (<em>initrd.img</em>) to należy
+        również skopiować pliki jądra. Jeśli nie mamy pewności czy nasze
+        czynności miały wpływ na te składniki systemu to najbezpieczniej jest
+        je wydobyć z <em>rootfs</em> i skopiować pod odpowiednimi nazwami
+        (<em>vmlinuz</em> - dla jądra oraz <em>initrd</em> - dla ram dysku).
+      </p>
+      <p>
+        ~xf0r3m
+      </p>
+			<p class="footer">
+				2023; COPYLEFT; ALL RIGHTS REVERSED;
+			</p>
+    </div>
+  </body>
+</html>

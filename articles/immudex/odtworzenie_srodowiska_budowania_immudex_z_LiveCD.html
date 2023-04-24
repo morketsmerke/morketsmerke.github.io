@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+ _                               _           
+(_)_ __ ___  _ __ ___  _   _  __| | _____  __
+| | '_ ` _ \| '_ ` _ \| | | |/ _` |/ _ \ \/ /
+| | | | | | | | | | | | |_| | (_| |  __/>  < 
+|_|_| |_| |_|_| |_| |_|\__,_|\__,_|\___/_/\_\
+</pre>
+	  <p class="header_link">
+		  &#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	  </p>
+	  <div class="main">
+		  <h1 class="title">Odtworzenie środowiska budowania immudex z LiveCD</h1>
+		  <p>
+        Przygotowując przez ten czas kolejne wersje <em>immudex</em> natrafiłem
+        na dość spory problem logistyczny. Otóż środowiska budowania (katalog
+        z <em>rootfs</em>, plikami <em>LiveCD</em> itp.) potrafił ważyć ok. 10
+        GB. Co powodowało problemy z archiwizacją oraz z ewentualnym
+        przenoszeniem tych danych. Zastanawiając się nad tym chwilę doszedłem do
+        wniosku, iż obrazy <em>.iso</em> muszą zawierać większość plików
+        zawartych w środowisku. Zatem wydaje mi się, że można je skopiować i
+        ustrukturyzować, aby obecność środowiska budowania przestała mieć
+        znaczenie.
+      </p>
+      <p>
+        <span class="warn-sign notice">&#9888;</span>
+        Ten materiał jest opisem czynności wykonywanych w skrypcie
+        opublikowanym na repozytorium projektu: <em>immudex-testing</em>,
+        pod tym adresem: <a href="https://github.com/xf0r3m/immudex-testing/blob/main/immudex_rebuildenv">https://github.com/xf0r3m/immudex-testing/blob/main/immudex_rebuildenv</a>,
+        więc przykłady nie będą poleceniami, ale przeredagowanym fragmentami
+        ze skryptu.
+      </p>
+      <p>
+        <em>Immudex</em> posiada dwie wersje oficjalne, jedną nieoficjalną,
+        która nie jest publicznie dostępna. Dodatkowo obsługuje on dwie
+        architektury: <em>amd64</em> oraz <em>i386</em>. Dlatego też
+        najważnie jeszcze jest aby wydobyć jak najwięcej informacji z jej jak
+        najmniejszej ilości. W tym przypadku do dyspozycji posiadamy plik
+        z obrazem lub link do lokalizacji sieciowej, gdzie możemy go pobrać.
+        Na podstawie samej nazwy obrazu płyty, możemy dowiedzieć się kilku
+        rzeczy. Czy mamy doczynienia z wersją stabliną, testową czy nieoficjalną
+        oraz dla jakiej architektury przygotowany został system. Na podstawie
+        tych informacji oraz informacji z instrukcji budowania <em>immudex</em>
+        możemy utworzyć strukturę katalogową, która pomoże nam utrzymać porządek
+        oraz umożliwi automatyzację procesu tworzenia nowego obrazu.
+      </p>
+<pre class="code-block">
+isoPath=$1;
+if echo $isoPath | grep -q 'http'; then wget $isoPath; fi
+
+filename=$(basename $isoPath);
+if echo $filename | grep -q 'immudex-testing'; then
+  branch="immudex-testing";
+  branchAltName="testing";
+elif echo $filename | grep -q 'immudex-niko'; then
+  branch="immudex";
+  branchAltName="niko"
+else
+  branch="immudex";
+  branchAltName="stable";
+fi
+
+if echo $filename | grep -q '64'; then
+  arch="64";
+else
+  arch="32";
+fi
+
+mkdir -pv build/${branchAltName}/${branch}/${arch}/{chroot,staging,tmp};
+</pre>
+      <p>
+        Posiadając już strukturę katalogów możemy określić "katalog główny" dla
+        naszych czynności. Wykonywane przez nas czynności nie będą
+        opuszczać obszaru tego katalogu.
+      </p>
+<pre class="code-block">
+rootPath="build/${branchAltName}";
+</pre>
+      <p>
+        Następną czynnością, jaką możemy wykonąć jest pobranie dla odpowiedniej
+        wersji <em>immudex</em>, skryptu odpowiedzialnego za budowanie obrazu 
+        płyty oraz nadanie mu odpowiednich uprawnień.
+      </p>
+<pre class="code-block">
+wget https://github.com/xf0r3m/${branch}/raw/main/immudex_build -O ${rootPath}/immudex_build
+chmod +x ${rootPath}/immudex_build;
+</pre>
+      <p>
+        Teraz możemy przjść już to skopiowania danych z płyty.
+      </p>
+<pre class="code-block">
+mkdir -v /tmp/iso;
+sudo mount -v $isoPath /tmp/iso;
+sudo cp -rvv /tmp/iso/* ${rootPath}/${branch}/${arch}/staging;
+sudo chown -Rv ${USER}:${USER} ${rootPath}/${branch}/${arch}/staging;
+sudo umount -v /tmp/iso;
+sudo rmdir -v /tmp/iso;
+</pre>
+      <p>
+        Dla utrzymania porządku w systemie, wypadało by utworzyć punkt
+        montowania dla obrazu płyty, z którego będziemy kopiować dane. Następnie
+        płytę należy zamontować. Jeśli nie przyglądaliśmy się za bardzo
+        poleceniu tworzenia struktury katalogowej dla środowiska, to każde 
+        środowisko budowania, dla konkretnej architektury
+        składa się z trzech katalogów. W katalogu
+        <code class="code-inline">staging</code> znajduje się cała zawartość
+        obrazu płyty i do tego katalogu będzie ona kopiowana. Następnie
+        nadawane są odpowiednie prawa własnosci dla skopiowanych danych.
+        Na koniec obraz płyty jest odłączany od systemu a punkt montowania
+        usuwany.
+      </p>
+      <p>
+        W tym momencie na trafiamy na pierwszy problem, otóż nie wszystkie
+        pliki znajdują się na obrazie. Taki plikiem jest plik konfiguracji
+        GRUB-a, dla samodzielnego pliku wykonywalnego programu rozruchowego.
+        Może to brzmi skomplikowanie, ale ta czynność jest opcjonalna, ponieważ
+        ten plik pozostaje bez zmian (plik wykonywalny), dlatego nie potrzeba
+        tworzyć go na nowo, ale jeśli chcemy mieć pełne środowisko to można
+        wykonać te czynności.
+      </p>
+<pre class="code-block">
+cat &gt; ${rootPath}/${branch}/${arch}/tmp/grub-standalone.cfg &lt;&lt;EOF
+search --set=root --file /DEBIAN
+set prefix=($root)/boot/grub
+configfile /boot/grub/grub.cfg
+EOF
+cat ${rootPath}/${branch}/${arch}/tmp/grub-standalone.cfg;
+</pre>
+      <p>
+        Po wykonaniu czynności przygotowawczych, nadszedł czas aby zabrać się
+        za rozpakowywanie archiwum <em>squashfs</em>.
+      </p>
+<pre class="code-block">
+sudo unsquashfs -f -d ${rootPath}/${branch}/${arch}/chroot ${rootPath}/${branch}/${arch}/staging/live/filesystem.squashfs;
+</pre>
+      <p>
+        Zawartość skopiowanego archiwum wypakowujemy do przygotowanego
+        wcześniej katalogu <em>chroot</em>. Po wypakowaniu ustalamy jakie
+        jądro według architektury należy zainstalować. Tu pojawia się drugi
+        problem, otóż archiwa <em>squashfs</em> pozbawione są plików jądra.
+        Więc aby nie rozpoczynąć każdego pliku wersji (skryptu aktualizacji)
+        od uzupełnienia jądra. Robi się to teraz, a jest realizowane za pomocą
+        małego skryptu uruchamianego w zmienionym na zawartość archiwum
+        <em>squashfs</em> katalogu domowym. Z tego też powodu musimy ustalić
+        wersję jądra, którą na podstawie architektury uzupełnimy środowisko
+        budowania.
+      </p>
+<pre class="code-block">
+if [ "$arch" = "64" ]; then
+  linuxKernel="linux-image-amd64";
+else
+  linuxKernel="linux-image-686-pae";
+fi
+
+cat &gt; chrtcmd.sh &lt;&lt;EOF
+#!/bin/bash
+
+mkdir /boot;
+apt purge -y linux-image*;
+dhclient;
+apt update;
+apt install -y $linuxKernel;
+echo &gt; /root/.bash_history;
+history -c;
+EOF
+  
+cat chrtcmd.sh;
+sudo mv -v chrtcmd.sh ${rootPath}/${branch}/${arch}/chroot;
+sudo chroot ${rootPath}/${branch}/${arch}/chroot bash chrtcmd.sh;
+sudo rm -v ${rootPath}/${branch}/${arch}/chroot/chrtcmd.sh;
+</pre>
+      <p>
+        Po określeniu jądra oraz napisaniu skryptu możemy przenieść go do
+        katalogu <code class="code-inline">chroot</code> a następnie
+        uruchomić. Skrypt usunie pozostałości po jądrze i zainstaluje je na
+        nowo. Tutaj podczas usuwania pakietów jądra może pojawić się monit
+        o tym, że usuwamy aktualnie używane jądro. Wydaje mi się, że możemy
+        śmiało kontynuować i nie powinno się nic stać, ponieważ zmieniliśmy
+        katalog główny. Jeśli używamy <em>immudex</em> to na pewno się nic
+        się nie stanie, ponieważ katalog <em>/boot</em> nawet nie istnieje.
+        Po zakończeniu działania skryptu, możemy go usunąć.
+      </p>
+      <p>
+        W ten sposób udało sie nam odzyskać środowisko budowania
+        <em>immudex</em> z obrazu płyty.
+      </p>
+      <p>
+        ~xf0r3m
+      </p>
+			<p class="footer">
+				2023; COPYLEFT; ALL RIGHTS REVERSED;
+			</p>
+    </div>
+  </body>
+</html>

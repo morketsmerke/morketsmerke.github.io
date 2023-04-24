@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+ _                               _           
+(_)_ __ ___  _ __ ___  _   _  __| | _____  __
+| | '_ ` _ \| '_ ` _ \| | | |/ _` |/ _ \ \/ /
+| | | | | | | | | | | | |_| | (_| |  __/>  < 
+|_|_| |_| |_|_| |_| |_|\__,_|\__,_|\___/_/\_\
+</pre>
+	  <p class="header_link">
+		  &#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	  </p>
+	  <div class="main">
+		  <h1 class="title">Instalacja sterownika dla Nvidia GeForce 920M</h1>
+		  <p>
+        Jakiś czas temu musiałem zoptymalizować mój "zestaw", wymieniłem
+        komputer gamingowy, na dwa latopy. Jeden z nich posiada grafikę Nvidia
+        GeForce 920M, chciałem aby na tym sprzęcie rezydował <em>immudex</em>
+        w wersji <em>testing</em>. I tutaj zaczęły się schody, bowiem
+        obecny (dostępny w repozytorium Debian Bookworm) sterownik Nvidii w 
+        wersji 528, nie posiada wsparcia dla tej karty. Więc wpadłem na
+        pomysł zainstalowania wersji 470 z Debian Bullseye. Poniżej znajduje
+        się opis oraz to co udało mi się uzyskać.
+      </p>
+      <p>
+        <span class="warn-sign warning">&#9888;</span>
+        Uwaga! Wykonywane tutaj czynności wykorzystują 
+        <strong>oprogramowanie własnościowe</strong>, jeśli jest to sprzeczne z
+        Twoim zasadami etycznymi zrezyguj z dalszego wykonywania poniższych
+        czynności.
+      </p>
+      <p>
+        <span class="warn-sign notice">&#9888;</span>
+        Pro Tip! Najlepiej te czynności wykonywać na komputerze uruchomionym
+        z pamięci USB.
+      </p> 
+      <p>
+        Sterowniki do obrazu <em>immudex</em>, możemy dodać na zasadzie
+        "<a href="przewiniecie_ingerencja_w_obraz_immudex.html">przewinięcia</a>".
+        Więc czynności rozpoczniemy od sprawdzenia dostępności takich poleceń
+        jak <strong>unsquashfs</strong> oraz <strong>mksquashfs</strong>. W 
+        najnowszych wersjach <em>immudex</em>
+        lub <em>immudex-testing</em> powinny byś one zainstalowane. W celach
+        porządkowych, utworzymy sobie katalog.
+      </p>
+<pre class="code-block">
+$ mkdir 0.1.7
+</pre>
+      <p>
+        Następnie na wypadek niepowodzenia naszych zmian, pobierzemy z partycji
+        obecnie używane archiwum <em>.squashfs</em>.
+      </p> 
+<pre class="code-block">
+$ cp /run/live/medium/live/filesystem.squashfs filesystem.squashfs_original
+</pre>
+      <p>
+        Teraz możemy przejść do katalogu i rozpakować nasze archiwum.
+      </p>
+<pre class="code-block">
+$ cd 0.1.7
+$ sudo unsquashfs -f -d tmp /run/live/medium/live/filesystem.squashfs
+</pre>
+      <p>
+        Po rozpakowaniu archiwum, katalog <em>tmp</em> będzie zawierać
+        <em>rootfs</em> najnowszego obrazu <em>immudex</em>. Aby był on
+        pełnoprawnym obrazem systemu brakuje mu plików jądra, które
+        nie wchodzi w skład archiwum (bo i po co, pliki jądra muszą znajdować
+        się na zewnatrz archiwum, aby system mógł się uruchomić, archiwum
+        zawierające <em>initrd</em> oraz jądro, marnuje po prostu miejsce).
+        Z tego względu, że brakuje w ogóle kilku plików, nie możemy sobie od
+        tak ich skopiować. Musimy posłużyć się narzędziem
+        <strong>apt</strong> oraz trochę je oszukać, aby przywrócić te pliki.
+        Wszystkie czynności przedstawione na poniższym przykładzie wykonywane
+        są w środowisku zmienionego katalogu głównego (<em>chroot</em>).
+        Aby moduły jądra zostały poprawnie zbudowane do środowiska zmienionego
+        katalogu głównego potrzebne jest przekazanie kilku systemowych
+        interfejsów: <em>/dev /dev/pts /proc /run /sys</em>.
+      </p>
+      <p>
+        <span class="warn-sign warning">&#9888;</span>
+        Polecenie <em>apt install</em> może zawieści się. Wówczas należy
+        przerwać operację i odświerzyć połączenie sieciowe poprzez komunikację
+        z serwerem DHCP (polecenie <em>dhclient</em>). 
+      </p>
+<pre class="code-block">
+0.1.7$ for i in /dev /dev/pts /proc /sys /run; do sudo mount -B $i tmp${i}; done
+0.1.7$ sudo chroot tmp/ bash
+(chroot)/$ mkdir boot
+(chroot)/$ apt purge linux-image* -y
+(chroot)/$ apt install linux-image-amd64
+</pre>
+      <p>
+        Jeśli nie ma katalogu /boot w katalogu głównym, polecenie
+        <code class="code-inline">apt</code>, zwróci błąd i zakończy działanie.
+        Aby jednak wykonał on zażądane przez nas czynności wystarczy mu sama
+        obecność tego katalogu (katalog może być pusty). Polecenie usuwania 
+        pakietu, może zwrócić monit o tym, że usuwamy działające obecnie jądro
+        i czy chcemy przerwać tę czynność. Z pewnością 99% możemy kliknąć 
+        <code class="code-inline">Nie</code>,
+        osobiście kiedyś udało mi się zawieści działanie jednego z serwerów
+        przeprowadzając tę czynność, mimo wykonania jej środowisku zmienionego
+        katalogu głównego. Jeśli naszym system jest <em>immudex</em>, to mamy 
+        100%.
+      </p>
+      <p>
+        Po odzyskaniu plików jądra, wypadałoby zainstalować pakiety
+        wspomagające budowanie jego modułów (chociaż, pakiet 
+        <em>build-essential</em>, jest zainstalowany w <em>immudex</em>).
+      </p>
+<pre class="code-block">
+(chroot)/$ apt install build-essential dkms linux-headers-$(uname -r)
+</pre>
+      <p>
+        Po zainstalowaniu tych pakietów, możemy przejść do instalacji
+        właściwego sterownika. W tym celu utworzymy sobie plik zawierający
+        lokalizację źródeł repozytorium dla wersji Debian Bullseye, ale tylko
+        do repozytoriów <em>contrib</em> oraz <em>non-free</em> (oczywiście,
+        można użyć bardziej odpowiedniej nazyw niż <em>nvidia.list</em>, jednak
+        dla mnie te repozytoria będą służyć jedynie do tego).
+      </p>
+<pre class="code-block">
+(chroot)/$ cp /etc/apt/sources.list /etc/apt/sources.list.d/nvidia.list
+(chroot)/$ sed -e 's/bookworm/bullseye/g' -e 's/main/contrib non-free/g' -i /etc/apt/sources.list.d/nvidia.list
+(chroot)/$ apt update
+(chroot)/$ apt install nvidia-detect
+(chroot)/$ nvidia-detect
+(chroot)/$ apt install nvidia-driver
+</pre>
+      <p>
+        Polecenie <code class="code-inline">nvidia-detect</code> zwróci
+        informacje o tym że pasującym sterownikiem jest sterownik w wersji 470.
+        A nie jak w przypadku Debian 12, pakiet sterowników dla układów Nvidia
+        Tesla, który nie działa z tym układem.
+        Powykonaniu tych <em>rootfs</em> jest gotowy do pakowania. Jest jeden
+        mały szczegół. Otóż w tej instalacji zabrakło instalacji pakietu
+        <em>nvidia-settings</em>. Nie został on zainstalowany przez niespełnione
+        zależności. Ważna dla tego pakietu jest biblioteka 
+        <strong>libxnvctrl0</strong>, powinna być ona zgodna z wersją
+        instalowanego sterownika Nvidii, jednak ze względu na to, że
+        zostawiliśmy repozytorium <em>main</em> dla Debian Bookworm, nie będzie
+        między nimi zgodności. Zatem, co trzeba zrobić? Otóż należy usunąć
+        obecnie zainstalowany wersję tej biblioteki wraz z pakietami, które jej
+        wymagają, są to dwa pakiety XFCE. Nie należy usuwać pakietów, już
+        niepotrzebnych, ponieważ za chwilę będą one znów potrzebne. Zapisujemy
+        sobie te pakiety (prawdopodbnie będą to: 
+        <em>xfce4-goodies</em> oraz <em>xfce4-sensors-plugin</em>), ponieważ
+        będziemy je instalować ponownie, kiedy uzyskamy odpowiednią wersję
+        wspomnianej biblioteki. Po usunięciu pakietów, tymczasowo zmieniamy
+        wersję dystrybucji, z Bookworm na Bullseye (dla repozytorium 
+        <em>main</em>). Instalujemy naszą
+        bibiotekę, następnie wracamy z powrotem do wersji Bookworm dla
+        repozytrium głównego. Teraz możemy zainstalować ponownie te dwa pakiety
+        oraz pakiet <em>nvidia-settings</em>. Poniżej przedstawiłem wyżej
+        wymieniony opis w postaci poleceń.
+      </p>
+<pre class="code-block">
+(chroot)/$ sed -i 's/Bookworm/Bullseye/g' /etc/apt/sources.list;
+(chroot)/$ apt remove libxnvctrl0 -y
+(chroot)/$ apt update
+(chroot)/$ apt install libxnvctrl0 -y
+(chroot)/$ sed -i 's/Bullseye/Bookworm/g' /etc/apt/sources.list;
+(chroot)/$ apt install xfce4-goodies xfce4-sensors-plugin nvidia-settings
+</pre>
+      <p>
+        Teraz <em>rootfs</em> jest gotowy do pakowania. Zanim jednak do tego
+        przystąpimy, warto posprzątać po sobie, aby nie zaśmiecać niepotrzebnie
+        obrazu. Następnie musimy odmontować zamontowane interfejsy systemowe. 
+        Do pakowania wykorzystamy polecenie <strong>mksquashfs</strong>.
+      </p>
+<pre class="code-block">
+(chroot)/$ apt-get clean
+(chroot)/$ apt-get autoclean
+(chroot)/$ apt-get autoremove
+(chroot)/$ history -c
+(chroot)/$ Ctrl+d
+0.1.7$ for i in /dev/pts /dev /proc /run /sys; do sudo umount tmp${i}; done
+0.1.7$ sudo mksquashfs tmp/ filesystem.squashfs -e boot
+</pre>
+      <p>
+        Ze względu na to iż sterowniki do moduły jądra, które mogą ładowane
+        w niekoniecznie znanym nam momencie, warto było by przenieść na dysk
+        docelowy także obraz jądra oraz obraz <em>initrd</em>.
+      </p>
+<pre class="code-block">
+0.1.7$ sudo cp tmp/boot/vmlinuz-6.1.0-7-amd64 vmlinuz
+0.1.7$ sduo cp tmp/boot/initrd.img-6.1.0-7-amd64 initrd
+</pre>
+      <p>
+        Te trzy pliki kopiujemy na dysk. Po skopiowaniu możemy uruchomić
+        system i sprawdzić czy wszytko jest działa. Zainstalowany sterownik
+        z Debian 11, działa prawidłowo na Debian 12. Po wykonaniu dodatkowych
+        czynności w systemie obecny jest również program <em>nvidia-settings</em>,
+        jednak dla tej karty nie posiada on zbyt wielu opcji lub
+        najzwyczajniej nie działa. Mimo to jeśli posiadamy komputer z tym
+        układem, to warto wykonać te czynności, aby nie doświadczać wielu 
+        irytujących błędów substytutu sterownika, takich jak <em>screen tearing</em>
+        czy jeszcze bardziej denerwującego restartu serwera X11 podczas
+        odblokowywania sesji po wyłączeniu ekranu ze względu na brak aktywności.
+      </p>
+      <p>
+        ~xf0r3m
+      </p>
+			<p class="footer">
+				2023; COPYLEFT; ALL RIGHTS REVERSED;
+			</p>
+    </div>
+  </body>
+</html>

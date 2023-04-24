@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+ _                               _           
+(_)_ __ ___  _ __ ___  _   _  __| | _____  __
+| | '_ ` _ \| '_ ` _ \| | | |/ _` |/ _ \ \/ /
+| | | | | | | | | | | | |_| | (_| |  __/>  < 
+|_|_| |_| |_|_| |_| |_|\__,_|\__,_|\___/_/\_\
+</pre>
+	  <p class="header_link">
+		  &#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	  </p>
+	  <div class="main">
+		  <h1 class="title">Koncepcje immudex</h1>
+		  <p>
+        Wiekszość dystrybucji Linuksa powstało, aby służyć ludziom. Dać im
+        możliwość panowania na posiadanym sprzętem. Wiele specyficznych 
+        dystrybucji posiada kilka zasad jakimi kieruje się podczas jej
+        tworzenia i rozwoju, <em>immudex</em> nie jest wyjątkiem. W tym
+        materiale zostało zebranych 7 zasad, które definiują tę dystrybucję.
+      </p>
+      <h3>1. Niezmienność</h3>
+      <p>
+        Podstawową cechą tej dystrybucji jest <strong>niezmienność</strong>
+        w najprostrzej, najczystszej postacji. Wiem, że uruchamianie systemu
+        jako <em>Live CD</em> może nie być postrzegne jako niezmienne. Dla
+        mnie <em>niezmienne</em> oznacza tyle, że jeśli uruchomisz system
+        ponownie to powróci on do swojej pierwotnej postaci. Nabrudzisz, 
+        nagrzebiesz, nie ważne. <em>Reboot</em> i masz już czysty system z
+        powrotem.
+      </p>
+      <h3>2. Separacja</h3>
+      <p>
+        Jeśli chcielibyśmy zainfektować jakąś dystrybucję szkodliwym
+        oprogramowniem (nie, oprogramowanie własnościowe się nie liczy), to
+        trzeba było by tego naprawdę chcieć. Nie mmiej jednak tworząc
+        <em>immudex</em> mam świadomość, że największym zagrożeniem dlatego
+        systemu pozostaje przeglądarka internetowa. Obecnie przeglądarki
+        stały się podsystemami dla systemów operacyjnych, więc warto było
+        by im ukrócić trochę uprawnienia. Dlatego też domyślnie przeglądarka
+        w <em>immudex</em> uruchamiana jest przez <em>sandboxer</em>
+        <strong>firejail</strong> wraz z własną emulacją stosu TCP/IP.
+      </p>
+      <p>
+        Innym rodzajem speracji jest załączony <em>firewall</em>
+        <strong>ufw</strong> z domyślną polityką dla połączeń przychodzących
+        ustawioną na <em>deny</em>.
+      </p>
+      <h3>3. Szyfrowanie danych</h3>
+      <p>
+        <em>Immudex</em> zachęca poprzez wsparcie autorskimi rozwiązaniami
+        korzystanie z szyfrowanych partycji. Jeśli taka partycja pozostanie
+        zamknięta, to mimo uzyskania dostępu do komputera dane na nim
+        przechowywane pozostaną bezpieczne. Punkty montowania nie są osiągalne
+        również z przeglądarki uruchomionej przez <em>firejail</em>.
+      </p>
+      <h3>4. Użyteczność</h3>
+      <p>
+        Mimo specyfiki systemu dalej pozostaje on użyteczny jak każda inna
+        dystrybuja skierowana na komputery biurkowe. Posiada ona intuicyjne
+        środowisko graficzne XFCE, oprgramowanie do odtwarzania multimediów,
+        pakiet biurowy, <u>normalną</u> przeglądarkę internetową z
+        zainstalowanym blokerem reklam oraz innych nachalnych elementów
+        stron internetowych. Dystrybucja się również zapewnić rozwiązania
+        związane z ochroną prywatności takie jak dedykowana dla niej instancja
+        meta-silnika wyszukiwarek internetowych <em>searxng</em> z dodanym
+        silnikiem również do przeglądarki (dodatek idx-search) oraz
+        oprogramowanie <em>openvpn</em>.
+      </p>
+      <h3>5. Elastyczność</h3>
+      <p>
+        Dystrybucja stara się być jak najbardziej elastyczna i nie narzucać
+        nikomu niczego. Nie musimy stoswać się do żadnej z wienionych tutaj
+        zasad, możemy wprowadzać własne rozwiązania. Również wiele wyżej
+        wymienionych koncepcji zostało zaimplementowanych w taki sposób, że
+        są łatwe do ominięcia. Możemy <em>immudex</em> dowolnie
+        przebudowywać i zmieniać. W pewnym momencie dojdziemy do wniosku, że
+        ona tak naprawdę nie istnieje. Jest tylko Debian, odpowiednio
+        skonfigurowany.
+      </p>
+      <h3>6. Bezkosztowość</h3>
+      <p>
+        <em>Immudex</em> utrzymywany jest na publicznie dostępnych serwisach,
+        takich jak <em>sourceforge.net</em> czy <em>github.com</em>. Istnienie
+        oficjalnego mirroru <em>ftp.morketsmerke.org</em> jest tylko i
+        wyłącznie fanberią twórcy. Sam Debian jest o tyle ciekawą dystrybucją,
+        że jego obrazy mogą być tworzone na naprawdę niskobudżetowym sprzęcie,
+        pokroju <em>chrombooka</em> (tylko trzeba się w dysk zaopatrzyć).
+        Nie potrzeba wydajnych serwerów, wystarczy zwykły laptop, połączenie
+        z internetem, zainstalowany Debian oraz trochę cierpliwości.
+        <em>Immudex</em> również jest dystrybucją, która powinna zadziałać 
+        na każdym sprzęcie. 
+      </p>
+      <h3>7. Wolność</h3>
+      <p>
+        Wolne oprogramowanie (<em>free software</em>) nie daje pełni wolności.
+        Aby moć się nią cieszyć, należy dać użytkownikom prawo do wyboru.
+        <em>Immudex</em> nie neguje istoty wolności oprgramowania. Nie chce
+        skazywać użytkowników na dyskonfort związany z niemożnością
+        wykorzystania sprzętu, na który wydali ciężko zarobione pieniądze lub
+        na wykluczenie korzystania ze współczesnych technologi zachowując
+        przy tym równowagę i posiadając z tyłu głowy wszystkie zagrożenia jakie
+        może ze sobą nieść. Domyślnie i oficjalnie <em>immudex</em> zawsze 
+        będzie posiadał
+        tylko i wyłącznie wolne oprogramowania, jednak nigdy nie będzie czynnem
+        niemile widzianym uzupełnienie obrazu o brakujący firmware czy inne
+        oprogramowanie własnościowe. Na tym własnie polega prawdziwa wolność,
+        na daniu możliwości wyboru.
+      <p>
+      <p>
+        <em>Immudex</em> został i jest tworzony głównie z myślą o mnie, nie
+        każdemu moje rozwiązania mogą pasować. Nie musi z niej korzystać,
+        dostępnych jest tyle wspaniałych dystrybucji, że napewno wybierze coś
+        dla siebie. Zajmowanie się tą dystrybucją, traktuję jako dobrą zabawę
+        więc wiele rzeczy oficjalnie może nie działać jak powino. Nie ma
+        tutaj gwarancji przydatności ani poprawności działania.
+      <p>
+        ~xf0r3m
+      </p>
+			<p class="footer">
+				2023; COPYLEFT; ALL RIGHTS REVERSED;
+			</p>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+ _                               _           
+(_)_ __ ___  _ __ ___  _   _  __| | _____  __
+| | '_ ` _ \| '_ ` _ \| | | |/ _` |/ _ \ \/ /
+| | | | | | | | | | | | |_| | (_| |  __/>  < 
+|_|_| |_| |_|_| |_| |_|\__,_|\__,_|\___/_/\_\
+</pre>
+	  <p class="header_link">
+		  &#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	  </p>
+	  <div class="main">
+		  <h1 class="title">Skrypt aktualizacji - plik wersji</h1>
+		  <p>
+        Zmiany wprowadzane do <em>immudex</em> są rozpisywane w postaci skryptu.
+        Program ten nazwany jest <strong>plikiem wersji</strong>, ze względu na
+        to, że jego nazwą jest numer kolejnej wersji dystrybucji. Pliki wersji
+        są tworzone od momentu pierwszych poprawek, aż do daty wydania tej
+        wersji systemu. Plik wersji składa się z definicji funkcji, które
+        poźniej są wkorzystywane do utworzenia listy instrukcji, która
+        wprowadzi wszystkie zmiany przeznaczone dla tej wersji <em>immudex</em>.
+        Poniżej znajduje się przykładowy plik wersji 
+        (<em>testing, wersja 0.1.9</em>).
+      </p>
+<pre class="code-block">
+#!/bin/bash
+
+function update_packages() {
+  dhclient; 
+  apt update;
+  apt upgrade -y;
+}
+
+function install_packages() {
+  apt install $@ -y;
+}
+
+function get_immudex_testing_project() {
+  if [ ! -d ~/immudex-testing ]; then
+    cd;
+    git clone https://github.com/xf0r3m/immudex-testing.git;
+  fi
+}
+
+function recreate_users() {
+  userdel -r user;
+  userdel -r xf0r3m;
+
+  useradd -m -s /bin/bash user;
+  if [ ! -f /home/user/.vimrc ]; then
+    cp -rvv /etc/skel/.??* /home/user;
+    cp -rvv /etc/skel/?* /home/user;
+    mkdir /home/user/.local;
+    tar -xvf ~/immudex-testing/files/017/local_user.tar -C /home/user/.local;
+    rm /home/user/.face;
+    cp /usr/share/images/desktop-base/immudex_xfce_greeter_logo.png /home/user/.face;
+    chown -R user:user /home/user;
+  fi
+  echo "user:user1" | chpasswd;
+
+  useradd -m -s /bin/bash xf0r3m;
+  if [ ! -f /home/xf0r3m/.vimrc ]; then
+    cp -rvv /etc/skel/.??* /home/xf0r3m;
+    cp -rvv /etc/skel/?* /home/xf0r3m;
+    mkdir /home/xf0r3m/.local;
+    tar -xvf ~/immudex-testing/files/017/local_xf0r3m.tar -C /home/xf0r3m/.local;
+    rm /home/xf0r3m/.face;
+    cp /usr/share/images/desktop-base/immudex_xfce_greeter_logo.png /home/xf0r3m/.face;
+    chown -R xf0r3m:xf0r3m /home/xf0r3m;
+  fi
+  echo "xf0r3m:xf0r3m1" | chpasswd;
+
+  usermod -aG libvirt,libvirt-qemu xf0r3m;
+  usermod -aG libvirt,libvirt-qemu user;
+}
+
+function tidy() {
+  apt-get clean;
+  apt-get clean;
+  apt-get autoremove -y;
+  apt-get autoclean;
+  rm -rf ~/immudex-testing;
+  echo &gt; ~/.bash_history;
+  history -c   
+}
+
+function set_default_wallpaper() {
+  rm /usr/share/images/desktop-base/default;
+  ln -s /usr/share/images/desktop-base/$1 /usr/share/images/desktop-base/default;
+}
+
+function set_notifier_packages() {
+  cp -vv ~/immudex-testing/files/011/Notifier\ -\ packages.desktop /home/xf0r3m/.config/autostart;
+  chown xf0r3m:xf0r3m /home/xf0r3m/.config/autostart/Notifier\ -\ packages.desktop;
+}
+
+VERSION=$(echo $0 | cut -d "." -f 1);
+if [ ! "$VERSION" ]; then echo -e "\e[31mUpdate failed!\e[0m"; exit 1; fi;
+
+update_packages;
+install_packages gimp isolinux;
+
+get_immudex_testing_project;
+
+cp -vv ~/immudex-testing/images/${VERSION}/abandoned_hospital_bower.png /usr/share/images/desktop-base;
+
+sed -i 's/no_trespass_abandon.jpeg/abandoned_hospital_bower.png/' /etc/lightdm/lightdm-gtk-greeter.conf;
+
+rm /etc/apt/source.list;
+
+tidy;
+
+</pre>
+      <p>
+        Niektóre pliki wersji mogą być bardzo ubogie. Zawierać dwie trzy
+        instrukcje i to dzięki użyciu funkcji, w których zawarto typowe i
+        powtarzalne czynności wykowane podczas każdej aktualizacji, takie jak
+        aktualizacja zainstalowanego oprogramowania czy posprzątanie po sobie.
+        Po warunku określającym, czy aktualizacj w ogóle powiedzie się 
+        <code class="code-inline">if [ ! "$VERSION ];...</code> rozpoczyna się
+        seria czynności definiujących tę wersję systemu.
+      </p>
+      <p>
+        Uruchomienia tego pliku dokonuje się w środowisku zmienionego katalogu
+        głónego, po przez wywołanie powłoki BASH, podając ten plik jako
+        argument. Na przykład:
+      </p>
+<pre class="code-block">
+$ sudo chroot immudex-testing/64/chroot bash 019.sh
+</pre>
+      <p>
+        Przyglądając się temu strukturze tego skryptu, od razu rzuca się w oczy
+        potencjał optymalizacyjny. Na początku musimy sobie jednak odpowiedzieć
+        na jedno pytanie. Skąd biorą się te definicje funkcji? Definicje
+        funkcji są składowane wraz plikami wersji w tym samym katalogu pod
+        postacią pliku szablonu (<em>template.sh</em>). To jeśli definicje
+        znajdują się w odrębnym pliku to zamiast je kopiować można je
+        przecież załadować do pliku za pomocą polecenia <strong>source</strong>
+        lub instrukcji kropki (<strong>.</strong>). Tu pojawia się problem,
+        którego wolelibyśmy uniknąć a mianowicie kopiowana kolejnych plików do
+        <em>rootfs</em>. I go unikniemy wykorzystując to co już mamy dostępne.
+      </p>
+      <p>
+        Zamiast zaczynać plik serii definicji funkcji, pobierzemy je z
+        repozytorium:
+      </p>
+<pre class="code-block">
+dhclient;
+cd;
+if [ -x /usr/bin/git ]; then git clone https://github.com/xf0r3m/immudex-testing.git;
+else apt install git &amp;&amp; git clone https://github.com/xf0r3m/immudex-testing.git;
+fi
+</pre>
+      <p>
+        Teraz plik szablonu (plik z definicjami) możemy załadować do pliku
+        wersji.
+      </p>
+<pre class="code-block">
+source ~/immudex-testing/versions/template.sh;
+</pre>
+      <p>
+        Teraz od tej linii rozpoczyna się plik wersji. Warto też dodać, że
+        funkcja odpowiedzialna za sklonowanie repozytorium przestaje być
+        potrzebna, ponieważ zrobi to teraz każdy plik wersji na początku
+        wykonania. Warto dopisać do początku polecenie <strong>dhclient</strong>
+        aby odświerzyć połączenie sieciowe. Przedstawiony na początku
+        materiału przykład po optymalizacji prezentuje się w taki o to sposób.
+      </p>
+<pre class="code-block">
+dhclient;
+cd;
+if [ -x /usr/bin/git ]; then git clone https://github.com/xf0r3m/immudex-testing.git;
+else apt install git &amp;&amp; git clone https://github.com/xf0r3m/immudex-testing.git;
+fi
+source ~/immudex-testing/versions/template.sh;
+update_packages;
+install_packages gimp isolinux;
+
+cp -vv ~/immudex-testing/images/${VERSION}/abandoned_hospital_bower.png /usr/share/images/desktop-base;
+
+sed -i 's/no_trespass_abandon.jpeg/abandoned_hospital_bower.png/' /etc/lightdm/lightdm-gtk-greeter.conf;
+
+rm /etc/apt/source.list;
+
+tidy;
+</pre>
+      <p>
+        Podsumowując pliki wersji to nic innego jak skrypty, które wdrażają
+        zmiany przeznaczone dla tej wersji systemu.
+      </p>
+      <p>
+        ~xf0r3m
+      </p>
+			<p class="footer">
+				2023; COPYLEFT; ALL RIGHTS REVERSED;
+			</p>
+    </div>
+  </body>
+</html>
