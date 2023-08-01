@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+ _                               _           
+(_)_ __ ___  _ __ ___  _   _  __| | _____  __
+| | '_ ` _ \| '_ ` _ \| | | |/ _` |/ _ \ \/ /
+| | | | | | | | | | | | |_| | (_| |  __/>  < 
+|_|_| |_| |_|_| |_| |_|\__,_|\__,_|\___/_/\_\
+</pre>
+	  <p class="header_link">
+		  &#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	  </p>
+	  <div class="main">
+		  <h1 class="title">IMMutable DEbian with Xfce</h1>
+      <p>
+        <strong>Aktualności:</strong>
+      </p>
+      <ul class="reduced-list">
+      	<li>01.08.2023 - Wydanie nowej wersji immudex - immudex-lhe (Low Hardware Edition) oraz aktualizacja wersji stablinej (immudex) do wersji 1.0.2</li>
+	<li>25.07.2023 - Uwaga! Od poniedziałku (31.07) godziny 18:00 do wtorku(01.08) godziny 07:00 dostęp do searx.morketsmerke.org (silnik wyszukiwania, strona startowa firefox-a) może być ograniczony ze względu na prowadzone w tym czasie prace konserwatorskie.</li>
+	<li>11.06.2023 - Uwaga! Od wersji 1.0.0, immudex będzie wymagać min. 6GB wolnego miejsca na dysku.</li>
+      </ul>
+      <p>
+        <strong>O dystrybucji:</strong>
+      <p>
+      <p>
+        Immudex to wersja debian zawierająca niezmienne środowisko pracy.
+        Wykorzystuje ona bowiem archiwum .squashfs znane z LiveCD. Przyczym 
+        pozwala ona na pełen dostęp do partycji zawierające archiwum, w razie
+        aktualizacji. Tak przygotowana wersja popularnego systemu operacyjnego
+        pozwoli bezpieczniejsze korzystanie z komputera oraz zasobów internetu.
+        Jeśli coś się stanie, wystarczy uruchomić komputer ponownie.
+      </p>
+      <p>
+        Immudex nastawiowny jest na wykorzystanie do przechowywania danych 
+        szyfrowanych partycji za pomocą mechanizmu LUKS. Domyślnie
+        przeglądarka WWW (<em>firefox-esr</em>) uruchamiany jest przez
+        sandboxer FireJail z własną emulacją stosu TCP/IP. Tak uruchomiana
+        przeglądarka nia posiada dostępu do otwartych szyfrowanych partycji.
+        Immudex tworzony jest również z myślą o nie narzucaniu rozwiązań
+        dlatego też wiele z nich można w łatwy sposób pominąć, oczywiście na
+        własną odpowiedzialność. W więcej informacji na temat rozwiązań w
+        Immudex znajduje się w artykule "Koncepcje immudex" na stronie z
+        dokumentacją systemu. Wszelkie połączenia przychodzące do są 
+        zablokowane poprzez firewall <em>ufw</em>.
+      </p>
+      <p>
+        <strong>Oprogramowanie:</strong>
+      </p>
+      <p>
+        Immudex domyślnie korzysta z wolnego oprogramowania, nie zainstalowano
+        na nim niewolnych pakietów w konfiguracji nie ma również niewolnych 
+        repozytoriów.
+      </p>
+      <p>
+        Oficjalnie immudex wspiera instalację
+        niewolnego oprogamowania wyłącznie w postacji <em>addonsów</em>
+        dostępnych w postacji samodzielnych skryptów na repozytorium projektu
+        lub poprzez narzędzie <em>immudex_addons</em>. Do dyspozycji mamy:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th rowspan="2">Oprogramowanie</th>
+            <th colspan="3" class="centered-text">Wersja immudex</th>
+          </tr>
+          <tr>
+            <th class="centered-text">Stable</th>
+            <th class="centered-text">Testing</th>
+            <th class="centered-text">LHE*</th>
+          </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>Środowisko XFCE</td>
+          <td class="centered-text">&#x2714;</td>
+          <td class="centered-text">&#x2714;</td>
+          <td class="centered-text">&#x2716;</td>
+        </tr>
+        <tr>
+          <td>Menadżer okien Ratpoison</td>
+          <td class="centered-text">&#x2716;</td>
+          <td class="centered-text">&#x2716;</td>
+          <td class="centered-text">&#x2714;</td>
+        </tr>
+        <tr>
+          <td>Odtwarzacz multimedialny VLC</td>
+          <td class="centered-text">&#x2714;</td>
+          <td class="centered-text">&#x2714;</td>
+          <td class="centered-text">&#x2716;</td>
+        </tr>
+        <tr>
+          <td>Odtwarzacz multimedialny mpv</td>
+          <td class="centered-text">&#x2714;</td>
+          <td class="centered-text">&#x2714;</td>
+          <td class="centered-text">&#x2714;</td>
+        </tr>
+        <tr>
+          <td>Skrypt yt-dlp</td>
+          <td class="centered-text">&#x2714;</td>
+          <td class="centered-text">&#x2714;</td>
+          <td class="centered-text">&#x2714;</td>
+        </tr>
+        <tr>
+          <td>Przeglądarka Mozilla Firefox ESR</td>
+          <td class="centered-text">&#x2714;</td>
+          <td class="centered-text">&#x2714;</td>
+          <td class="centered-text">&#x2716;</td>
+        </tr>
+        <tr>
+          <td>Przeglądarka GNU IceCat</td>
+          <td class="centered-text">&#x2716;</td>
+          <td class="centered-text">&#x2716;</td>
+          <td class="centered-text">&#x2714;</td>
+        </tr>
+        <tr>
+          <td>Wirtualizacja KVM (libvirtd + virt-manager):</td>
+          <td class="centered-text">&#x2714;</td>
+          <td class="centered-text">&#x2714;</td>
+          <td class="centered-text">&#x2716;</td>
+        </tr>
+        <tr>
+          <td>Narzędzia autorskie immudex:</td>
+          <td class="centered-text">&#x2714;</td>
+          <td class="centered-text">&#x2714;</td>
+          <td class="centered-text">&#x2714;</td>
+        </tr>
+        </tbody>
+      </table>
+      <p>
+        <em>* - Low Hardware Edition, Debian 10 Buster, 32-bit</em>
+      </p>
+      <p>
+        Pełna lista oprogramowania wraz z listą pakietów z znajduje się w 
+        pod tym linkiem: 
+        <a href="https://ipr.morketsmerke.org">Lista oprogramowania immudex</a>
+      </p>
+      <p>
+        <strong>Obrazy płyt:</strong>
+      </p>
+      <table border="1" style="border-collapse: collapse;">
+        <tr>
+          <th colspan="3">&bull;&nbsp;immudex (stable, Debian 12 Bookworm)&nbsp;&bull;</th>
+                  </tr>
+        <tr>
+          <td rowspan="2">64-bit:</td>
+                    <td colspan="3"><a href="https://ftp.morketsmerke.org/immudex/stable/iso/1.0.2/immudex64.iso">https://ftp.morketsmerke.org/immudex/stable/iso/1.0.2/immudex64.iso</a></td>
+        </tr>
+        <tr>
+          <td>CRC: 3854847542</td>
+          <td>SHA1: 139c851f15eb0900616cf0c79b6443bc8ff92e83</td>
+        </tr>
+        <tr>
+          <td rowspan="2">32-bit:</td>
+                    <td colspan="3"><a href="https://ftp.morketsmerke.org/immudex/stable/iso/1.0.2/immudex32.iso">https://ftp.morketsmerke.org/immudex/stable/iso/1.0.2/immudex32.iso</a></td>
+        </tr>
+        <tr>
+          <td>CRC: 2119466051</td>
+          <td>SHA1: 7f0d0f62e9a56d33a16b0420e98a3be470ba0d65</td>
+        </tr>
+        <tr>
+          <td colspan="3">&bull;&nbsp;<a href="https://github.com/xf0r3m/immudex/blob/main/changelogs/1.0.2.txt">Lista zmian dla wydania</a></td>
+        </tr>
+        <tr>
+          <th colspan="3">&bull;&nbsp;immudex-testing (Debian testing, 13 Trixie)&nbsp;&bull;</th>
+                  </tr>
+        <tr>
+          <td rowspan="2">64-bit:</td>
+                    <td colspan="3"><a href="https://ftp.morketsmerke.org/immudex/testing/iso/1.0.6/immudex-testing64.iso">https://ftp.morketsmerke.org/immudex/testing/iso/1.0.6/immudex-testing64.iso</a></td>
+        </tr>
+        <tr>
+          <td>CRC: 2946708413</td>
+          <td>SHA1: 111a0d04ddb7fc39a214a4ecb10f34dc07222e9d</td>
+        </tr>
+        <tr>
+          <td rowspan="2">32-bit:</td>
+                    <td colspan="3"><a href="https://ftp.morketsmerke.org/immudex/testing/iso/1.0.6/immudex-testing32.iso">https://ftp.morketsmerke.org/immudex/testing/iso/1.0.6/immudex-testing32.iso</a></td>
+        </tr>
+        <tr>
+          <td>CRC: 3468248041</td>
+          <td>SHA1: a6e04f8d40646606ebcc4041fc503012794391fa</td>
+        </tr>
+        <tr>
+          <td colspan="3">&bull;&nbsp;<a href="https://github.com/xf0r3m/immudex-testing/blob/main/changelogs/1.0.6.txt">Lista zmian dla wydania</a></td>
+        </tr>
+        <tr>
+          <th colspan="3">&bull;&nbsp;immudex-lhe (oldoldstable, Debian 10 Buster)&nbsp;&bull;</th>
+                  </tr>
+        <tr>
+          <td rowspan="2">32-bit:</td>
+                    <td colspan="3"><a href="https://ftp.morketsmerke.org/immudex/lhe/iso/0.0.0/immudex-lhe32.iso">https://ftp.morketsmerke.org/immudex/lhe/iso/0.0.0/immudex-lhe32.iso</a></td>
+        </tr>
+        <tr>
+          <td>CRC: 4169454011</td>
+          <td>SHA1: 6122eacd36c9fc33bf14e7f7da206a888db31c88</td>
+        </tr>
+        <tr>
+          <td colspan="3">&bull;&nbsp;<a href="https://github.com/xf0r3m/immudex-lhe/blob/main/changelogs/0.0.0.txt">Lista zmian dla wydania</a></td>
+        </tr>
+      </table>
+      <p>
+        Domyślnym użytkownikiem jest <strong>user</strong>, dostęp to niego 
+        uzyskujemy za pomocą hasła <em>user1</em>. Możemy również skorzystać z
+        konta superużytkownika <em>root</em> z hasłem <em>toor</em>.
+      </p>
+      <p>
+        <strong>Dokumentacja projektu:</strong>
+      </p>
+      <p>
+        Dokumentacja systemu znajduje się pod tym linkiem: <a href="https://morketsmerke.github.io/articles/immudex/index.html">Dokumentacja immudex</a>.
+      </p>
+      <p>
+        <strong>Zastrzeżenia i uznanie autorstwa:</strong>
+      </p>
+      <p>
+        immudex is not affiliated with Debian. Debian is a registered trademark
+        owned by Software in the Public Interest, Inc.
+      </p>
+      <p>
+        <a href="https://www.flaticon.com/free-icons/rss">Rss icons created by Freepik - Flaticon</a> 
+      </p>
+			<p class="footer">
+				2023; COPYLEFT; ALL RIGHTS REVERSED;
+			</p>
+    </div>
+  </body>
+</html>
+
+        
