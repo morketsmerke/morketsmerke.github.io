@@ -22,7 +22,8 @@
         <strong>Aktualności:</strong>
       </p>
       <ul class="reduced-list">
-      	<li>31.12.2023 - Wydanie immudex (stable) w wersji 1.0.7 oraz immudex-lhe w wersji 0.0.2 - finalne obrazy płyty.</li>
+      	<li>01.01.2024 - Unifikacja projektów immudex.</li>
+	<li>31.12.2023 - Wydanie immudex (stable) w wersji 1.0.7 oraz immudex-lhe w wersji 0.0.2 - finalne obrazy płyty.</li>
 	<li>11.12.2023 - Aktualizacja immudex zostanie opóźniona do 31.12.2023.</li>
 	<li>19.11.2023 - Publikacja immudex w wersji 1.0.6</li>
 	<li>13.10.2023 - Publikacja immudex-lhe w wersji 0.0.1</li>
@@ -54,7 +55,7 @@
       <p>
         Immudex nastawiowny jest na wykorzystanie do przechowywania danych 
         szyfrowanych partycji za pomocą mechanizmu LUKS. Domyślnie
-        przeglądarka WWW (<em>LibreWolf</em>) uruchamiany jest przez
+        przeglądarka WWW (<em>Firefox ESR</em>) uruchamiany jest przez
         sandboxer FireJail z własną emulacją stosu TCP/IP. Tak uruchomiana
         przeglądarka nia posiada dostępu do otwartych szyfrowanych partycji.
         Immudex tworzony jest również z myślą o nie narzucaniu rozwiązań
@@ -76,7 +77,8 @@
         Oficjalnie immudex wspiera instalację
         niewolnego oprogamowania wyłącznie w postacji <em>addonsów</em>
         dostępnych w postacji samodzielnych skryptów na repozytorium projektu
-        lub poprzez narzędzie <em>immudex_addons</em>. Do dyspozycji mamy:
+        lub w katalogu <em>/usr/share/immudex/addons</em>
+        <!-- poprzez narzędzie <em>immudex_addons</em> -->. Do dyspozycji mamy:
       </p>
       <table>
         <thead>
@@ -87,190 +89,140 @@
           <tr>
             <th class="centered-text">Stable</th>
             <th class="centered-text">Testing</th>
-            <th class="centered-text">LHE*</th>
+            <th class="centered-text">Oldstable</th>
+            <!--<th class="centered-text">LHE*</th>-->
           </tr>
         </thead>
         <tbody>
         <tr>
           <td>Środowisko XFCE</td>
-          <td class="centered-text">&#x2714;</td>
+          <td colspan="3" class="centered-text">&#x2714;</td>
+          <!--
           <td class="centered-text">&#x2714;</td>
           <td class="centered-text">&#x2716;</td>
-        </tr>
-        <tr>
-          <td>Menadżer okien Ratpoison</td>
-          <td class="centered-text">&#x2716;</td>
-          <td class="centered-text">&#x2716;</td>
-          <td class="centered-text">&#x2714;</td>
+          -->
         </tr>
         <tr>
           <td>Odtwarzacz multimedialny VLC</td>
-          <td class="centered-text">&#x2714;</td>
+          <td colspan="3" class="centered-text">&#x2714;</td>
+          <!--
           <td class="centered-text">&#x2714;</td>
           <td class="centered-text">&#x2716;</td>
+          -->
         </tr>
         <tr>
           <td>Odtwarzacz multimedialny mpv</td>
+          <td colspan="3" class="centered-text">&#x2714;</td>
+          <!--
           <td class="centered-text">&#x2714;</td>
           <td class="centered-text">&#x2714;</td>
-          <td class="centered-text">&#x2714;</td>
+          -->
         </tr>
         <tr>
           <td>Skrypt yt-dlp</td>
+          <td colspan="3" class="centered-text">&#x2714;</td>
+          <!--
           <td class="centered-text">&#x2714;</td>
           <td class="centered-text">&#x2714;</td>
-          <td class="centered-text">&#x2714;</td>
+          -->
         </tr>
+        <!--
         <tr>
           <td>Przeglądarka LibreWolf</td>
+          <td colspan="3" class="centered-text">&#x2714;</td>
+          -->
+          <!--
           <td class="centered-text">&#x2714;</td>
           <td class="centered-text">&#x2714;</td>
-          <td class="centered-text">&#x2714;</td>
-        </tr>
+          -->
+        <!-- </tr> -->
         <tr>
           <td>Przeglądarka Mozilla Firefox ESR</td>
-          <td class="centered-text">&#x2714;</td>
+          <td colspan="3" class="centered-text">&#x2714;</td>
+          <!--
           <td class="centered-text">&#x2714;</td>
           <td class="centered-text">&#x2716;</td>
+          -->
         </tr>
         <tr>
           <td>Wirtualizacja KVM (libvirtd + virt-manager):</td>
-          <td class="centered-text">&#x2714;</td>
+          <td colspan="3" class="centered-text">&#x2714;</td>
+          <!--
           <td class="centered-text">&#x2714;</td>
           <td class="centered-text">&#x2716;</td>
+          -->
         </tr>
         <tr>
           <td>Narzędzia autorskie immudex:</td>
+          <td colspan="3" class="centered-text">&#x2714;</td>
+          <!--
           <td class="centered-text">&#x2714;</td>
           <td class="centered-text">&#x2714;</td>
-          <td class="centered-text">&#x2714;</td>
+          -->
         </tr>
         </tbody>
       </table>
+      <!--
       <p>
         <em>* - Low Hardware Edition, Debian 10 Buster, 32-bit</em>
       </p>
+      -->
       <p>
-        Pełna lista oprogramowania wraz z listą pakietów z znajduje się w 
-        pod tym linkiem: 
+        Pełna lista <!--oprogramowania wraz z listą--> pakietów z znajduje się w 
+        w pliku wersji bazowej (<em>version/base.sh</em>) oraz w skrypcie 
+        instalacyjnym projektu <em>xfcedebian</em> (<em>install.sh</em>).
+        <!--pod tym linkiem:
         <a href="https://ipr.morketsmerke.org">Lista oprogramowania immudex</a>
-      </p>
-      <p>
-        <strong>Obrazy płyt:</strong>
-      </p>
-      <table border="1" style="border-collapse: collapse;">
-         <tr>
-          <th colspan="3">&bull;&nbsp;immudex (stable, Debian 12 Bookworm)&nbsp;&bull;</th>
-                  </tr>
-        <tr>
-          <td rowspan="2">64-bit:</td>
-                    <td colspan="3">            <a href="https://sourceforge.net/projects/immudex/files/immudex/stable/iso/1.0.7/immudex64.iso/download">https://sourceforge.net/projects/immudex/files/immudex/stable/iso/1.0.7/immudex64.iso/download</a></td>
-        </tr>
-        <tr>
-          <td>CRC: 611376696</td>
-          <td>SHA1: 787bb9d842d9360a5dc3f9be888b3ae085d4e592</td>
-        </tr>
-        <tr>
-          <td rowspan="2">32-bit:</td>
-                    <td colspan="3">            <a href="https://sourceforge.net/projects/immudex/files/immudex/stable/iso/1.0.7/immudex32.iso/download">https://sourceforge.net/projects/immudex/files/immudex/stable/iso/1.0.7/immudex32.iso/download</a></td>
-        </tr>
-        <tr>
-          <td>CRC: 829906021</td>
-          <td>SHA1: 812d09738287e288da8dae6b83882de4e3bc3af0</td>
-        </tr>
-        <tr>
-          <td colspan="3">&bull;&nbsp;<a href="https://github.com/xf0r3m/immudex/blob/main/changelogs/1.0.7.txt">Lista zmian dla wydania</a></td>
-        </tr>
-        <tr>
-          <th colspan="3">&bull;&nbsp;immudex-lhe (oldoldstable, Debian 10 Buster)&nbsp;&bull;</th>
-                  </tr>
-        <tr>
-          <td rowspan="2">32-bit:</td>
-                    <td colspan="3">            <a href="https://sourceforge.net/projects/immudex/files/immudex/lhe/iso/0.0.2/immudex-lhe32.iso/download">https://sourceforge.net/projects/immudex/files/immudex/lhe/iso/0.0.2/immudex-lhe32.iso/download</a></td>
-        </tr>
-        <tr>
-          <td>CRC: 2111259419</td>
-          <td>SHA1: a0f8807ba247acd5fb27e659f58353388edbd8ea</td>
-        </tr>
-        <tr>
-          <td colspan="3">&bull;&nbsp;<a href="https://github.com/xf0r3m/immudex-lhe/blob/main/changelogs/0.0.2.txt">Lista zmian dla wydania</a></td>
-        </tr>
-        <!--
-        <tr>
-          <th colspan="3">&bull;&nbsp;immudex (stable, Debian 12 Bookworm)&nbsp;&bull;</th>
-                  </tr>
-        <tr>
-          <td rowspan="2">64-bit:</td>
-                    <td colspan="3"></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td rowspan="2">32-bit:</td>
-                    <td colspan="3"></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td colspan="3">&bull;&nbsp;<a href="https://github.com/xf0r3m/immudex/blob/main/changelogs/.txt">Lista zmian dla wydania</a></td>
-        </tr>
         -->
-        <!--
-        <tr>
-          <th colspan="3">&bull;&nbsp;immudex-testing (Debian testing, 13 Trixie)&nbsp;&bull;</th>
-                  </tr>
-        <tr>
-          <td rowspan="2">64-bit:</td>
-                    <td colspan="3"></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td rowspan="2">32-bit:</td>
-                    <td colspan="3"></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td colspan="3">&bull;&nbsp;<a href="https://github.com/xf0r3m/immudex-testing/blob/main/changelogs/.txt">Lista zmian dla wydania</a></td>
-        </tr>
-        -->
-
-        <!--
-        <tr>
-          <th colspan="3">&bull;&nbsp;immudex-lhe (oldoldstable, Debian 10 Buster)&nbsp;&bull;</th>
-                  </tr>
-        <tr>
-          <td rowspan="2">32-bit:</td>
-                    <td colspan="3"></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td colspan="3">&bull;&nbsp;<a href="https://github.com/xf0r3m/immudex-lhe/blob/main/changelogs/.txt">Lista zmian dla wydania</a></td>
-        </tr>
-        -->
-      </table>
-      <p>
-        Domyślnym użytkownikiem jest <strong>user</strong>, dostęp to niego 
-        uzyskujemy za pomocą hasła <em>user1</em>. Możemy również skorzystać z
-        konta superużytkownika <em>root</em> z hasłem <em>toor</em>.
       </p>
       <p>
-        <strong>Meta-Distribution Rolling-Release</strong>
+       <strong>Unifikacja:</strong> 
       </p>
       <p>
-        Obecnie immudex-testing wydawany jest na zasadzie: 
+        Do tej pory (tj. 01.01.2024), immudex wydawany był w trzech rożnych
+        wariantach. Teraz jednak te trzy warianty będą takie same, a w zasadzie
+        podobne. Póżnice będą opierać się głównie na wersji paketów,
+        ponieważ te obecne wariany operają się o dostępne warianty dystrybucji
+        bazowej, czyli Debiana. Do wyboru będziemy mieli: <em>testing</em>
+        (jak immudex-testing), <em>stable</em> (jak klasyczny stabliny immudex)
+        oraz <em>oldstable</em>, który ma za zadanie zastąpić <em>LHE</em>,
+        jednak nie w tak skrajny sposób. Prezentując tak naprawdę zupełnie
+        inne doświadczenia, podczas korzystania z niego. 
+      </p>
+      <p>
+        Wyżej wymienione wersje mają zainstalowane to samo opgramowanie, mimo
+        braku, nie których pakietów repozytoriach. Wszystkie wersje przezentują
+        ten sam pulpit, to samo środowisko pracy. A jedną z zauważlnych
+        różnic może być, krój czcionki, prezentujący takie informacje jak:
+        nazwy dostępnych urządzeń pamięci masowej prezentowanych na pulpicie
+        czy inne nazwy plików w menedżerze plików. Natomiast, krój czcionki w
+        terminalu pozostaje taki sam. 
+      </p>
+      <p>
+        Przedstawiane tutaj wersje immudex będą wydawane na zasadzie 
+        <strong>Meta-Distribution Rolling-Release</strong>. Skąd takie zmiany?
+        Otóż główny celem jest ujednolicenie procesu technologicznego dla
+        wszystkich wersji immudex oraz zmiana adaptacji infrastruktury. <!--tj.
+        wykorzystanie niektórych jej składników w innych celach np. do budowy
+        projektu <em>LibreWolf</em> (który wymaga min. 12GB wolnej pamięci RAM).
+        -->
+      </p>
+      <p>
+        Warto wspomnieć, że projekty immudex-lhe oraz immudex-testing zostały
+        zarchiwizowane. Zarchiwizowany został również stan repozytoruim
+        projektu immudex przed unifikacją. Gałąź <em>main</em> projektu 
+        <em>xfcedebian</em>
+        zostanie scalona z gałęzią <em>d13</em> i to ona będzie gałęzią,
+        główną projektu. Wówczas wszystkie zmiany dotyczące <em>layoutu</em>
+        środowiska XFCE oraz pakietów podstawowych (tych zapisanych w skrypcie
+        <em>install.sh</em>) będą publikowana za pośrednictwem projektu
+        <em>xfcedebian</em>.
+      </p>
+      <p>
+        <strong>Meta-Distribution Rolling-Release:</strong>
+      </p>
+      <p>
+        Obecnie immudex wydawany jest na zasadzie: 
         <strong>Meta-Distribution Rolling-Release</strong>.
         Przez co obrazy płyty wydawane przez autora dystrybucji nie będą już 
         dostępne. Zatem takie czynności jak 'rewinding' oraz aktualizacje 
@@ -284,7 +236,7 @@
         nowego obrazu iso.
       </p>
       <p>
-        <a href="https://github.com/xf0r3m/immudex-testing">https://github.com/xf0r3m/immudex-testing</a>
+        <a href="https://github.com/xf0r3m/immudex">immudex</a>
       </p>
       <p>
         Zmiana podejścia jest efektem dążenia do pełnej bezkosztowości. Gdzie 
@@ -316,7 +268,7 @@
       </p>
       <p>
         Ostatnie utworzone przez autora obrazy płyt będą dostępne na pod adresem:
-        <a href="https://ftp.morketsmerke.org/archive/immudex-cd">https://ftp.morketsmerke.org/archive/immudex-cd</a>.
+        <a href="https://sourceforge.net/projects/immudex/files/immudex">https://sourceforge.net/projects/immudex/files/immudex</a>.
       </p>
       <p>
         Nie wykluczone jest także aby wersja stablina przeszła na sam tryb. 
@@ -327,6 +279,127 @@
         gdyż jest ona chyba najbardziej przyjemna w obsłudze. Pojawiła się
         również koncepcja, aby immudex był budowany na dowolnej wersji
         Debiana, z jednym konkretnym layoutem, z jednym zestawem narzędzi.
+      </p>
+      <p>
+        Proces budowania immudex można wspomóc korzystając z przygotowanego
+        wcześniej obrazu płyty zawierającego wszystkie potrzebne pakiety
+        wymagane do poprawnego utworzenia obrazu płyty z docelową wersją
+        immudex. Konfiguracja budowania obrazu płyt przy wykorzystaniu
+        dedykowanego środowiska sprowadza się do odpowiedzi na trzy pytania:
+      </p>
+      <ul>
+        <li>wskazania wymaganej przestrzeni dyskowej (min. 10G) w postaci 
+          punktu montowania,</li>
+        <li>podania docelowej architektury,</li>
+        <li>podania bazowej wersji Debiana.</li>
+      </ul>
+      <p>
+        Narzędzia służace do budowania są uruchamiane automatycznie zaraz po
+        zalogowaniu się do systemu. Dane logowania to:
+      </p>
+      <ul>
+        <li>Nazwa użytkownika: <strong>root</strong></li>
+        <li>Hasło: <strong>toor</strong></li>
+      </ul>
+      <p>
+        Obrazy SDK, bazują na Debian Stable i ich wersjonowanie jest identyczne
+        jak tej dystrybucji. Ponad to na obrazie znajdują się narzędzia
+        umożliwiające rozwój oraz dostosowanie immudex do własnych potrzeb.
+        Obraz SDK jest wyłącznie 64-bitowy.
+        Poniżej znajduje odnośnik do obrazu SDK:
+      </p>
+        <table border="1" style="border-collapse: collapse;">
+        <tr>
+          <th colspan="3">&bull;&nbsp;immudex-sdk (Debian 12 Bookworm)&nbsp;&bull;</th>
+                  </tr>
+        <tr>
+          <td rowspan="2">64-bit:</td>
+                    <td colspan="3">            <a href="https://sourceforge.net/projects/immudex/files/immudex/sdk/immudex-sdk_12.4_amd64.iso/download">https://sourceforge.net/projects/immudex/files/immudex/sdk/immudex-sdk_12.4_amd64.iso/download</a>
+          </td>
+        </tr>
+        <tr>
+          <td>CRC: 2872224461</td>
+          <td>SHA1: 22cb220d91dd89f98efc148929b7aa1d6e0d4d7e</td>
+        </tr>
+      </table>
+      <p>
+        <strong>Dostęp do systemu:</strong>
+      </p>
+      <p>
+        Domyślnym użytkownikiem jest <strong>user</strong>, dostęp to niego 
+        uzyskujemy za pomocą hasła <em>user1</em>. Możemy również skorzystać z
+        konta superużytkownika <em>root</em> z hasłem <em>toor</em>. Oczywiście
+        wszystko to może ulec zmianie, jeśli tylko będzie mieć na to chęć.
+      </p>
+      <p>
+        <strong>Obrazy płyt wersji finalnych:</strong>
+      </p>
+      <table border="1" style="border-collapse: collapse;">
+        <tr>
+          <th colspan="3">&bull;&nbsp;immudex (stable, Debian 12 Bookworm)&nbsp;&bull;</th>
+                  </tr>
+        <tr>
+          <td rowspan="2">64-bit:</td>
+                    <td colspan="3">            <a href="https://sourceforge.net/projects/immudex/files/immudex/stable/iso/1.0.7/immudex64.iso/download">https://sourceforge.net/projects/immudex/files/immudex/stable/iso/1.0.7/immudex64.iso/download</a></td>
+        </tr>
+        <tr>
+          <td>CRC: 611376696</td>
+          <td>SHA1: 787bb9d842d9360a5dc3f9be888b3ae085d4e592</td>
+        </tr>
+        <tr>
+          <td rowspan="2">32-bit:</td>
+                    <td colspan="3">            <a href="https://sourceforge.net/projects/immudex/files/immudex/stable/iso/1.0.7/immudex32.iso/download">https://sourceforge.net/projects/immudex/files/immudex/stable/iso/1.0.7/immudex32.iso/download</a></td>
+        </tr>
+        <tr>
+          <td>CRC: 829906021</td>
+          <td>SHA1: 812d09738287e288da8dae6b83882de4e3bc3af0</td>
+        </tr>
+        <tr>
+          <td colspan="3">&bull;&nbsp;<a href="https://github.com/xf0r3m/immudex/blob/main/changelogs/1.0.7.txt">Lista zmian dla wydania</a></td>
+        </tr>
+        <tr>
+          <th colspan="3">&bull;&nbsp;immudex-testing (Debian testing, 13 Trixie)&nbsp;&bull;</th>
+                  </tr>
+        <tr>
+          <td rowspan="2">64-bit:</td>
+                    <td colspan="3">            <a href="https://sourceforge.net/projects/immudex/files/immudex/testing/iso/1.1.0/immudex-testing64.iso/download">https://sourceforge.net/projects/immudex/files/immudex/testing/iso/1.1.0/immudex-testing64.iso/download</a>
+          </td>
+        </tr>
+        <tr>
+          <td>CRC: 3209508973</td>
+          <td>SHA1: 7d1e20cae38517e9f7a94866ce2eddff5d1da33f</td>
+        </tr>
+        <tr>
+          <td rowspan="2">32-bit:</td>
+                    <td colspan="3">            <a href="https://sourceforge.net/projects/immudex/files/immudex/testing/iso/1.1.0/immudex-testing32.iso/download">https://sourceforge.net/projects/immudex/files/immudex/testing/iso/1.1.0/immudex-testing32.iso/download</a>
+          </td>
+        </tr>
+        <tr>
+          <td>CRC: 2912498511</td>
+          <td>SHA1: bae73930f1a928399a3a42e0f4850e14bc4b8ef8</td>
+        </tr>
+        <tr>
+          <td colspan="3">&bull;&nbsp;<a href="https://github.com/xf0r3m/archive/blob/main/immudex-testing/changelogs/1.1.0.txt">Lista zmian dla wydania</a></td>
+        </tr>
+        <tr>
+          <th colspan="3">&bull;&nbsp;immudex-lhe (oldoldstable, Debian 10 Buster)&nbsp;&bull;</th>
+                  </tr>
+        <tr>
+          <td rowspan="2">32-bit:</td>
+                    <td colspan="3">            <a href="https://sourceforge.net/projects/immudex/files/immudex/lhe/iso/0.0.2/immudex-lhe32.iso/download">https://sourceforge.net/projects/immudex/files/immudex/lhe/iso/0.0.2/immudex-lhe32.iso/download</a></td>
+        </tr>
+        <tr>
+          <td>CRC: 2111259419</td>
+          <td>SHA1: a0f8807ba247acd5fb27e659f58353388edbd8ea</td>
+        </tr>
+        <tr>
+          <td colspan="3">&bull;&nbsp;<a href="https://github.com/xf0r3m/immudex-lhe/blob/main/changelogs/0.0.2.txt">Lista zmian dla wydania</a></td>
+        </tr>
+      </table>
+      <p>
+        Domyślnym użytkownikiem jest <strong>user</strong>, dostęp to niego 
+        uzyskujemy za pomocą hasła <em>user1</em>. Możemy również skorzystać z
+        konta superużytkownika <em>root</em> z hasłem <em>toor</em>.
       </p>
       <p>
         <strong>Dokumentacja projektu:</strong>
