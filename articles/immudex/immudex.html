@@ -22,7 +22,9 @@
         <strong>Aktualności:</strong>
       </p>
       <ul class="reduced-list">
-      	<li>01.01.2024 - Nowa wersja immudex-sdk - 12.4-1</li>
+      	<li>07.01.2024 - Zmiana podejścia do użytkowników w immudex.</li>
+	<li>07.01.2024 - Nowa wersja immudex-sdk - 12.4-2</li>
+	<li>01.01.2024 - Nowa wersja immudex-sdk - 12.4-1</li>
 	<li>01.01.2024 - Unifikacja projektów immudex.</li>
 	<li>31.12.2023 - Wydanie immudex (stable) w wersji 1.0.7 oraz immudex-lhe w wersji 0.0.2 - finalne obrazy płyty.</li>
 	<li>11.12.2023 - Aktualizacja immudex zostanie opóźniona do 31.12.2023.</li>
@@ -296,7 +298,9 @@
       </ul>
       <p>
         Narzędzia służace do budowania są uruchamiane automatycznie zaraz po
-        zalogowaniu się do systemu. Dane logowania to:
+        po załadowaniu systemu. System loguje się automatycznie na konto
+        superużytkownika, mimo to jeśli dane logowania będą potrzebne to
+        znajdują się poniżej:
       </p>
       <ul>
         <li>Nazwa użytkownika: <strong>root</strong></li>
@@ -315,22 +319,32 @@
                   </tr>
         <tr>
           <td rowspan="2">64-bit:</td>
-                    <td colspan="3">            <a href="https://sourceforge.net/projects/immudex/files/immudex/sdk/immudex-sdk_12.4-1_amd64.iso/download">https://sourceforge.net/projects/immudex/files/immudex/sdk/immudex-sdk_12.4-1_amd64.iso/download</a>
+                    <td colspan="3">            <a href="https://sourceforge.net/projects/immudex/files/immudex/sdk/immudex-sdk_12.4-2_amd64.iso/download">https://sourceforge.net/projects/immudex/files/immudex/sdk/immudex-sdk_12.4-2_amd64.iso/download</a>
           </td>
         </tr>
         <tr>
-          <td>CRC: 3164826970</td>
-          <td>SHA1: 2c687e5d98c540754a733b4e38cb5dbd48669153</td>
+          <td>CRC: 3126496459</td>
+          <td>SHA1: ad720604890e5e2f3397c0a9f86c57b4d1ecdc06</td>
         </tr>
       </table>
       <p>
         <strong>Dostęp do systemu:</strong>
       </p>
       <p>
+        Obecnie użytkownik podczas tworzenia obrazu płyty pytany jest o nazwę
+        użytkownika następnie o hasło. W ten sposób tworzone jest konto
+        podstawowego użytkownika systemu. Konto ma możliwość podniesienia
+        uprawnień do poziomu superużytkownika za pomocą polecenia <em>sudo</em>
+        oraz bezproblemowy dostęp do usług wirtualizacji. Konto
+        superużytkownika jest zablokowne i posiada przypisane losowe hasło.
+        Jeśli zajdzie potrzeba użycia tego konta, to można wykorzystać do tego
+        polecenie <em>sudo su</em>.
+        <!--
         Domyślnym użytkownikiem jest <strong>user</strong>, dostęp to niego 
         uzyskujemy za pomocą hasła <em>user1</em>. Możemy również skorzystać z
         konta superużytkownika <em>root</em> z hasłem <em>toor</em>. Oczywiście
         wszystko to może ulec zmianie, jeśli tylko będzie mieć na to chęć.
+        -->
       </p>
       <p>
         <strong>Obrazy płyt wersji finalnych:</strong>
