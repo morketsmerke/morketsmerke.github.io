@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+	  <p class="header_link">
+		  &#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	  </p>
+	  <div class="main">
+      <h1 class="title">Instalacja oraz administracja silnikiem wyszukiwania - SearXNG</h1>
+      <p>
+        SearXNG jest silnikiem wyszukiwania, który pozwala nam na bezpiecznie
+        wyszukiwanie treści w Internecie, przyczym warto wspomnieć, że
+        bezpieczne oznacza tutaj bardziej prywatne, czy wyszukiwanie z
+        poszanowaniem naszej prywatności. Działanie wyszukiwarki jest
+        bardzo proste. Wpisująć żądaną fraze, jest ona przesyłana do
+        silnika wyszukiwarki, a ten przy użyciu API odpytuje inne popularne
+        wyszukiwarki takie jak Google czy DuckDuckGo, przyczym dane te
+        przesyłane do tych wyszukiwarek są jałowe, to znaczy nie zawierają
+        żadnych danych, które mógły by ulec profilowaniu. Oczywiście jest
+        okupione pewną wadą, otóż nie zawsze wyniki wyszukiwania są
+        zadawalające. Moim zdaniem mamy tutaj doczynienia z wyszukiwaniem,
+        a nie próbą odgadnięcia co chcieliśmy znaleźć jak ma to miejsce np.
+        przy takie wyszukiwarce jak Google. Przy dzisiejszych możliwościach
+        połączenia z Internetem, prawie każdy jest do niego podłączony 24
+        godziny i 7 dni w tygodniu umiejętność zapamiętywania ustępuje
+        miejsca umiejętności sprawnego wyszukiwania informacji. Dlatego jeśli
+        decydujemy się korzystanie z alternatywnych wyszukiwarek, warto
+        zapoznać się z dokumentacją przedstawiającą różnego rodzaju dyrektywy
+        czy inne sztuczki, coś ala <em>Google hacking</em>.
+      </p>
+      <h2>Instalacja wyszukiwarki SearXNG</h2>
+      <p>
+        Jeśli chcielibyśmy skorzystać z silnika tego typu lub przetestować
+        jego działanie to możemy zrobić to na mojej publicznie dostępnej
+        instacji: <a href="https://searx.morketsmerke.org/">searx.morketsmerke.org</a>.
+        Nie mniej jednak SearXNG wymaga hostingu WWW, gdzieś na serwerze nawet
+        w sieci lokalnej. Ja do tych celów wykorzystam maszynę wirtualną z
+        Debianem. Po zainstalowaniu systemu lub/i zalogowaniu się do jego
+        powłoki, musimy na początku spełnić wszystkie zależności (wymagania).
+        Wydajemy polecenie:
+      </p>
+<pre class="code-block">
+$ sudo -H apt-get install -y python3-dev python3-babel python3-venv \
+uwsgi uwsgi-plugin-python3 git build-essential libxslt-dev zlib1g-dev \
+libffi-dev libssl-dev curl
+</pre>
+      <p>
+        W instrukcji na stronie projektu widnieje polecenie, aby sklonować
+        repozytorium do katalogu <em>Downloads</em> w swoim katalogu domowym.
+        Jednak w przypadku Debian 12, uruchomienie skryptu instalacji z tego
+        katalogu, możnie zakończyć się porażką, gdyż skrypt instalacyjny tworzy
+        użytkownika, na potrzeby działania silnika wyszukiwania, w pewnym
+        momencie skrypt przełącza się na niego i próbuje sklonować
+        pobrane przez nas wcześniej repozytorium i to się nie uda, ponieważ
+        od Debiana 12-tki, katalogi domowe użytkowników mają uprawnienia w
+        trybie 700, co daje kompletny brak uprawnień dla innych użytkowników
+        systemu do danych umieszczonych w tych katalogach. Zatem musimy wybrać
+        inne miejsce na pobranie repozytorium i takim miejscem może być katalog
+        <em>/tmp</em>.
+      </p>
+<pre class="code-block">
+$ cd /tmp
+$ git clone https://github.com/searxng/searxng.git searxng
+</pre>
+      <p>
+        Teraz przechodzimy do właściwej instalacji. Na większość pytań
+        odpowiadamy <em>Yes</em> łącznie z instalacją bazy danych <em>Redis</em>.
+        Nie przestraszmy się, instalator w pewnym momencie zwraca 
+        <em>exception</em> z Pythona. Dotyczy ono połączenia z bazą danych 
+        Redis ale nie
+        jest ona jescze zainstalowana, dlatego na pytanie o instalację Redis
+        wybieramy <em>Yes</em>, wystarczy kilknąć <strong>y</strong>.
+      </p>
+<pre class="code-block">
+$ cd searxng
+$ sudo -H ./utils/searxng.sh install all
+</pre>
+      <p>
+        Pod sam koniec instalacji skrypt sam zwraca uwagę na to, że nie mamy
+        zainstalowanego serwera WWW. Teraz doknamy jego instalacji oraz
+        włączenia wszystkich niezbędnych do działania modułów. Oczywiście
+        zakładam, że wykorzystywanym przez nas serwerem WWW jest Apache2.
+      </p>
+<pre class="code-block">
+$ sudo -H apt-get install apache2
+$ sudo -H a2enmod ssl
+$ sudo -H a2enmod headers
+$ sudo -H a2enmod proxy
+$ sudo -H a2enmod proxy_http
+$ sudo -H a2enmod proxy_uwsgi
+</pre>
+      <p>
+        Nie restartujemy teraz serwera WWW, dodamy jeszcze plik z hostingiem
+        zawierającym niezbędne przekierowania oraz dyrektywy do pracy 
+        naszej wyszukiwarki.
+      </p>
+<pre class="code-block">
+$ sudo touch /etc/apache2/sites-available/searxng.conf
+</pre>
+      <p>
+        Wewnątrz tego pliku umieszczamy zawartość poniższego bloku kodu.
+      </p>
+<pre class="code-block">
+# -*- coding: utf-8; mode: apache -*-
+
+LoadModule ssl_module           /usr/lib/apache2/modules/mod_ssl.so
+LoadModule headers_module       /usr/lib/apache2/modules/mod_headers.so
+LoadModule proxy_module         /usr/lib/apache2/modules/mod_proxy.so
+LoadModule proxy_uwsgi_module   /usr/lib/apache2/modules/mod_proxy_uwsgi.so
+# LoadModule setenvif_module      /usr/lib/apache2/modules/mod_setenvif.so
+#
+SetEnvIf Request_URI /searxng dontlog
+# CustomLog /dev/null combined env=dontlog
+
+&lt;Location /searxng&gt;
+
+    Require all granted
+    Order deny,allow
+    Deny from all
+    # Allow from fd00::/8 192.168.0.0/16 fe80::/10 127.0.0.0/8 ::1
+    Allow from all
+
+    # add the trailing slash
+    RedirectMatch  308 /searxng$ /searxng/
+
+    ProxyPreserveHost On
+    ProxyPass unix:/usr/local/searxng/run/socket|uwsgi://uwsgi-uds-searxng/
+
+    # see flaskfix.py
+    RequestHeader set X-Scheme %{REQUEST_SCHEME}s
+    RequestHeader set X-Script-Name /searxng
+
+    # see limiter.py
+    RequestHeader set X-Real-IP %{REMOTE_ADDR}s
+    RequestHeader append X-Forwarded-For %{REMOTE_ADDR}s
+
+&lt;/Location&gt;
+</pre>
+      <p>
+        Włączamy konfigurację hostingu dla SearXNG. Po tej czynności możemy
+        wreszcie uruchomić ponownie naszą usługę serwera WWW. Restartujemy
+        również usługę <em>uwsgi</em> wskazując jej instację <em>searxng</em>
+      </p>
+<pre class="code-block">
+$ sudo a2ensite searxng.conf
+$ sudo systemctl restart apache2
+$ sudo -H service uwsgi restart searxng
+</pre>
+      <p>
+        W ten sposób nasz <em>search engine</em> jest zainstalowany. Możemy
+        spróbować się z nim połączyć przy użyciu przeglądari podając adres IP
+        w URL i uwaga <strong>koncząc go /searxng</strong>. Oczywiście możemy
+        poprawić ten mankament, za pomocą dedykowane hostingu dla SearXNG oraz
+        dyrektywy przekierowania, ale to wydaje mi się, że każdy sobie już
+        sam potrafi zrobić. Dyrektywa przekierowania dla przypomnienia
+        znajduje się poniżej.
+      </p>
+<pre class="code-block">
+Redirect / /searxng
+</pre>
+      <p>
+        Naszym oczom ukazę się biała strona z dużym logo SearXNG pośrodku oraz
+        polem do wpisywania fraz. Warto sobie ją nieco skonfigurować.
+      </p>
+      <h2>Konfiguracja SearXNG</h2>
+      <p>
+        Plik konfiguracyjny SearXNG - <em>settings.yml</em>  znajduje się w 
+        katalogu
+        <em>/etc/searxng</em>. Poniżej
+        zamieszczam plik konfiguracyjny mojej instancji, aby można było sobie
+        co nieco skopiować. Usunąłem tylko opcję
+        <code class="code-inline">secret_key</code>
+      </p>
+<pre class="code-block">
+# SearXNG settings
+
+use_default_settings: true
+
+general:
+  debug: false
+  instance_name: "SearXNG - morketsmerke.org"
+
+search:
+  safe_search: 2
+  autocomplete: 'google'
+
+server:
+  # Is overwritten by ${SEARXNG_SECRET}
+  limiter: true
+  image_proxy: true
+  # public URL of the instance, to ensure correct inbound links. Is overwritten
+  # by ${SEARXNG_URL}.
+  # base_url: http://example.com/location
+
+redis:
+  # URL to connect redis database. Is overwritten by ${SEARXNG_REDIS_URL}.
+  url: unix:///usr/local/searxng-redis/run/redis.sock?db=0
+
+ui:
+  static_use_hash: true
+  default_locale: 'pl'
+
+# preferences:
+#   lock:
+#     - autocomplete
+#     - method
+
+enabled_plugins:
+  - 'Hash plugin'
+  - 'Search on category select'
+  - 'Self Informations'
+  - 'Tracker URL remover'
+  - 'Ahmia blacklist'
+  # - 'Hostname replace'  # see hostname_replace configuration below
+  # - 'Infinite scroll'
+  # - 'Open Access DOI rewrite'
+  # - 'Vim-like hotkeys'
+
+# plugins:
+#   - only_show_green_results
+
+# hostname_replace:
+#
+#   # twitter --&gt; nitter
+#   '(www\.)?twitter\.com$': 'nitter.net'
+
+engines:
+
+#   - name: fdroid
+#     disabled: false
+#
+#   - name: apk mirror
+#     disabled: false
+#
+#   - name: mediathekviewweb
+#     categories: TV
+#     disabled: false
+#
+#   - name: invidious
+#     disabled: false
+#     base_url:
+#       - https://invidious.snopyta.org
+#       - https://invidious.tiekoetter.com
+#       - https://invidio.xamh.de
+#       - https://inv.riverside.rocks
+
+</pre>
+      <p>
+        Innymi rzeczami, które mogą nas interesować w celach personalizacji
+        jest zmiana loga na stronie wyszukiwarki czy <em>favicony</em> na 
+        karcie
+        przeglądarki, ale o tym w następnym podrozdziale.
+      </p>
+      <h2>Aktualizacja SearXNG</h2>
+      <p>
+        Po pewnym czasie, może być tak, że nasza <em>instacja</em>, czyli
+        uruchomiona kopia procesu (formalnie, ale tym przypadku bardziej
+        chodzi o uruchomione przez użytkowników silniki SearXNG) będzie
+        wymagać aktualizacji. Aktualizacji możemy dokonywać z różną
+        częstotliwością, ale takim sygnałem, że trzeba taką aktualizację
+        przeprowadzić jest wygaśniecie kluczy API (wówczas nasz SearXNG, nie
+        będzie stanie pobrać wyników wyszukiwania z innych wyszukiwarek).
+        Aktualizacja naszego silnika jest dobrze opisana w dokumentacji
+        projektu. Jest tylko jeden problem, ze względu interaktywność
+        ostatniego etapu, czyli zapytania o zastąpienie pliku konfiguracyjnego
+        nowszą wersją z plików projektu, nie można w prosty sposób tego
+        procesu zautomatyzować.
+      </p>
+      <p>
+        Ja ten problem pośrednio rozwiązałem. Ze względu na to, że domyślną
+        nawet sugerowaną przez skrypt odpowiedzią na wyżej wymienione pytanie
+        jest <em>Nie</em>, odnalazłem funkcję
+        w plikach projektu odpowiedzialną za tę czynność i złamałem jej
+        wykonanie, poprzez dodanie do jej kodu zmiennej, którą polecenia w tej
+        funkcji wykorzystują. Kiedyś ustawiała ona natychmiastowe zatwierdzenie
+        domyślniej opcji i zakończenie wykonania, teraz ustawiana przez mnie
+        wartość jest nieakceptowalna i wykonanie funkcji zostaje zatrzymane
+        przez co nie dochodzi do samego pytania, a przy tym nadpisania pliku
+        konfiguracyjnego jak i zatrzymania wykonania skryptu aktualizacji.
+        Wszystkie niezbędne czynności zostały już wcześniej wykonane.
+        Poniżej znajduje się kod skryptu uruchamianego przez usługę
+        <em>cron</em>:
+      </p>
+<pre class="code-block">
+if [ ! -d ~/Downloads ]; then mkdir ~/Downloads; fi
+cd ~/Downloads;
+
+if [ -d searxng ]; then rm -rf searxng; fi
+
+git clone https://github.com/searxng/searxng.git searxng;
+cd searxng;
+
+sed -i '355i _t="-t 1"' ~/Downloads/searxng/utils/lib.sh;
+sudo -H ./utils/searxng.sh instance update
+
+sudo cp -vv /home/xf0r3m/searxng.png /usr/local/searxng/searxng-src/searx/static/themes/simple/img
+sudo cp -vv /home/xf0r3m/favicon.png /usr/local/searxng/searxng-src/searx/static/themes/simple/img
+sudo rm -v /usr/local/searxng/searxng-src/searx/static/themes/simple/img/favicon.svg
+sudo ln -v -s /usr/local/searxng/searxng-src/searx/static/themes/simple/img/favicon.png /usr/local/searxng/searxng-src/searx/static/themes/simple/img/favicon.svg
+</pre>
+      <p>
+        Tych kilka linijek, pozwala na automatyzowania zadania, które przecież
+        było interaktywne. Polecenie <code class="code-inline">sed</code> jest
+        odpowiedzialne za dodanie tej wcześniej omawianej wartości. Natomiast
+        ostatnie cztery linie, przedstawiają personalizację duzego loga na
+        stronie głównej oraz <em>favicony</em>.
+      </p>
+      <h2>Reinstalacja silnika wyszukiwania SearXNG</h2>
+      <p>
+        Z czasem, może przydarzyć nam się przykra sytuacja, gdy zamiast strony
+        naszego silnika otrzymamy krótki komunikat:
+      </p>
+<pre class="code-block">
+Internal Server Error
+</pre>
+      <p>
+        Oczywiście możemy próbować rozwiązać ten problem, ale najprostrzym
+        i najszybszym rozwiązaniem jest <strong>reinstalacja</strong> silnika.
+        Poniżej możemy zamieściłem listę poleceń, które należy wykonać aby
+        poprawnie zainstalować ponownie SearXNG. Uwaga, te polecenia należy
+        wykonywać w zapisanej w przykładzie kolejności, inaczej zostawimy
+        bałagan w systemie i możemy już nie zainstalować więcej SearXNG na tym
+        hoście. Ostatnie cztery polecenia dotyczą mojej instancji, można je
+        pominąć, ale jeśli zmienialiśmy logo na głównej stronie oraz 
+        <em>favicone</em>
+        to wystarczy zmienić pliki źródłowe, ponieważ tego dotyczą te
+        polecenia.
+      </p>
+<pre class="code-block">
+0. cp /etc/searxng/settings.yml /home/xf0r3m/searx_settings.yml
+1. sudo systemctl stop searxng-redis.service
+2. sudo service uwsgi stop searxng
+3. sudo rm /lib/systemd/system/searxng-redis.service
+4. sudo systemctl daemon-reload
+5. sudo rm /etc/uwsgi/apps-enabled/searxng.ini
+6. sudo rm /etc/uwsgi/apps-available/searxng.ini
+7. sudo reboot
+8. sudo userdel -r searxng
+9. sudo rm -rf /usr/share/searxng-redis
+10. sudo rm -rf ~/Downloads/searxng
+11. cd ~/Downloads
+12. git clone https://github.com/searxng/searxng.git searxng
+13. cd searxng
+14. sudo -H ./utils/searxng.sh install all # Na reverse proxy Apache odpowiadamy 'no'.
+15. sudo cp -vv /home/xf0r3m/searxng.png /usr/local/searxng/searxng-src/searx/static/themes/simple/img
+16. sudo cp -vv /home/xf0r3m/favicon.png /usr/local/searxng/searxng-src/searx/static/themes/simple/img 
+17. sudo rm /usr/local/searxng/searxng-src/searx/static/themes/simple/img/favicon.svg
+18. sudo ln -s /usr/local/searxng/searxng-src/searx/static/themes/simple/img/favicon.png /usr/local/searxng/searxng-src/searx/static/themes/simple/img/favicon.svg
+</pre>
+      <p>
+        W ten sposób przedstawia się instalacja meta-silnika wyszukiwania
+        SearXNG oraz kilka związanych z nim zadań administracyjnych.
+      </p>
+      <p>
+        ~xf0r3m
+      </p>
+      <p>
+        Źródła:
+      </p>
+      <ol>
+        <li><a href="https://docs.searxng.org/index.html">SearXNG Documentation</a></li>
+      </ol>
+    </div>
+		<p class="footer">
+			2024; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+</body>
+</html>
