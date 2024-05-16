@@ -22,7 +22,10 @@
         <strong>Aktualności:</strong>
       </p>
       <ul class="reduced-list">
-      	<li>16.03.2024 - Zmiany w dostarczaniu metod wirtualizacji: KVM - jako addon. Dodano dwie metody konteneryzacji: docker.io oraz distrobox (podman) - jako addony. Od dziś brak domyślnej metody wirtualizacji. Virt-manager jest dostęp jako osobny addon dla komputerów, które nie mają wirtualizować.</li>
+      	<li>15.05.2024 - Zmiana w addonie librewolf, zastąpienie samodzielnej kompilacji instalacją z paczek Debiana z oficjalnego repozytorium projektu (z uwzględnieniem polityki antyfrankensteinowej).</li>
+	<li>15.05.2024 - Wdrożenie polityki antyfrankensteinowej.</li>
+	<li>12.05.2024 - Wdrożenie projektu ytfzf (tylko stable i testing, dla oldstable brakuje zależności)</li>
+	<li>16.03.2024 - Zmiany w dostarczaniu metod wirtualizacji: KVM - jako addon. Dodano dwie metody konteneryzacji: docker.io oraz distrobox (podman) - jako addony. Od dziś brak domyślnej metody wirtualizacji. Virt-manager jest dostęp jako osobny addon dla komputerów, które nie mają wirtualizować.</li>
 	<li>13.02.2024 - Nowa wersja immudex-sdk - 12.5</li>
 	<li>14.01.2024 - Nowa wersja immudex-sdk - 12.4-3</li>
 	<li>07.01.2024 - Zmiana podejścia do użytkowników w immudex.</li>
@@ -132,6 +135,14 @@
           <td class="centered-text">&#x2714;</td>
           -->
         </tr>
+        <tr>
+          <td>Skrypt ytfzf</td>
+          <td colspan="3" class="centered-text">tylko stable i testing</td>
+          <!--
+          <td class="centered-text">&#x2714;</td>
+          <td class="centered-text">&#x2714;</td>
+          -->
+        </tr>
         <!--
         <tr>
           <td>Przeglądarka LibreWolf</td>
@@ -204,6 +215,39 @@
         <!--pod tym linkiem:
         <a href="https://ipr.morketsmerke.org">Lista oprogramowania immudex</a>
         -->
+      </p>
+      <p>
+        <strong>Polityka antyfrankensteinowa:</strong>
+      </p>
+      <p>
+        Przez większość czasu życia projektu immudex, był on projektowany w
+        taki sposób, aby dla wszystkich trzech wersji dostarczał to samo
+        oprogramowanie - ten sam system. Jednak ostatnie zawirowania w
+        pakietach Debiana, przez co coraz większa złożoność procesu budowania
+        dystrybucji, spowodowały że musiałem zreflektować ten pomysł i
+        ostatecznie go porzucić, na rzecz czystszego oraz bardziej stabilnego
+        systemu. Dlatego też, w niektórych plikach projektu, będzie można
+        zauważyć warunki determinujące określone wersje systemu. Wcześniej
+        również był stosowany taki warunek dostarczający np. <em>newsboat</em>
+        do wersji <em>testing</em> czy <em>xfce4-notes-plugin</em> do wersji
+        <em>stable</em>. Teraz to nie będzie miało miejsca. Tabela
+        oprogramowania dalej będzie z unifikowana i ewentualnie będę zaznaczać
+        jakich wersji dotyczy dany pakiet. 
+      </p>
+      <p>
+        Oczywiście nie oznacza to, że rezygnuje z unifikacji. Mimo tego, że te
+        wersje wyglądają tak samo i działają w bardzo podobny sposób to
+        różniły się wersjami oraz dostępnością oprogamowania. Ja starałem się
+        niwelować te rozbierzności, jednak ze względu na wyżej wymienione
+        powody zrezygnowałem z tego. Koniec, końców dyskonfort związany z
+        wprowadzeniem tej polityki, będzie związany jedynie z brakiem jakiegoś
+        programu w danej wersji, innych konsekewncji nie przewiduje.
+      </p>
+      <p>
+        Oczywiście, nikt nie musi iść zgodnie z głównym nurtem. Repozytoria
+        z plikami budowy immudex, można śmiało klonować, dodwać swoje zmiany
+        i redystrybuować na własnych serwisach (kontach) systemu Git. Dlatego
+        też zmiany w upstreamie, nie koniecznie mogą oznaczać zmiany, dla nas.
       </p>
       <p>
        <strong>Unifikacja:</strong> 
