@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+	<p class="header_link">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div class="main">
+		<h1 class="title">Przekierowanie konsoli tty0 na RS-232 (port COM)</h1>
+    <p>
+      Jeśli ktoś zapoznał się, z materiałem o automatycznym odblokowywaniu
+      istniejących partycji LUKS, to wie że pozostawienie plików klucza tak
+      sobie na dysku nie jest zbyt dobrym rozwiązaniem. Wystarczy, że ktoś nam
+      ten serwer/komputer ukradnie i nie będzie przednim żadnych tajemnic. Co
+      wówczas można zrobić tej sprawie. Najprościej rzecz ujmując, można
+      zaszyfrować dysk systemowy. Tylko w tym przypadku rodzi się pytanie, bo
+      jeśli jest to serwer, albo PC na którym pracujemy zdalnie? Można 
+      wykorzystać
+      drugi serwer lub też przy użyciu Raspberry Pi utworzyć sobie taki serwer
+      dostępowy. Natomiast komunikacja między tymi hostami, a przynajmnie ta
+      tekstowa odbędzie się za pomocą zapomniane już protokołu RS-232,
+      potocznie nazywanego COM-em lub połączeniem szeregowym. Pierwszą rzeczą
+      od której zaczniemy jest sprzęt i kilka wyjaśnień hardware-owych.
+    </p>
+    <p>
+      Chcąc zrealizować takie przekierowanie konsoli, abyśmy przez SSH na
+      serwerze dostępowym mogli za pomocą połączenia szeregowego odblokować
+      naszą partycję systemową musimy zaopatrzyć się w odpowiednie przewody
+      kabel COM żeńsko-żeński (adapter i PC maja męskie porty COM)
+      oraz adapter USB-RS232. Adaptery ostatnio potrafią osiągać jakieś chore
+      kwoty. Nie mniej jednak, ta tańsza wersja ze znanego portalu aukcyjnego
+      za 10 czy 15 złotych wystarczy w zupełności. Jeśli nie możemy dostać
+      kabla COM, to możemy użyć żeńskich kabli stykowych. Do komunikacji
+      potrzebne będą tylko 3 przewody, wówczas należy pamiętać o skrosowaniu
+      przewodów. To znaczy pin nadawczy (Tx) nadawcy musi być podłaczony do
+      pinu odbiorczego (Rx) odbiorcy i na odwrót. Pin nadawczy (Tx) odbiorcy
+      musi być podłączony do pinu odbiorczego (Rx) nadawcy. Należy pamiętać
+      jeszcze o przewodzie masowym (GND). Podłączenia dokonujemy wg. poniższego
+      schematu.
+    </p>
+<pre class="code-block">
+      RS-232    
+N               O
+A Tx --  -- Tx  D
+D       X       B
+A Rx --  -- Rx  I
+W               R
+C GND ----- GND C
+A               A
+</pre>
+      <p>
+        Kable COM mają już ten przeplot w sobie. Po zaopatrzeniu się w sprzęt
+        możemy przejść do właściwej konfiguracji systemu.
+      </p>
+      <p>
+        Na początek musimy dowiedzieć się z jakiego portu COM korzysta nasz
+        serwer i jak się on nazwya w systemie. W tym celu przeszukamy
+        komunikaty diagnostyczne jądra. Przefiltrujemy pod zwględem
+        występowania frazy <em>tty</em>.
+      </p>
+<pre class="code-block">
+xf0r3m@sc:~$ sudo dmesg | grep 'tty'
+[    0.059942] printk: console [tty0] enabled
+[    0.884573] 00:00: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+[    3.571786] systemd[1]: Created slice system-getty.slice - Slice /system/getty.
+</pre>
+      <p>
+        W moim przypadku jest <em>/dev/ttyS0</em> i to to urządzenie
+        wykorzystam do konfiguracji. Konfigurację zaczynamy od GRUB-a.
+        Uzupełniamy poniższe opcje, tak jak na przykładzie, opcji
+        <em>GRUB_SERIAL_COMMAND</em>, może nie być w pliku więc trzeba ją
+        dopisać. Plik, który będziemy edytować to <em>/etc/default/grub</em>.
+      </p>
+<pre class="code-block">
+GRUB_CMDLINE_LINUX="console=tty0 console=ttyS0,19200n8"
+...
+GRUB_TERMINAL=serial
+GRUB_SERIAL_COMMAND="serial --speed=19200 --unit=0 --word=8 --parity=no --stop=1"
+</pre>
+      <p>
+        Za pomocą pierwszej linii przekierowaliśmy konsole na połączenie
+        szeregowe. Pozostałe opcje służą wyświetalniu menu GRUB-a na konsoli
+        szeregowej. Po zapisaniu zmian, musimy wygenerować nowe pliki
+        konfiguracyjne za pomocą poniższego polecenia:
+      </p>
+<pre class="code-block">
+xf0r3m@sc:~$ sudo update-grub
+Generating grub configuration file ...
+Found linux image: /boot/vmlinuz-6.1.0-22-amd64
+Found initrd image: /boot/initrd.img-6.1.0-22-amd64
+Found linux image: /boot/vmlinuz-6.1.0-18-amd64
+Found initrd image: /boot/initrd.img-6.1.0-18-amd64
+Warning: os-prober will not be executed to detect other bootable partitions.
+Systems on them will not be added to the GRUB boot configuration.
+Check GRUB_DISABLE_OS_PROBER documentation entry.
+done
+</pre>
+      <p>
+        Teraz musimy uruchomić program <em>getty</em>, który pozwoli nam
+        się zalogować do systemu. W tym celu umieścimy w pliku
+        <em>/etc/inittab</em> poniższą linię. Tutaj również mamy wybór
+        rodzaju terminala. Ja pozostawiam domyśnie <em>vt100</em>. W
+        nowoczesnych dystrybucjach plik <em>/etc/inittab</em>, może nie
+        istnieć. Nic nie stoi na przeszkodzie, aby go utworzyć.
+      </p>
+<pre class="code-block">
+T0:23:respawn:/sbin/getty -L ttyS0 19200 vt100
+</pre>
+      <p>
+        Teraz konfiguracja serwera jest już gotowa. Pozostaje skonfigurowanie
+        klienta - ustawienie odpowiednich parametrów połaczenia szeregowego
+        aby mogło dojść do transmisji. Jako klienta, użyjemy aplikacji
+        <em>minicom</em>. Jeśli nie jest dostępna w systemie to można ją
+        zainstalować z repozytorium. Podłaczmy adapter i sprawdzamy pod jaka
+        nazwą występuje w systemie. Tę nazwę należy zachować do celów 
+        konfiguracji <em>minicom</em>-a. Następnie wydajemy polecenie:
+      </p>
+<pre class="code-inline">
+$ sudo minicom -s -c on
+</pre>
+      <p>
+        Ekran zostanie wyczyszczony, a nam zostanie wyświetlone okno
+        <em>konfiguracja</em>, przechodzimy do opcji 
+        <em>ustawienia portu szeregowego</em>. Teraz będzie zabawa bo
+        <em>minicom</em> konfiguruje się w dość pokraczny sposób. Naciskamy
+        klawisz 'A' i przechodzimy do edycji urządzenia szeregowego, tam
+        wpisujemy ścieżke do pliku pod którym występuje nasz adapter,
+        zatwierdzamy klawiszem <em>Enter</em>. Następnie naciskamy klawisz 'E',
+        w kolejnym oknie wybieramy opcje połączenia szeregowego. Jeśli zrobiśmy
+        wszystko zgodnie z tym artykułem - to przedstawione tutaj ustawienia są
+        standardowe więc w tym oknie naciskamy klawisz 'B', do momentu aż pole
+        przy opcji 'B' nie będzie wskazywać:
+      </p>
+<pre class="code-block">
+B:  &lt;Aktualnie: 19200 8N1
+</pre>
+        <p>
+          Zatwierdzamy klawiszem <em>Enter</em> i wartość
+          <code class="code-inline">19200 8N1</code>, powinna pojawić się w
+          głównym oknie konfiguracji, przy opcji <em>E:</em>. Jeśli tak, to 
+          możemy
+          opuścić to okno <em>Enter</em>-em i wybieramy opcje:
+          <em>Zapisanie konfiguracji jako dfl</em>, dzięki temu konfiguracja
+          zostanie wczytana od razu po uruchomieniu programu za pomocą 
+          polecenia
+          <code class="code-inline">sudo minicom -c on</code> - opcja
+          <code class="code-inline">-c on</code>, włącza kolory. Po
+          przygotowaniu pliku, możemy uruchamiać naszego <em>minicoma</em>
+          i restartować serwer. Konsola tty0 serwera powinna pojawić się w
+          oknie <em>minicoma</em>, na początku pokaże się menu GRUB-a.
+        </p>
+<pre class="code-block">
+$ sudo minicom -c on
+
+                       GNU GRUB  version 2.06-13+deb12u1
+
+ +----------------------------------------------------------------------------+
+ |*Debian GNU/Linux                                                           | 
+ | Advanced options for Debian GNU/Linux                                      |
+ |                                                                            |
+ |                                                                            |
+ |                                                                            |
+ |                                                                            |
+ |                                                                            |
+ |                                                                            |
+ |                                                                            |
+ |                                                                            |
+ |                                                                            |
+ |                                                                            | 
+ +----------------------------------------------------------------------------+
+
+      Use the ^ and v keys to select which entry is highlighted.          
+      Press enter to boot the selected OS, `e' to edit the commands       
+      before booting or `c' for a command-line.                           
+
+Please unlock disk vda5_crypt:
+cryptsetup: vda5_crypt: set up successfully
+/dev/mapper/ccna--vg-root: clean, 185425/1213456 files, 2214800/4851712 blocks
+
+Debian GNU/Linux 12 ccna ttyS0
+
+ccna login:
+</pre>
+      <p>
+        Źródło: <a href="https://www.cyberciti.biz/faq/howto-setup-serial-console-on-debian-linux/">Debian Linux: Set a Serial Console</a>
+      </p>
+        <p>
+            ~xf0r3m
+        </p>
+        
+    </div>
+		<p class="footer">
+			2024; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+</body>
+</html>
