@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+			<link rel="stylesheet" type="text/css" href="/style.css">
+		</head>
+		<body>
+<pre>
+  _______            ___   ______     _      __
+ /_  __(_)___  _____( _ ) /_  __/____(_)____/ /_______
+  / / / / __ \/ ___/ __ \/|/ / / ___/ / ___/ //_/ ___/
+ / / / / /_/ (__  ) /_/  &lt;/ / / /  / / /__/ ,&lt; (__  )
+/_/ /_/ .___/____/\____/\/_/ /_/  /_/\___/_/|_/____/
+     /_/
+</pre>
+
+		<p class="header_link">
+			&#9760;&nbsp;<a href="https://morketsmerke.github.io/">morketsmerke</a>&nbsp;&#9760;
+		</p>
+		<div class="main">
+      <h1 class="title">Eksport udziału NFS dla całej sieci</h1>
+		  <p>
+        Konfigurując jakiś czas temu NFS, na urządzeniu NAS ZyXEL-a, aby
+        udostępnić dla wszystkich hostów w sieci ten udział, adres w
+        powiedzmy <em>ustawieniach</em> podawało się w ten sposób: 
+		  </p>
+<pre class="code-block">
+192.168.0.*
+</pre>
+      <p>
+        Chcąc zrobić to samo na Debianie, zapisałem podobną konfigurację i
+        pomimo takiego zapisu, polecenie:
+        <code class="code-inline">exportfs -av</code> nie zwróciło żadnego
+        błędu. Podobnie było po restartcie usług związanych z NFS - również 0
+        błędów. Ale jeśli przyszło do montowania, to uzykałem jeden wielki
+        <em>permission denied!</em>. No to już wiedziałem, że prawdopodobnie
+        podany adres, wskazujący na całą sieć nie za bardzo działa. Coż nic
+        dziwnego ciężko jest stwierdzić jak duża jest sieć przy takim zapisie.
+        Nawet jeśli demony NFS były by na tyle inteligentne, że po podaniu
+        trzech okretów, mogłby stwierdzić, że sieć ma długość 24 bitów.
+        A gdyby tak faktycznie było to jak to określić w przypadku sieci 
+        12-bitowej - 172.16.0.0/12. Niestety tak nie jest i trzeba
+        było poszukać czegoś innego. Wrzuciłem do wyszukiwarki odpowiednią
+        frazę, i cóż w 4 rodziale artykułu w źródłach, pierwszy przykład, w
+        ostaniej linii, znalazłem swoje rozwiązanie.
+        <strong>Otóż chcąc udostępnić udział NFS dla całej sieci, należy
+        podać jej adres w notacji CIDR (najprościej, są inne możliwości).</strong>
+      </p>
+<pre class="code-block">
+192.168.0.0/24(<em>opcje NFS</em>)
+</pre>
+      <p>
+        I to tyle w temacie. Teraz próba podmontownia tego udziału na moim
+        komputerze, z adresm IP przydzielnym z DHCP, powiodła się bez żadnych
+        problemów. Ja osobiście już montowałem wcześniej udziały NFS, ale jeśli
+        ktoś nie montował, to może być wymagane (raczej będzie) zainstalowanie
+        obsługi montowania NFS - pakiet <em>nfs-common</em> dla Debianów.
+      </p>
+      <p>
+        Źródło: <a href="https://www.golinuxcloud.com/nfs-exports-options-examples/">10 practical examples to export NFS shares in Linux</a>
+      </p>
+      <p>
+        ~xf0r3m
+      </p>
+		</div>
+		<p class="footer">
+			2022; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+		</body>
+	</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+			<link rel="stylesheet" type="text/css" href="/style.css">
+		</head>
+		<body>
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |&gt;  &lt;
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+
+		<p class="header_link">
+			&#9760;&nbsp;<a href="https://morketsmerke.github.io/">morketsmerke</a>&nbsp;&#9760;
+		</p>
+		<div class="main">
+      <h1 class="title">Automatyczne odblokowanie istniejących partycji LUKS</h1>
+		  <p>
+        Mam kilka szyfrowanych LUKS-em dysków na stanie, do których potrzebuje
+        sporadycznie dostępu (do danych na nich zgromadzonych). Więc
+        stwierdziłem, podłącze je do serwera i udostępnie sobie przez NFS.
+        Wszystko spoko, fajnie tylko, że trzeba by je odblokować (rozszyfrować)
+        podczas rozruchu. Oczywiście jest tak możliwość. Można wykorzystać
+        plik klucza, który należy dodać do partycji. Generalnie to do partycji
+        LUKS, możemy dodać maksymalnie 8 kluczy odblokowywujących
+        (odszyfrywujących). Dodając do takiej partycji plik klucz, tak
+        naprawdę zapisujemy w wolnym miejscu (slocie) jego zawartość jako
+        kolejny z 8-miu możliwych do podania haseł. Całą konfigurację należy
+        rozpocząć od zdefiniowania samego hasła, może być to coś konkretnego,
+        np. jakieś zdanie lub zdefiniowany przez nas ciąg znaków, ale również
+        możemy skorzystać generatora pseudolosowego wbudowanego w każdego
+        Uniksa - <strong>/dev/random</strong>. Wygenerujen 32 bajty 
+        (lub więcej) losowych danych, które posłużą nam jako klucz do partycji
+        LUKS.
+		  </p>
+<pre class="code-block">
+~# dd if=/dev/random bs=32 count=1 of=plik_klucza0
+</pre>
+      <p>
+        Tak wygenerowany klucz możemy dodać teraz do partycji LUKS, przy
+        użyciu narzędzia <em>cryptsetup</em>.
+      </p>
+<pre class="code-block">
+# cryptsetup luksAddKey /dev/sdX /root/plik_klucza0
+</pre>
+      <p>
+        Narzędzie to poprosi nas o podanie jednego z obecnie dodanych klucz,
+        jeśli wcześniej nie dodawaliśmy, żadnych dodatkowych klucz
+        deszyfrujących, to podajemy hasło, które używaliśmy do tej pory do
+        odblokowywania LUKS. Po zatwierdzeniu hasła, klucz został dodany.
+        Warto zmienić mu uprawnienia, aby tylko właściciel mógł odczytać
+        jego zawartość 
+        (<code class="code-inline">chmod 600 /root/plik_klucza0<code>).
+      </p>
+      <p>
+        Teraz w pliku <em>/etc/crypttab</em> należy zdefiniować automatyczne
+        odblokowywanie partycji, podając jej: nazwę dla <em>mapera</em>, UUID
+        partycji, plik klucz i jeśli to wymagane inne opcję 
+        <em>cryptsetup</em> używane podczas odblokowywania. Na przykład:
+      </p>
+<pre class="code-block">
+luks-disk   UUID="d03d9875-6310-4eea-809e-8570909408ea"   /root/plik_klucza0
+</pre>
+      <p>
+        Na koniec musimy wskazać w pliku <em>/etc/fstab</em> punkt montowania
+        oraz opcje dla odszyforwanej partycji. Tutaj nie musimy posługiwać się
+        UUID-ami, jak zazwyczaj, ponieważ nazwa dla <em>mappera</em> jest
+        unikalnym identyfikatorem dla partycji, wątpię w to aby została ona
+        zmieniona podczas działania systemu. Chyba, że ręcznie zablokujemy
+        tego LUKS-a i odblokujemy pod inną nazwą.
+      </p>
+<pre class="code-block">
+/dev/mapper/luks-disk   /srv/cryptdisk  ext4 defaults 0 2
+</pre>
+      <p>
+        Po restartcie systemu, powinniśmy zobaczyć odblokowany i zamontowany
+        LUKS w naszym systemie. To rozwiązanie ma jedną zasadniczą wadę
+        związaną z bezpieczeństwem danych zgromadzonych na LUKS. W momencie
+        gdy ktoś uzyska dostęp fizyczny do maszyny, to uzyska również dostęp
+        do danych na LUKS. Rozwiązań tego problemu może być kilka, nie mniej
+        warto się jednak nad nim zastanowić.
+      </p>
+      <p>
+        Źródło: <a href="https://access.redhat.com/solutions/230993">How to add a passphrase, key, or keyfile to an existing LUKS device</a>
+      </p>
+      <p>
+        ~xf0r3m
+      </p>
+		</div>
+		<p class="footer">
+			2022; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+		</body>
+	</html>

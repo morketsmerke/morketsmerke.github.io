@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+			<link rel="stylesheet" type="text/css" href="/style.css">
+		</head>
+		<body>
+<pre>
+  _______            ___   ______     _      __
+ /_  __(_)___  _____( _ ) /_  __/____(_)____/ /_______
+  / / / / __ \/ ___/ __ \/|/ / / ___/ / ___/ //_/ ___/
+ / / / / /_/ (__  ) /_/  &lt;/ / / /  / / /__/ ,&lt; (__  )
+/_/ /_/ .___/____/\____/\/_/ /_/  /_/\___/_/|_/____/
+     /_/
+</pre>
+
+		<p class="header_link">
+			&#9760;&nbsp;<a href="https://morketsmerke.github.io/">morketsmerke</a>&nbsp;&#9760;
+		</p>
+		<div class="main">
+      <h1 class="title">Dodanie hosta do certyfikatu Let's Encrypt</h1>
+		  <p>
+        Generalnie poza możliwością odwołania certyfikatu (<em>revoke</em>)
+        czy/lub poźniejszego jego usunięcia (<em>delete</em>) nie mamy zbyt
+        wiele możliwości. Jeśli nie jesteśmy pewnii, co narobi nam najmniejszy
+        bałan, to otóż na tym samym serwerze, jeśli wszystkie kryteria są
+        spełnione. Można uzyskać odrębny certyfikat dla tego konkretnego hosta/
+        hostingu.
+		  </p>
+<pre class="code-block">
+$ sudo certbot certonly -d sc.morketsmerke.org
+</pre>
+      <p>
+        Poźniej wystarczy skopiować tylko plik hostingu SSL z innego hosta
+        korzystającego z <em>Let's Encrypt</em> i zmienić nazwę hosta w 
+        ścieżce. Ta nazwa tego hosta jest zarazem nazwą certyfikatu. Jeśli
+        będziemy chcieli wrócić do jednego certyfikatu, to trzeba poczekać
+        do jego wygaśnięcia, wówczas ten wygasły usunąć i utworzyć nowy
+        ze wszytkimi domenami. Jednak lepiej jest nic nie robić. Certyfikaty
+        powinny same się odnawiać.
+      </p>
+      <p>
+        Źródło: Ja.
+      </p>
+      <p>
+        ~xf0r3m
+      </p>
+		</div>
+		<p class="footer">
+			2022; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+		</body>
+	</html>
