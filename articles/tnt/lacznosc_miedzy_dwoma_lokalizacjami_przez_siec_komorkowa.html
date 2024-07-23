@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+			<link rel="stylesheet" type="text/css" href="/style.css">
+		</head>
+		<body>
+<pre>
+  _______            ___   ______     _      __
+ /_  __(_)___  _____( _ ) /_  __/____(_)____/ /_______
+  / / / / __ \/ ___/ __ \/|/ / / ___/ / ___/ //_/ ___/
+ / / / / /_/ (__  ) /_/  &lt;/ / / /  / / /__/ ,&lt; (__  )
+/_/ /_/ .___/____/\____/\/_/ /_/  /_/\___/_/|_/____/
+     /_/
+</pre>
+
+		<p class="header_link">
+			&#9760;&nbsp;<a href="https://morketsmerke.github.io/">morketsmerke</a>&nbsp;&#9760;
+		</p>
+		<div class="main">
+      <h1 class="title">Łączność miedzy dwiema lokalizacjami przez sieć komórkową</h1>
+      <p>
+        Wiemy jak upierdliwa jest łączność między dwiema lokalizacjami, które
+        dostęp do Internetu realizują za pomocą sieci komórkowej. Ona w ogóle
+        nie istnieje i trzeba kombinować. Jeśli potrzebujemy jednej konkretnej
+        usługi, to tunel SSH może wystarczyć. Jednak jest lepsza
+        metoda, zapewniająca bardziej swobodną komunikację. Jest nią 
+        <strong>sieć VPN</strong>. O sieciach VPN zrobiłem osobny materiał, 
+        link znajduje się w źródłach. Mimo, że od dawna wiedziałem, że mogłem
+        zrealizować taką komunikację za pomocą sieci VPN, to źle zabierałem się
+        do jej konfiguracji. Logicznie rzecz biorąc pierwszą rzeczą jaka
+        przychodzi nam na myśl jest, biorąc pod uwagę <em>dwie lokalizacje</em>
+        jest - łączenie ze sobą oddziałów firmy. <strong>No właśnie nie.</strong>
+        Kilku krotnie podchodziłem do tematu - właśnie używając sposobów na
+        łączenie ze sobą oddziałów firmy. Ostatnio zmieniłem strategię. 
+      </p>
+      <p>
+        Otóz a co jeśli poszczególne hosty traktować jako klientów. Tylko
+        problemem może być to, że klasyczne połączenie między klientem a
+        serwerem tworzy wirtualną sieć od długości /30. Co daje nam całe dwa
+        hosty: serwer vpn i klienta. Tak domyślnie działa oprogramowanie
+        <strong>OpenVPN</strong> z którego korzystam. Nie mniej jednak
+        znalazłem w dokumentacji (link w źródłach), że możemy zmienić tę
+        funkcjonalność za pomocą opcji <em>topology subnet</em> i teraz
+        zamiast obsługiwać pojedyncze połączenia tunel będzie obsługiwać całą
+        sieć. Trzeba więc to przetestować. Stworzyłem na komputerze przy użyciu
+        maszyn wirtualnych 
+        najbardziej zbliżoną infrastrukturę do tej rzeczywistej. I rozpocząłem
+        konfigurację.
+      </p>
+      <p>
+        Na początku skonfigurowałem dwie bramki na <em>Alpine Linux</em>, aby
+        strony połączenia znajdowały się za NAT-em, jak to jest w
+        rzeczywistości. To bardzo prymitywna konfiguracja bez DHCP i DNS same
+        interfejsy i NAT przez <em>iptables</em>. Następnie skonfigurowałem
+        CA dla certyfikatów na tym samym serwerze co VPN, dla bezpieczeństwa
+        lepiej tego nie robić, ale to tylko środowisko testowe. Konfiguracji
+        doknałem zgodnie z 3 linkiem w źródłach. Już raz o tym pisałem, więc
+        odsyłam. Po skonfigurowaniu CA wygenerowałem certyfikaty dla całej
+        infrastruktury. Następnie zabrałem sie za konfigurację serwera. Tak
+        o to wyglądał plik konfiguracyjny serwera VPN w środowisku testowym:
+      </p>
+<pre class="code-inline">
+dev tun
+local 192.168.97.203
+proto udp
+port 17003
+user openvpn
+group openvpn
+ca cacert.pem
+cert servercrt.pem
+key serverkey.pem
+dh dh2048.pem
+topology subnet
+server 10.8.0.0 255.255.255.0
+ifconfig-pool-persist ipp.txt
+client-config-dir ccd
+keepalive 10 120
+comp-lzo
+</pre>
+      <p>
+        Testowo uruchomiłem <em>OpenVPN</em> i serwer zrucił błąd za małego
+        <em>klucza</em> DH trzeba było wygenerować nowy, dłuższy, poźniej
+        zapomniałem o użytkowniku. Ale koniec, końców udało się go podnieść
+        i mamy w naszym systemie interfejs <em>tun0</em> o adresie 10.8.0.1.
+      </p>
+      <p>
+        Następnie przyszedł czas na konfigurację klientów, ich konfiguracja
+        nie wymaga zbyt wiele wysiłku. Ja przepisałem ją z mojego
+        wcześniejszego materiału (4 link w źródłach). Certyfikaty zgrane,
+        <em>OpenVPN</em> skonfigurowany, tunele zestawione i oto nadchodzi
+        wielka chwila prawdy. Test <em>pingiem</em> między jedną stroną a
+        drugą. Uruchamiam polecenie i... Ciemnosc i nie ma połączenia ;(.
+      </p>
+      <p>
+        Pingi do serwera VPN idą bez problemu, a między hostami nie. Nie wiem
+        dlaczego ale stwierdziłem, że jest coś nie tak z serwerem. Jego
+        zadaniem jest przekazać... No właśnie przekazać pakiety z jednego
+        interfejsu na ten sam, ale muszą one zostać przetworzone. Bez
+        przekazywania, serwer tylko sprawdzić czy ten pakiet jest do niego.
+        Jeśli nie, to go odrzuci. Włączyłem zatem przekazywanie pakietów IPv4.
+      </p>
+<pre class="code-block">
+$ sudo sysctl net.ipv4.ip_forward=1
+</pre>
+      <p>
+        I ponownie testuje i jakaż euforia mnie opanowała, kiedy jedna strona
+        z drugą stroną zaczęły sie komunikować za pośrednictwem tunelu VPN.
+      </p>
+      <p>
+        Rozwiązanie wdrożyłem na produkcji, z jednej stronym mam różowego
+        operatora a z drugiej zielonego. I tutaj pro-tip. Nie korzystajcie
+        dostarczonego pliku jednostki <em>systemd</em>, <em>OpenVPN</em>.
+        Skopiujcie jego zawartość do powiedzmy: <em>openvpn-local.service</em>
+        i ten plik włączcie. Unikniecie problemów ze startem tunelu podczas
+        <em>bootowania</em> - np. za którymś uruchomieniem zamiast jednego
+        interfejsu <em>tun0</em> będą dwa z tym samym adresem
+        (<em>tun0</em> i <em>tun1</em>). Samo rozwiązanie działa zadawaląco
+        pozwala nawet odtworzyć większy plik wideo za pomocą programu VLC z
+        udziału zamontowanego po przez NFS.
+      </p>
+      <p>
+        Ten artykuł został wydany bardziej w formie felietonu, a niżeli takich
+        typowych materiałów przedstawiających tutoriale, aczkolwiek musiał
+        powstać, aby nie przepadło to doświadczenie, jakiego nabrałem
+        podczas konfigurowania zarówno środowiska testowego jak i produkcyjnego.
+      </p>
+      <p>
+        Źródło:<br />
+        <ul>
+          <li><a href="https://morketsmerke.github.io/articles/terminallog/sieci_VPN.html">Sieci VPN</a></li>
+          <li><a href="https://community.openvpn.net/openvpn/wiki/Topology">Opcja Topology</a></li>
+          <li><a href="https://morketsmerke.github.io/articles/terminallog/sieci_VPN.html#ssl">SSL dla VPN</a></li>
+          <li><a href="https://morketsmerke.github.io/articles/terminallog/sieci_VPN.html#openvpn">OpenVPN na morketsmerke.org</a></li>
+        </ul>
+      </p>
+      <p>
+        ~xf0r3m
+      </p>
+		</div>
+		<p class="footer">
+			2022; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+		</body>
+	</html>
