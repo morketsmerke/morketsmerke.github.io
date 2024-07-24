@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+			<link rel="stylesheet" type="text/css" href="/style.css">
+		</head>
+		<body>
+<pre>
+  _______            ___   ______     _      __
+ /_  __(_)___  _____( _ ) /_  __/____(_)____/ /_______
+  / / / / __ \/ ___/ __ \/|/ / / ___/ / ___/ //_/ ___/
+ / / / / /_/ (__  ) /_/  &lt;/ / / /  / / /__/ ,&lt; (__  )
+/_/ /_/ .___/____/\____/\/_/ /_/  /_/\___/_/|_/____/
+     /_/
+</pre>
+
+		<p class="header_link">
+			&#9760;&nbsp;<a href="https://morketsmerke.github.io/">morketsmerke</a>&nbsp;&#9760;
+		</p>
+		<div class="main">
+      <h1 class="title">Aliasy połaczeń SSH</h1>
+		  <p>
+        Jeśli chcemy skorzystać z protokołu SFTP przez takie programy jak
+        <em>Midnight Command</em> (<em>mc</em>), możemy natkąć się na
+        przeszkodę jeśli host będzie wymagać opcji jakich nie będziemy w
+        stanie podać w oknie programu. Takich jak np. dedykowany plik klucza.
+        Co wówczas można zrobić w takiej sytuacji? Otóż dla połączeń SSH można
+        zdefiniować aliasy, które mogą przechowywać wszystkie potrzebne nam
+        opcje. 
+		  </p>
+      <p>
+        Aliasy dla połączeń SSH, są definiowane w pliku <strong>~/.ssh/config</strong>
+        w podany poniżej sposób:
+      </p>
+<pre class="code-block">
+Host yourHost
+    HostName 10.0.0.1
+    Port 2222
+    User ubuntu
+    IdentityFile ~/.ssh/privatekey.key
+</pre>
+      <p>
+        <strong>Każda opcja SSH</strong> to osobna linia w sekcji
+        <code class="code-inline">Host</code>. Po zapisaniu zmian w pliku
+        ważne, aby nadać mu odpowiednie uprawnienia.
+      </p>
+<pre class="code-block">
+$ chmod 600 ~/.ssh/config
+</pre>
+      <p>
+        Po za <em>mc</em> możemy korzystać z tych aliasów za pomocą zwykłego
+        polecenia <em>ssh</em>. Chcąc się połaczyć z wyżej zdefiniowanym hostem
+        wydajemy poniższe polecenie. Tak samo jest w przypadku programu
+        <em>mc</em>, chcąc odwołać się do aliasu podajemy w oknie połączenia
+        wyłącznie jego nazwę. 
+      </p>
+<pre class="code-block">
+$ ssh yourHost
+</pre>
+      <p>
+        Źródło:<br />
+        <ul>
+          <li><a href="https://4sysops.com/archives/midnight-commander-remote-connect-via-shell-link-copy-files-over-ssh-and-sftp-link-using-fish-and-public-key-authentication/">Midnight Commander remote connect via Shell link (copy files over SSH) and SFTP link using FISH and public key authentication</a></li>
+          <li><a href="https://linuxize.com/post/using-the-ssh-config-file/">Using the SSH Config File</a></li>
+        </ul>
+      </p>
+      <p>
+        ~xf0r3m
+      </p>
+		</div>
+		<p class="footer">
+			2024; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+		</body>
+	</html>
