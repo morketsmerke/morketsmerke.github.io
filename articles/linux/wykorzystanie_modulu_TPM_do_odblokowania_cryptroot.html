@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+	<p class="header_link">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div class="main">
+		<h1 class="title">Wykorzystanie modułu TPM do odblokowania cryptroot</h1>
+    <p>
+      Myślałem, że na zdalnym odblokowywaniu cryptroot seria się skończy, ale
+      rodziła się potrzeba stworzenia laptopa do zdalnej pomocy, przy czym
+      system na tym laptopie miał być jak najbardziej bezobsługowy. To jest
+      użytkownik końcowy ma go tylko włączyć i już jak system się załaduje to
+      załóżmy konsultant działu IT, powinien już się z nim połączyć. Kiedy
+      rozwiązano wszystkie inne problemy - takie jak wybór sposóbu
+      udostępnienia zdalnego pulpitu. Pozostał problem ochrony klucza
+      prywatnego VPN, ze zdjętym hasłem. Dla nas sprawa wydaje się oczywista.
+      Szyfrujemy dysk. A co z wymogiem bezobsługowości? No i tutaj pojawiły
+      się dwa wyjścia, albo wykorzystujemy moduł TPM. Wówczas szyfrowanie
+      dysków na dystrybucjach Linuksa wygląda podobnie do BitLockera na
+      MS Windows. Nie musimy wpisywać żadnych haseł, a dysk odblokowuje się
+      podczas uruchamiania systemu. W takim systemie, dane chronione są
+      przez hasło użytkownika. Drugim wyjściem, było nie szyfrowanie dysku, ale
+      zablokowanie na serwerze proxy sieci VPN możliwości inicjowania
+      połączeniem z innymi hostami sieci prywatnej. Stwierdziłem, że jeżeli
+      pierwszy plan nie wypali, to ostatecznie użyjemy drugiej metody.
+    </p>
+    <p>
+      Aby rozpocząć konfigurowanie LUKS (dodanie klucza) w użyciem TPM, należy
+      na początku upewnić się że sam TPM jest obecny i funkcjonalny. Tak
+      wygląda włączony i poprawnie działający moduł TPM na Debianie:
+    </p>
+<pre class="code-block">
+xf0r3m@romek:~$ sudo dmesg | grep "TPM"                                                                                                                                                                                                     
+[    1.078372] tpm_tis 00:05: 1.2 TPM (device-id 0xB, rev-id 16)
+[   32.365170] systemd[1]: systemd 252.26-1~deb12u2 running in system mode 
+(+PAM +AUDIT +SELINUX +APPARMOR +IMA +SMACK +SECCOMP +GCRYPT -GNUTLS +OPENSSL
++ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +IPTC +KMOD +LIBCRYPTSETUP
++LIBFDISK)
+</pre>
+    <p>
+      Jeśli pojawi się informacja o tym, że moduł ten jest wyłączony lub 
+      zdezaktywowany i/lub pojawiają się komunikaty o błędach w komunikacji
+      z nim, to wówczas należy sprawdzić w BIOS-ie komputera czy jest on
+      włączony. Jeśli nie jesteśmy w stanie odnaleźć takich ustawień, to być
+      może nasza platforma nie posiada modułu TPM (większość, komputerów
+      profesjonalnych takich jak Lenovo TP, Dell Latitude czy komputerów
+      stacjonarnych takich jak HP Z Workstations posiada moduł TPM w wersji
+      zależnej od wieku sprzętu). W BIOS-ach mogą one nazywać się przeróżnie
+      od <em>Security Chip</em> po <em>Embedded Security Device Support</em>.
+    </p>
+    <p>
+      W przypadku modułów TPM w wersji niższej niż 2.0, może być problem z
+      oprogramowaniem pozwalającym obsługiwać moduł TPM w dzisiejszych
+      wersjach dystrybucji. Jednym z takich programów jest 
+      <strong>clevis</strong> - modularny <em>framework</em> do automatyzacji
+      szyfrowania. Oficjalna wersja nie wspiera modułów TPM poniżej 2.0, więc
+      jeden z hakerów, wykonał <em>fork</em> (własną wersję, czyjegoś
+      projektu) <em>clevisa</em> dodając do niego obsługę modułów TPM &lt;2.0.
+      Jego projekt jest możliwy do instalacji za pomocą paczek .deb. Pakiety
+      mają również zdefiniowane zależności więc po za pobraniem i
+      wydaniem odpowiedniego polecenia nie trzeba nic robić.
+    </p>
+<pre class="code-block">
+xf0r3m@romek:~$ wget https://github.com/oldium/clevis/releases/download/v20_tpm1/clevis-initramfs_20-1+tpm1_amd64.deb
+xf0r3m@romek:~$ wget https://github.com/oldium/clevis/releases/download/v20_tpm1/clevis-systemd_20-1+tpm1_amd64.deb
+xf0r3m@romek:~$ wget https://github.com/oldium/clevis/releases/download/v20_tpm1/clevis-tpm1_20-1+tpm1_amd64.deb
+xf0r3m@romek:~$ wget https://github.com/oldium/clevis/releases/download/v20_tpm1/clevis-luks_20-1+tpm1_amd64.deb
+xf0r3m@romek:~$ wget https://github.com/oldium/clevis/releases/download/v20_tpm1/clevis_20-1+tpm1_amd64.deb
+xf0r3m@romek:~$ ls
+clevis_20-1+tpm1_amd64.deb            clevis-systemd_20-1+tpm1_amd64.deb
+clevis-initramfs_20-1+tpm1_amd64.deb  clevis-tpm1_20-1+tpm1_amd64.deb
+clevis-luks_20-1+tpm1_amd64.deb
+xf0r3m@romek:~$ sudo apt install ./clevis-initramfs_20-1+tpm1_amd64.deb \
+./clevis-systemd_20-1+tpm1_amd64.deb ./clevis-tpm1_20-1+tpm1_amd64.deb \
+./clevis-luks_20-1+tpm1_amd64.deb ./clevis_20-1+tpm1_amd64.deb
+</pre>
+    <p>
+      Po zainstalowaniu oprogramowania, można zainicjować moduł TPM. Za pomocą
+      odpowiedniego polecenia. Polecenie zarząda od nas ustawienia sobie
+      hasła właściciela:
+    </p>
+<pre class="code-block">
+xf0r3m@romek:~$ sudo tpm_takeownership -z
+Enter owner password: 
+Confirm password: 
+</pre>
+    <p>
+      Polecenie po ustawieniu hasła nie powinno zwrócić żadnych dodatkowych
+      komunikatów. Opcja <code class="code-inline">-z</code> ustawi hasło
+      SRK (<em>Secret Root Key</em>) na 20B samych zer (0). Dzięki czemu
+      będziemy w stanie automatycznie odblokować zaszyfrowany główny system
+      plików. 
+    </p>
+    <p>
+      Po przejęciu kontroli na modułem TPM, możemy dodać klucz zapisany w TPM
+      do naszej zaszyfrowanej partycji.
+    </p>
+<pre class="code-block">
+xf0r3m@romek:~$ sudo clevis luks bind -d /dev/sdb5 tpm1 '{"pcr_ids":"0,4,7"}' 
+Enter existing LUKS password: 
+</pre>
+    <p>
+      Polecenie powinno zakończyć się bez żadnych dodatkowych komunikatów.
+      Wartości <em>PCR_IDS</em> są wskaźnikami status bezpieczeństwa. Ich
+      wartości
+      pozwalają ustalić czy TPM działa w zaufanym środowisku. Jeśli któraś z
+      wartości nie jest zgodna z oczekiwaniami - moduł TPM, może odmówić 
+      wydania klucza kryptograficznego.
+    </p>
+    <p>
+      Po dodaniu klucz do partycji, należy zaktualizować <em>initrd</em>.
+    </p>
+<pre class="code-block">
+xf0r3m@romek:~$ sudo update-initramfs -u -k 'all'
+update-initramfs: Generating /boot/initrd.img-6.1.0-23-amd64
+update-initramfs: Generating /boot/initrd.img-6.1.0-18-amd64
+</pre>
+    <p>
+      Aktualizację nalepiej wykonać, dla wszystkich wersji. Stąd opcja
+      <code class="code-inline">-k 'all'</code>.
+    </p>
+    <p>
+      Dla pewności, aby został uruchomiony odpowiedni plik. Aktualizujemy
+      również konfigurację GRUB-a.
+    </p>
+<pre class="code-block">
+xf0r3m@romek:~$ sudo update-grub
+Generating grub configuration file ...
+Found linux image: /boot/vmlinuz-6.1.0-23-amd64
+Found initrd image: /boot/initrd.img-6.1.0-23-amd64
+Found linux image: /boot/vmlinuz-6.1.0-18-amd64
+Found initrd image: /boot/initrd.img-6.1.0-18-amd64
+Warning: os-prober will be executed to detect other bootable partitions.
+Its output will be used to detect bootable binaries on them and create new boot entries.
+done
+</pre>
+    <p>
+      Teraz możemy uruchomić ponownie komputer. Kiedy przyjdzie do odblokowania
+      partycji. Program poprosi nas o hasło, ale po chwili powinien pojawić się
+      komunikat, że partycja został odblokowana przez <em>clevis</em>.
+    </p>
+<pre class="code-block">
+Please unlock disk sda5_crypt:Unlocked /dev/sdb5 with clevis
+/dev/mapper/romek--vg--root: clean, 133975/31883264 files, 3426415/127506432 blocks
+...
+Debian GNU/Linux 12 romek ttyS0
+
+romek login:
+</pre>
+    <p>
+      Jeśli przed dodaniem klucza do partycji, chcemy sprawdzić czy nasz TPM
+      działa poprawnie. Możemy wykonać prosty test.
+    </p>
+<pre class="code-block">
+xf0r3m@romek:~$ echo test | clevis encrypt tpm1 '{"pcr_ids":"0,4,7"}' | clevis decrypt
+test
+</pre>
+    <p>
+      Ten test powinien zwrócić na wyjściu to samo co dostał na wejściu.
+    </p>
+    <p>
+      Tak skonfigurowany system będzie bezpieczny, nawet z bootowanie z
+      pendrive-a nic nie da. TPM sprawdzi wartość rejestru nr. 4 i jeśli nie
+      uruchomiliśmy komputera z prawidłowego dysku to nie wyda klucza.
+    </p>
+    <p>
+      Źródła:
+    </p>
+    <ul>
+      <li><a href="https://github.com/latchset/clevis/issues/84">Wsparcie clevis dla TPM 1.X</a></li>
+      <li><a href="https://github.com/oldium/clevis/releases/tag/v20_tpm1">Nieoficjalna wersja clevis ze wsparciem dla TPM 1.X</a></li>
+      <li><a href="https://linux.die.net/man/8/tpm_takeownership">Strona podręcznika polecenia tpm_takeownership</a></li>
+      <li><a href="https://pl.wikipedia.org/wiki/Trusted_Platform_Module#Pomiar_PCR">Objaśnienie PCR w TPM - Wikipedia</a></li>
+      <li><a href="https://wiki.archlinux.org/title/Trusted_Platform_Module#Accessing_PCR_registers">Bardziej szczegółowe omówienie rejestrów PCR - ArchWiki</a></li>
+    </ul>
+    <p>
+      ~ xf0r3m
+    </p>
+  </div>
+  <p class="footer">
+	  2024; COPYLEFT; ALL RIGHTS REVERSED;
+  </p>
+</body>
+</html>
