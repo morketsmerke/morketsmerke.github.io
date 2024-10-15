@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+	<p class="header_link">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div class="main">
+		<h1 class="title">Instalacja i konfiguracja kontenerów LXC</h1>
+		<p>
+      Dawno temu na tej stronie zajmowałem się tematem instalacji LXD, czyli
+      kontenerów, będących alternatywą dla maszyn wirtualnych, gdzie możemy
+      korzystać z zalet VM-ek, ale nie potrzebujemy pełnej wirtualizacji.
+      Po mimo tego, że mówiliśmy tam o LXD, to tak naprawdę całym mechanizmem
+      kontenerów zajmowało się LXC - temat tego artykułu. 
+      LXD nawet nie robi tego samego co LXC, ale LXD daje nam możliwość
+      skonfigurowania LXC i zarządania kontenerami tej technologii w bardziej 
+      przystępny sposób. Można uznać LXD za <em>frontend</em> dla LXC. W tym
+      przypadku, będziemy ciąć niepotrzebne bajery i przygotujemy do pracy
+      LXC do pracy z kontenerami nieuprzywilejowanymi - uruchamianymi z
+      uprawnieniami zwykłego użytkownika w jego przestrzeni. Kontenery
+      uprzywilejowane - uruchamiane z uprawnieniami superużytkownika - działają
+      od razu po zainstalowaniu LXC w systemie. 
+		</p>
+    <p>
+      Na nieuprzywilejowanych kontenerach nie będziemy mogli:
+    </p>
+    <ul>
+      <li>Zamontować większości wykorzystywanych systemów plików.</li>
+      <li>Tworzyć nowych węzłów urządzeń.</li>
+      <li>Wykonać żadanej operacji po za tymi dozwolnymi dla użytkownika,
+        którego identyfikatory zostały zmapowane do użytkownika root wewnątrz
+        kontenera.</li>
+    </ul>
+    <p>
+      W momencie gdy tworzenie i zarządzanie uprzywilejowanymi kontenerami
+      sprowadza się do poprzedzenia poleceń LXC, poleceniem <em>sudo</em>, to
+      konfiguracja LXC w celu uruchamiania nieuprzywilejowanych kontenerów
+      wymaga już nieco więcej zachodu. 
+    </p>
+    <p>
+      Sam ten materiał powstał w oparciu o różne strony zajmujące się
+      instalacją i konfiguracją LXC, nie mniej jednak zebrano i zweryfikowano
+      różne rozwiązania, aby zapewnić konkretne, działające rozwiązanie.
+      Wiele rozwiązań, prezentowanych nawet na głównej stronie
+      projektu nie zawsze okazuje się prawidłowe dla naszego środowiska.
+      W tym materiale
+      skupiłem się na dystrybucji GNU/Linux Debian i <strong><u>to dla niej
+      dedytkowane są poniższe rowiązania.</u></strong>
+    </p>
+    <ol>
+      <li>Konfigurację rozpoczynamy od zainstalowania pakietu LXC z
+        repozytorium.
+<pre class="code-block">
+xf0r3m@lxc-host:~$ sudo apt install lxc -y
+</pre>
+      </li>
+      <li>Wiążemy użytkownika, który będzie uruchamiał kontenery z dodatkowym
+        UID oraz GID. Te identyfikatory natomiast będą powiązane z
+        użytkownikiem <em>root</em> wewnątrz kontenera, ale na początku system
+        musi wiedzieć, z którym z użytkowników je powiązać. Do tego służą pliki
+        <em>/etc/subuid</em> oraz <em>/etc/subgid</em>.
+<pre class="code-block">
+xf0r3m@lxc-host:~$ echo "xf0r3m:100000:65536" | sudo tee -a /etc/subuid
+xf0r3m:100000:65536
+xf0r3m@lxc-host:~$ echo "xf0r3m:100000:65536" | sudo tee -a /etc/subgid
+xf0r3m:100000:65536
+</pre>
+      </li>
+      <li>Tworzymy przydział możliwych do utworzenia urządzeń sieciowych
+        (uruchomionych jednocześnie kontenerów) przez nieuprzywilejowanego
+        użytkownika. Utworzenie takiego przydziału wymaga dodanie wpisu do
+        pliku <em>/etc/lxc/lxc-usernet</em>.
+<pre class="code-block">
+xf0r3m@lxc-host:~$ echo "xf0r3m veth lxcbr0 50" | sudo tee -a /etc/lxc/lxc-usernet
+xf0r3m veth lxcbr0 50
+</pre>
+        Liczba 50, na końcu polecenie wskazuje ile będzie można uruchomić
+        jednocześnie kontenerów (wpiętych do sieci).
+      </li>
+      <li>Tworzymy katalog <em>lxc</em> użytkownika. Do niego kopiujemy
+        globalny plik konfiguracyjny LXC (<em>/etc/lxc/default.conf</em>) oraz
+        wiążemy superużytkownika kontenera z użytkownikiem systemowym za pomocą
+        wcześniej zdefiniowanych dodatkowych identyfikatorów UID oraz GID.
+<pre class="code-block">
+xf0r3m@lxc-host:~$ mkdir -p ~/.config/lxc
+xf0r3m@lxc-host:~$ cp /etc/lxc/default.conf ~/.config/lxc/default.conf
+xf0r3m@lxc-host:~$ echo "lxc.idmap = u 0 100000 65536" &gt;&gt; ~/.config/lxc/default.conf
+xf0r3m@lxc-host:~$ echo "lxc.idmap = g 0 100000 65536" &gt;&gt; ~/.config/lxc/default.conf
+</pre>
+      </li>
+      <li>LXC w celu zapewnienia odpowiedniego poziomu bezpieczeństwa
+        wykorzystuje AppArmor. Przynajmniej korzysta z jego profili. Wpis,
+        który znajduje się w pliku domyślnej konfiguracji kontenerów
+        nieuprzywilejowanych lub użytkownika (~/.config/lxc/default.conf),
+        zawiera profil, którego zwykły użytkownik nie może użyć. Dlatego też
+        trzeba go zmienić oraz usunąć możliwość zagnieżdzania
+        (w celach bezpieczeństwa).
+<pre class="code-block">
+xf0r3m@lxc-host:~$ sed -i 's/generated/unconfined/' ~/.config/lxc/default.conf
+xf0r3m@lxc-host:~$ sed -i '6d' ~/.config/lxc/default.conf
+xf0r3m@lxc-host:~$ cat -n ~/.config/lxc/default.conf 
+     1	lxc.net.0.type = veth
+     2	lxc.net.0.link = lxcbr0
+     3	lxc.net.0.flags = up
+     4	
+     5	lxc.apparmor.profile = unconfined
+     6	lxc.idmap = u 0 100000 65536
+     7	lxc.idmap = g 0 100000 65536
+</pre>
+        Jeśli będziemy wprowadzać zmiany w tym plików i mają mieć one wpływ
+        na obecne kontenery, to... Nie będą miały. Zmiany będą miały tylko
+        wpływ na nowe kontenery.
+      </li>
+      <li>W najnowszych dystrybucjach Debiana, katalogi domowe mają domyślne
+        uprawnienia o wartości 700. Aby można było uruchamiać kontenery,
+        których, <em>roofs</em> jest ukryty gdzieś w <em>dotdirs</em>.
+        Potrzbne są co najmniej możlwości uruchomienia i takie uprawnienia
+        trzeba nadać inaczej kontenery się nie uruchomią.
+<pre class="code-block">
+xf0r3m@lxc-host:~$ chmod +x .
+</pre> 
+      </li>
+      <li>Ostatnią czynnością, którą musmy wykonać jest dodanie ścieżki do
+        polecenia <code class="code-inline">apparmor_parser</code> do zmiennej
+        PATH, która odpowiada z wyszukiwanie poleceń w systemie. Tą
+        konfigurację musimy nadać na stałe więc dodamy linię do naszego pliku
+        <em>~/.bashrc</em>.
+<pre class="code-block">
+echo "export PATH=${PATH}:/usr/sbin/apparmor_parser" &gt;&gt; ~/.bashrc;
+</pre>
+      </li>
+      <li>Jeśli już dodajemy ochoczo linię do <em>~/.bashrc</em> to możemym
+        dodać aliasy, które umożlwią nam szybsze tworzenie, uruchamianie oraz
+        podłączanie się pod kontenery.
+<pre class="code-block">
+echo 'alias unpriv-lxc-create="systemd-run --user --scope -p "Delegate=yes" -- lxc-create"' &gt;&gt; ~/.bashrc;
+echo 'alias unpriv-lxc-start="systemd-run --user --scope -p "Delegate=yes" -- lxc-start"' &gt;&gt; ~/.bashrc;
+echo 'alias unpriv-lxc-attach="systemd-run --user --scope -p "Delegate=yes" -- lxc-attach"' &gt;&gt; ~/.bashrc;
+</pre>
+      </li>
+    </ol>
+    <p>
+      Po wykonaniu tych czynności warto się wylogować i zalogować ponownie, 
+      chociażby po to, aby ponownie wczytać plik <em>~/.bashrc</em>.
+      Zarządzanie takimi kontenerami wygląda w następujący sposób:
+    </p>
+    <ul>
+      <li>Tworzenie nowego kontenera:
+<pre class="code-block">
+xf0r3m@lxc-host:~$ unpriv-lxc-create --name c1 --template download -- --dist debian --release bookworm --arch amd64
+Running scope as unit: run-r8ff0d41124ac4ec4bf8b156dedd6e443.scope
+Downloading the image index
+Downloading the rootfs
+Downloading the metadata
+The image cache is now ready
+Unpacking the rootfs
+
+---
+You just created a Debian bookworm amd64 (20241015_05:24) container.
+
+To enable SSH, run: apt install openssh-server
+No default root or user password are set by LXC.
+</pre>
+      </li>
+      <li>Uruchamianie kontenera:
+<pre class="code-block">
+xf0r3m@lxc-host:~$ unpriv-lxc-start -n c1
+Running scope as unit: run-r1a78035bc74149f29a9d0978c11d1f7f.scope
+</pre>
+      </li>
+      <li>Podłączanie się do kontenera:
+<pre class="code-block">
+xf0r3m@lxc-host:~$ unpriv-lxc-attach -n c1
+Running scope as unit: run-rb5dd458fd5a947e69d7a5e02a00e7f16.scope
+root@c1:/# 
+</pre>
+      </li>
+      <li>Więcej informacji o kontenerze (podsumowanie):
+<pre class="code-block">
+xf0r3m@lxc-host:~$ lxc-info -n c1
+Name:           c1
+State:          RUNNING
+PID:            12192
+IP:             10.0.3.65
+Link:           veth1000_nsuN
+ TX bytes:      1.92 KiB
+ RX bytes:      1.99 KiB
+ Total bytes:   3.91 KiB
+</pre>
+      </li>
+      <li>Lista utworzonych kontenerów, ze szczegółami:
+<pre class="code-block">
+xf0r3m@lxc-host:~$ lxc-ls --fancy
+NAME STATE   AUTOSTART GROUPS IPV4      IPV6 UNPRIVILEGED 
+c1   RUNNING 0         -      10.0.3.65 -    true         
+</pre>
+    </ul>
+    <p>
+      W taki o to sposób możemy skonfigurować LXC do działania bez potrzeby
+      instalacji LXD, który był przez dłuższy czas niedostępny
+      w dystrybucji Debian i trzeb było go instalować przez Snap. Powyższe
+      polecenia, instalująco-konfigurujące możemy zapisać za pomocą skryptu,
+      zapisać go, nadać uprawnienia i uruchomić.
+    </p>
+<pre class="code-block">
+#!/bin/bash
+
+sudo apt install lxc -y;
+echo "${USER}:100000:65536" | sudo tee -a /etc/subuid;
+echo "${USER}:100000:65536" | sudo tee -a /etc/subgid;
+
+echo "${USER} veth lxcbr0 50" | sudo tee -a /etc/lxc/lxc-usernet;
+
+mkdir -p ${HOME}/.config/lxc;
+cp /etc/lxc/default.conf ${HOME}/.config/lxc/default.conf;
+echo "lxc.idmap = u 0 100000 65536" &gt;&gt; ${HOME}/.config/lxc/default.conf;
+echo "lxc.idmap = g 0 100000 65536" &gt;&gt; ${HOME}/.config/lxc/default.conf;
+sed -i 's/generated/unconfined/' ${HOME}/.config/lxc/default.conf;
+sed -i '6d' ${HOME}/.config/lxc/default.conf;
+
+chmod +x ${HOME};
+
+echo "export PATH=${PATH}:/usr/sbin/apparmor_parser" &gt;&gt; ${HOME}/.bashrc;
+echo 'alias unpriv-lxc-create="systemd-run --user --scope -p "Delegate=yes" -- lxc-create"' &gt;&gt; ${HOME}/.bashrc;
+echo 'alias unpriv-lxc-start="systemd-run --user --scope -p "Delegate=yes" -- lxc-start"' &gt;&gt; ${HOME}/.bashrc;
+echo 'alias unpriv-lxc-attach="systemd-run --user --scope -p "Delegate=yes" -- lxc-attach"' &gt;&gt; ${HOME}/.bashrc;
+</pre>
+    <p>
+      Źródła:
+    </p>
+    <ol>
+      <li><a href="https://linuxcontainers.org/lxc/getting-started/">Linux Containers - LXC - Getting started</a></li>
+      <li><a href="https://wiki.debian.org/LXC/CGroupV2#Known_Debian_problems_with_Debian_package_4.0.2-1.2BAH4-1">Known Debian problems with Debian package 4.0.2-1~1</a></li>
+      <li><a href="https://documentation.ubuntu.com/lxd/en/latest/explanation/lxd_lxc/">About lxd and lxc</a></li>
+      <li><a href="https://szkoladockera.pl/czym-rozni-sie-docker-od-lxc/">Docker vs LXC – czym to się różni?</a></li>
+    </ol>
+		<p>
+			~xf0r3m
+		</p>
+	</div>
+	<p class="footer">
+		2024; COPYLEFT; ALL RIGHTS REVERSED;
+	</p>
+</body>
+</html>
