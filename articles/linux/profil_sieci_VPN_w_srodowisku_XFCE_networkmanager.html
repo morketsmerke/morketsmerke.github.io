@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body style="font-family: monospace;" >
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+	<p class="header_link">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div class="main">
+		<h1 class="title">Profil sieci VPN w środowisku XFCE (NetworkManager, OpenVPN)</h1>
+    <p>
+      Korzystanie z sieci VPN w dystrybucjach Linuksa często wymaga wydania
+      jednego lub serii poleceń w powłoce. Ta sesja powłoki zostaje zablokowana
+      na czas działania procesu, oczywiście możemy uruchomić proces
+      oprogramowania VPN w tle, z przekierowaniem wyjścia. Inną możliwością
+      jest skorzystanie oprogramowania pozwalającego na zwielkrotnienie sesji
+      powłoki w jednej zewnętrznej, takie programy zwane multiplekserami
+      pozwalają również na odłączenie swojego proceu od tej zewnętrznej sesji.
+      Mimo to dalej trzymamy się powłoki uruchomionej w terminalu.
+    </p>
+    <p>
+      W taki razie, dlaczego w ogóle instalujemy środowiska graficzne? W
+      dystrybucjach Linuksa, o wiele więcej konfiguracji systemu oraz zadań
+      związanych z administracją tymi systemami możemy przeprowadzić za pomocą
+      powłoki i to jest fakt, z którym cieżko jest wchodzić w polemikę. Same
+      środowiska graficzne, pozostają dość daleko w tyle jeśli chodzi o
+      dostępność apletów przygotowanych do tych że zadań. Rozwiązaniem
+      stosowanym przez wielu użytkowników jest instalacja dodatkowego
+      oprogramowania pozwalającego na kontrolowanie wielu aspektów
+      administracyjnych za pomocą wygodnego okna, przycisków oraz pól wyborów.
+    </p>
+    <p>
+      Jednym z takich udogodnień jest aplet <strong>NetworkMenager</strong>.
+      <em>NetworkManager</em> jest to zbiór programów kontrolujących ustawienia
+      sieciowe w systemie. Jako osobny pakiet dostępny jest aplet, pozwalający
+      na zarządzanie połączeniami sieciowymi naszego komputera. Za jego pomocą
+      możemy na przykład połączyć się wybraną siecią bezprzewodową. Aplet ten
+      pozwala również na utworzenie profilu (połączenia) sieci VPN. W tym
+      artykule skupimy się na tworzeniu profilu sieci VPN opartej o
+      rozwiązanie - <strong>OpenVPN</strong> oraz zakładam że posiadamy
+      dostęp do sieci VPN, opartej na OpenVPN, łączyliśmy się już z nią za
+      pomocą powłoki. Jeśli nie, to 
+      <a href="https://morketsmerke.github.io/articles/terminallog/sieci_VPN.html">tutaj</a>
+      możemy dowiedzieć się jak taką sieć skonfigurować. Zakładam również, że
+      na naszych dystrybucjach korzystamy z środowiska XFCE wraz z
+      zainstalowanym apletem <em>NetworkManager</em>, jeśli nie posiadamy
+      zainstalowanego pakietu musimy go doinstalować. Możemy to zrobić przy
+      użyciu pakietów oprogramowania naszej dystrybucji. Ja na potrzeby tego
+      artykułu wykorzystam dystrybucje GNU/Linux Debian wraz ze środowiskiem
+      XFCE instalowanym podczas instalacji systemu.
+    </p>
+    <p>
+      Aby moc tworzyć profile sieci OpenVPN musimy doinstalować dwa pakiety:
+    </p>
+<pre class="code-block">
+$ sudo apt install -y network-manager-openvpn network-manager-openvpn-gnome
+</pre>
+    <p>
+      Pierwszy pakiet odpowiedzialny jest za wytyczkę obsługującą OpenVPN dla 
+      <em>NetworkManager</em>. Drugi natomiast pozwoli nam na ewentualną
+      zmianę konfiguracji z poziomu okna apletu.
+    </p>
+    <p>
+      Po zainstalowaniu wymaganych pakietów, możemy przejść do dodawania
+      profilu i tutaj mamy dwie możliwości. Możemy dodawać ręcznie konfigurację
+      po kolei każdy parametr. Jednak jest na to szybszy sposób wiedząc, że
+      korzystaliśmy już OpenVPN w tym systemie, ale uruchamialiśmy go przez
+      powłokę. Posiadamy już plik konfiguracyjny więc nie ma sensu przepisywać
+      informacji w nim zawartych w do profilu. Program zrobi to za nas.
+      Na początek kopiujemy plik konfiguracyjny, na przykład do naszego
+      katalogu domowego (kopiowanie pliku, może wymagać uprawnień <em>root</em>
+      oraz lub zmiany uprawnień, tak aby można było go modyfikować). 
+    </p>
+<pre class="code-block">
+$ sudo cp /etc/openvpn/client.conf ~
+$ sudo chown xf0r3m:xf0r3m ~/client.conf
+</pre>
+    <p>
+      Następnie zmieniamy ścieżki wskazujące na pliki certyfiktów na
+      <strong>ścieżki bezwzględne</strong> - w ten sposób pliki te będą
+      osiągalne z dowolnego miejsca w systemie.
+    </p>
+<pre class="code-block">
+...
+ca /etc/ssl/certs/cacert.pem
+cert /etc/ssl/certs/crt.pem
+key /etc/ssl/private/key.pem
+...
+</pre>
+    <p>
+      Tak zmodyfikowany plik zapisujemy z rozszerzeniem <strong>.ovpn</strong>.
+      Teraz możemy zaimportować nasz plik. Możemy to również zrobić na dwa
+      sposoby. Pierwszym z nich jest dodanie go przez aplet. Klikamy LPM na
+      aplet, następnie <em>Połaczenie VPN</em> i <em>Skonfiguruj VPN...</em>.
+      Pojawi się okno zawierające wszystkie dotych czas skonfigurowane profile
+      na dole okna klikamy <em>+</em>, a z listy wybieramy
+      <em>Zaimportuj zapisaną konfigurację VPN...</em> wówczas pojawi się
+      okno wyboru pliku i tutaj wskazujemy na nasz plik <em>.ovpn</em>. Po
+      wybraniu pliku, przejdziemy od razu do modyfikacji naszego profilu.
+      Tutaj możemy zapisać hasło klucza prywatnego (niezalecane). Ważne, aby
+      skonfigurować trasy zgodnie z konfiguracją naszej sieci VPN. Domyślnie
+      <em>NetworkManager</em> będzie wymuszać trasowanie całego ruchu przez
+      VPN, co może nie być pożądane we wszystkich konfiguracjach. Aby uzyskać
+      dostęp wyłącznie do zasobów oferowanych przez tę sieć należy w zakładce
+      <em>Ustawienia IPv4</em>, kliknąć przycisk <em>Trasy...</em> i zaznaczyć
+      dwie opcje opcje pod tabelą <em>Ignorowanie automatycznie uzyskanych
+      tras</em> oraz <em>Używanie tego połączenia tylko dla zasobów tej sieci</em>
+    </p>
+    <p>
+      Drugim sposobem jest skorzystanie - a jakże - z powłoki, a dokładnie z
+      polecenia <strong>nmcli</strong>. Aby dodać profil dla sieci VPN wydajemy
+      poniższe polecenia.
+    </p>
+<pre class="code-block">
+$ nmcli connection import type openvpn file /ic0/vpn/morketsmerke.ovpn 
+Pomyślnie dodano połączenie „morketsmerke” (79223210-1ce8-4316-a11d-1f0a9a1fe3a5).
+$ nmcli connection modify morketsmerke ipv4.ignore-auto-routes true
+$ nmcli connection modify morketsmerke ipv4.never-default true
+</pre>
+    <p>
+      Pierwsze polecenie tworzy nam profil OpenVPN i
+      <code class="code-inline">morketsmerke</code>. Co zostaje nam 
+      zasygnalizowane przez samo polecenie <code class="code-inline">nmcli</code>
+      Drugie polecenie polecenie zaznacza opcje <em>Ignorowanie automatycznie
+      uzyskanych tras</em>, natomiast trzecie zaznacza opcje <em>Używanie tego
+      połączenia tylko dla zasobów tej sieci</em>.
+    </p>
+    <p>
+      Utworzone w ten sposób, czy zaimportowane ręcznie - profile będą dostępne
+      w aplecie <em>NetworkManager</em> na liście <em>Połączenia VPN</em>. W
+      sposób ręczny możemy zaimportować wyłącznie pliki konfiguracyjne
+      OpenVPN. Natomiast wykorzystując polecenia, możemy zaimportować pliki
+      innego rodzaju połączeń niż tylko OpenVPN, takie jak np. WireGuard.
+    </p>
+    <p>
+      <strong>Źródła:</strong><br />
+      <ol>
+        <li><a href="https://blogs.gnome.org/thaller/2019/03/15/wireguard-in-networkmanager/">WireGuard in NetworkManager</a> [ang.]</li>
+      </ol>
+    </p>
+		<p>
+			~xf0r3m
+		</p>
+    </div>
+		<p class="footer">
+			2025; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+	</body>
+</html>
