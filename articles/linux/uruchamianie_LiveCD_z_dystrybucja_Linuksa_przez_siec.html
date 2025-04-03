@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body style="font-family: monospace;" >
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+	<p class="header_link">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div class="main">
+		<h1 class="title">Uruchamianie LiveCD z dystrybucją Linuksa przez sieć</h1>
+    <p>
+      Już jakiś czas temu na tej stronie powstał artykuł o tym w jaki sposób
+      utworzyć własne LiveCD z dystrybucją GNU/Linux Debian. Na podstawie tego
+      materiału powstały dwa większe projekty jakim był <em>greenOS</em> oraz
+      <em>immudex</em>. <em>Immudex</em> jest dalej rozwijany, a
+      jego charakterystyczną cechą jest to, że musi on być aktualizowany
+      ręcznie przez użytkownika za pomocą dysku USB lub dysku optycznego.
+      W podobny sposób przebiega również instalacja. W zależności od tego jak
+      tworzony jest obraz należy go przegrać na jakiś nośnik, aby uruchomić z
+      niego komputer a następnie z aktualizować lub zainstalować na nim
+      system. Nawet więcej, rozważmy taki przypadek, że chcemy uruchomić
+      więcej niż jeden komputer z LiveCD, a mamy do dyspozycji tylko jeden
+      <em>pendrive</em>. Rozwiązaniem tych, że problemów może być uruchomienie
+      systemu z sieci z wykorzystaniem takich technologii jak 
+      <strong>DHCP</strong>, <strong>TFTP</strong>, <strong>PXE</strong> oraz
+      <strong>HTTP</strong>.
+    </p>
+    <p>
+      Ze względu na to, że wykorzystujemy tutaj usługę DHCP - powszechną w
+      każdej sieci lokalnej - środowisko PXE (uruchamiania z sieci) możemy
+      skonfigurować w różnych wariantach. Podczas zgłębiania tematu udało mi
+      się wyodrębnić 3 wariacje konfiguracji. Pierwsza z nich - ta najbardziej
+      sprawdzona polega na wyłączniu obecnie używanej dla sieci usługi DHCP i
+      zastąpienie jej tą uruchamianą na serwerze PXE. Z zalet to środowisko
+      PXE na pewno zadziała w naszej sieci, gorzej z faktem, że musimy
+      przenieść całą obecną konfigurację DHCP na nasz serwer i jeśli mamy
+      bardzo dużo rezerwacji to okazuje się to bardzo żmudnym procesem. Dlatego
+      to rozwiązanie może okazać się dobry rozwiązaniem dla wewnętrznej sieci
+      laboratoryjnej. Ta właśnie metodą zostanie tutaj opisana, ponieważ w
+      nalepszy sposób obrazuje zadania konfiguracyjne i stanowi solidną bazę
+      do dalszych eksperymentów ze środowiskiem PXE. Drugą możliwością jest 
+      wykorzystanie obecnie działającego serwera DHCP, wówczas serwer PXE
+      zajmuje wyłącznie się hostowanie plików przy użyciu protokołu TFTP. To
+      rozwiązanie będzie dobrze funkcjonować w sieciach gdzie wykorzystywane
+      są routery programowe, oparte na takim oprogramowanie jak na przykład
+      <em>IPFire</em>. Trzecim wariantem jest brak serwera PXE w ogóle, bowiem
+      istnieją
+      routery lub oprogramowanie przygotowane dla routerów takie jak
+      <strong>OpenWRT</strong>, które jest wstanie uruchomić serwer TFTP.
+      Problemem tutaj jest fakt, że (przynajmniej w przypadku OpenWRT) możemy
+      podać tylko jeden plik <em>bootloadera</em>, a dla komputerów z UEFI
+      potrzebujemy innego pliku <em>bootloadera</em>, niż dla komputerów 
+      wykorzystujących klasyczny BIOS. Tutaj będziemy potrzebować wyłącznie
+      plików programu rozruchowego, które możemy przygotować na własnym
+      komputerze. Problematycze może być umieszczenie tych plików w pamięci
+      <em>flash</em> urządzenia.
+    </p>
+    <p>
+      Jeśli na naszym komputerze posiadamy już zainstalowny system operacyjny
+      w moim przypadku jest GNU/Linux Debian. To naszą konfigurację z racji, że
+      będzie tam zainstalowany serwer DHCP - rozpoczynamy od statycznej
+      konfiguracji interfejsu sieciowego.
+    </p>
+<pre class="code-block">
+# sudo vim /etc/network/interfaces
+...
+allow-hotplug enp3s0
+iface enp3s0 inet static
+  address 192.168.1.253
+  netmask 255.255.255.0
+  gateway 192.168.1.1
+  dns-nameservers 192.168.1.1
+</pre>
+    <p>
+      Po wykonaniu tej konfiguracji, najlepiej jest serwer zrestartować aby
+      zaczął on korzystać z tej konfiguracji. Następną czynnością jest
+      utworzenie odpowiedniej struktury katalogowej dla serwera TFTP.
+    </p>
+<pre class="code-block">
+$ sudo mkdir -vp /pxeboot/{config,firmware}
+</pre>
+    <p>
+      Teraz wypełnimy katalog <em>/pxeboot/firmware</em> plikami programu
+      rozruchowego. Do tego będzie potrzebować owych plików oraz pierwszego
+      skryptu <strong>ipxe</strong>. Skrypt <em>ipxe</em> zawiera listę poleceń
+      wykonywach w środowisku powłoki programu ładującego. Takim programem
+      służącym do rozruchu z sieci jest właśnie projekt <strong>iPXE</strong>.
+      Pliki wykonywalne tego programu skompilujemy samodzielnie z najnowszego
+      kodu źródłowego projektu dostępnego w serwisie GitHub. Na początek
+      zainstalujemy z repozytorium wymagane do pobrania kodu oraz jego 
+      kompilacji pakiety.
+    </p>
+<pre class="code-block">
+$ sudo apt install -y build-essetial liblzma-dev git
+</pre>
+    <p>
+      Po zainstalowaniu pakietów pobieramy kod źródłowy ze GitHub i
+      przechodzimy do katalogu <em>ipxe/src</em>.
+    </p>
+<pre class="code-block">
+$ git clone https://github.com/ipxe/ipxe
+Klonowanie do „ipxe”...
+remote: Enumerating objects: 62694, done.
+remote: Counting objects: 100% (38/38), done.
+remote: Compressing objects: 100% (27/27), done.
+remote: Total 62694 (delta 15), reused 22 (delta 11), pack-reused 62656 (from 1)
+Pobieranie obiektów: 100% (62694/62694), 18.99 MiB | 30.47 MiB/s, gotowe.
+Rozwiązywanie delt: 100% (47450/47450), gotowe.
+$ cd ipxe/src
+</pre>
+    <p>
+      W tym katalogu, przed rozpoczęciem kompilacji tworzymy nasz skrypt
+      <em>ipxe</em>. Skrypt ten zostanie umieszczony w kodzie programu
+      rozruchowego, tak aby on uruchamiany zaraz po uruchomieniu samego
+      programu - dążymy do tego aby było to jak najbardziej bezobsługowe.
+    </p>
+<pre class="code-block">
+~/ipxe/src$ vim bootconfig.ipxe
+#!ipxe
+
+dhcp
+chain tftp://192.168.1.253/config/boot.ipxe
+</pre>
+    <p>
+      Skrypt ten nakazuje programowi ładującemu, uzyskanie adresu konfiguracji
+      sieciowej z serwera DHCP i następnie przejście do uruchomienia kolejnego
+      skryptu (w tym przypadku) lub innego programu rozruchowego
+      (tzw. <em>chainloading</em>), który zapisany jest na serwerze TFTP.
+      Po utworzeniu pliku przechodzimy do kompliacji plików <em>bootloadera</em>
+      W tym celu wydajemy poniżej odpowiednie polecenie. Flaga
+      <code class="code-inline">EMBED</code> wskazuje na nasz skrypt, bardzo
+      ważne jest prawidłowe zapisanie jej nazwy oraz wskazanie odpowiedniego
+      pliku, bowiem <code class="code-inline">make</code> nie wskaże co do tego
+      błędów.
+    </p>
+<pre class="code-block">
+~/ipxe/src$ make bin/ipxe.pxe bin-x86_64-efi/ipxe.efi EMBED=bootconfig.ipxe
+  [PARSEROM]
+  [DEPS] core/version.c
+  [DEPS] arch/x86/drivers/net/undiisr.S
+  [DEPS] arch/x86/transitions/librm.S
+  [DEPS] arch/x86/transitions/libpm.S
+  [DEPS] arch/x86/transitions/libkir.S
+  [DEPS] arch/x86/transitions/liba20.S
+  [DEPS] arch/x86/prefix/usbdisk.S
+  [DEPS] arch/x86/prefix/unlzma.S
+...
+  [BUILD] bin/rtl8180.ids.o
+  [BUILD] bin/rtl8185.ids.o
+  [BUILD] bin/ath5k.ids.o
+  [BUILD] bin/ath9k.ids.o
+  [AR] bin/blib.a
+  [HOSTCC] util/zbin
+  [VERSION] bin/version.ipxe.pxe.o
+  [LD] bin/ipxe.pxe.tmp
+  [BIN] bin/ipxe.pxe.bin
+  [ZINFO] bin/ipxe.pxe.zinfo
+  [ZBIN] bin/ipxe.pxe.zbin
+  [FINISH] bin/ipxe.pxe
+rm bin/ipxe.pxe.zinfo bin/ipxe.pxe.bin bin/version.ipxe.pxe.o bin/ipxe.pxe.zbin
+  [PARSEROM]
+  [DEPS] core/version.c
+  [DEPS] arch/x86/transitions/librm.S
+  [DEPS] arch/x86/transitions/libpm.S
+  [DEPS] arch/x86/transitions/libkir.S
+  [DEPS] arch/x86/transitions/liba20.S
+  [DEPS] arch/x86/prefix/usbdisk.S
+  [DEPS] arch/x86/prefix/unlzma.S
+...
+  [BUILD] bin-x86_64-efi/hvm.ids.o
+  [BUILD] bin-x86_64-efi/rtl8180.ids.o
+  [BUILD] bin-x86_64-efi/rtl8185.ids.o
+  [BUILD] bin-x86_64-efi/ath5k.ids.o
+  [BUILD] bin-x86_64-efi/ath9k.ids.o
+  [AR] bin-x86_64-efi/blib.a
+  [HOSTCC] util/elf2efi64
+  [VERSION] bin-x86_64-efi/version.ipxe.efi.o
+  [LD] bin-x86_64-efi/ipxe.efi.tmp
+  [FINISH] bin-x86_64-efi/ipxe.efi
+rm bin-x86_64-efi/version.ipxe.efi.o
+</pre>
+    <p>
+      Skompliowane pliki wykonywalne programu rozruchowego kopiujemy do
+      wcześniej utworzonego katalogu <em>/pxeboot/firmware</em>.
+    </p>
+<pre class="code-block">
+~/ipxe/src$ sudo cp -v bin/ipxe.pxe bin-x86_64-efi/ipxe.efi /pxeboot/firmware
+'bin/ipxe.pxe' -&gt; '/pxeboot/firmware/ipxe.pxe'
+'bin-x86_64-efi/ipxe.efi' -&gt; '/pxeboot/firmware/ipxe.efi'
+</pre>
+    <p>
+      Po skopiowaniu plików <em>bootloadera</em>, możemy zainstalować program,
+      który będzie służył nam za serwer DHCP oraz za serwer TFTP. Dodatkowo
+      domyślnie przekazuje on zapytania DNS, dalej do serwerów skonfigurowanych
+      w systemie.
+    </p>
+<pre class="code-block">
+$ sudo apt install -y dnsmasq
+</pre>
+    <p>
+      Po zainstalowaniu pakietu możemy przjeść do jego konfiguracji.
+      Rozpoczynamy ją od zabezpieczenia konfiguracji dostarczanej wraz z
+      pakietem. W ten sposób będziemy rozpoczynać konfiguracje od zera, w tym
+      przypadku jest to wskazane.
+    </p>
+<pre class="code-block">
+$ sudo mv /etc/dnsmasq.conf /etc/dnsmmasq.conf.bak
+</pre>
+    <p>
+      Teraz możemy zapisać poniższą konfigurację w <em>/etc/dnsmasq.con</em>.
+    </p>
+<pre class="code-block">
+interface=enp3s0
+bind-interfaces
+domain=morketsmerke.org
+
+dhcp-range=enp3s0,192.168.1.100,192.168.1.200,255.255.255.0,12h
+dhcp-option=option:router,192.168.1.1
+dhcp-option=option:dns-server,192.168.1.1
+dhcp-option=option:dns-server,8.8.8.8
+
+enable-tftp
+tftp-root=/pxeboot
+
+dhcp-match=set:bios-x86,option:client-arch,0
+dhcp-boot=tag:bios-x86,firmware/ipxe.pxe
+
+dhcp-match=set:efi-x86_64,option:client-arch,7
+dhcp-match=set:efi-x86_64,option:client-arch,9
+dhcp-boot=tag:efi-x86_64,firmware/ipxe.efi
+</pre>
+    <p>
+      Na początku konfiguracji, dodajemy opcje związane z ogólnymi ustawieniami
+      serwera, takie jak interfejs, na którym ma nasłuchiwać oraz wymuśić na
+      <em>dnsmasq</em> nasłuchiwanie na wyłącznie podanych interfejsach.
+      Opcjonalnie możemy dodać nazwę domeny. W drugiej częsci konfiguracji
+      ustawiamy parametry DHCP, takie jak zakres adresów, czas dzierżawy oraz
+      adres bramy czy adresy serwerów DNS. Następnie włączamy usługę TFTP oraz
+      wskazujemy jej katalog główny, w którym będą znajdować pliki 
+      udostępniane przez tę usługę. W ostaniej sekcji konfiguracji ustalamy
+      z jakim oprogramowaniem układowym komputer skomunikował się z naszym
+      serwerem DHCP i na podstawie tak uzyskanych informacji <em>dnsmasq</em>
+      będzie określać jaki plik programu rozruchowego mu przekazać do
+      uruchomienia.
+    </p>
+    <p>
+      Po skonfigurowaniu <em>dnsmasq</em>, nadszedł czas aby napisać już
+      właściwy skrypt <em>ipxe</em>,  które go zadaniem bedzie pobranie,
+      załadowanie jądra naszej dystrybucji wraz plikiem <em>initrd</em> oraz
+      uruchomienie jądra wraz z odpowiednimi parametrami. Plik nazwany
+      <em>boot.ipxe</em> - nazwa ta musi być zgodna z nazwą podaną w skrypcie
+      <em>bootconfig.ipxe</em> - ten umiesczamy w <em>/pxeboot/config</em>
+    </p>
+<pre class="code-block">
+#!ipxe
+
+set host ftp.morketsmerke.org
+set root_path immudex/pxe
+
+kernel http://${host}/${root_path}/vmlinuz
+initrd http://${host}/${root_path}/initrd
+imgargs vmlinuz initrd=initrd boot=live fetch=http://${host}/${root_path}/filesystem.squashfs
+boot
+</pre>
+  <p>
+    W tym skrypcie możemy spokojnie używać nazwy domenowej serwera jeśli
+    nie pamiętamy adresu IP. Ostatnia linia przekazuje argumenty uruchomieniowe
+    jądra. Parametr <code class="code-inline">fetch</code>, jest opcją programu
+    <strong>live-boot</strong>, który jest odpowiedzialny za uruchomienie
+    i utrzymanie środowiska LiveCD. W tej linii możemy umieścić więcej opcji
+    konfigurujących to środowisko. Po zapisaniu konfiguracji pozostało nam,
+    uruchomienie ponowne usługi <em>dnsmasq</em> i spróbowanie uruchomienia.
+  </p>
+  <p>
+    <strong>Źródła:</strong><br />
+    <ol>
+      <li><a href="https://linuxhint.com/pxe_boot_ubuntu_server/">Configuring PXE Network Boot Server on Ubuntu 22.04 LTS</a> [ang.]</li>
+      <li><a href="https://superuser.com/questions/1718231/installing-debian-bullseye-iso-over-pxe-with">Installing Debian Bullseye ISO over PXE with</a> [ang.]</li>
+      <li><a href="https://manpages.debian.org/testing/live-boot-doc/live-boot.7.en.html">live-boot GNU/Linux Debian man page</a> [ang.]</li>
+    </ol>  
+  </p>
+		<p>
+			~xf0r3m
+		</p>
+    </div>
+		<p class="footer">
+			2025; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+	</body>
+</html>
