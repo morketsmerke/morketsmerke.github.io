@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body style="font-family: monospace;" >
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+	<p class="header_link">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div class="main">
+		<h1 class="title">Obsługa inicjatora iSCSI na dystrybucjach Linuksa</h1>
+    <p>
+      Już jakiś czas temu kupiłem sobie urządzenie sieciowe NAS od ZyXEL-a
+      dokładnie to model NAS326 z dwoma 4 TB dyskami HDD skonfigurowanymi w
+      RAID 1. Jego zadaniem było
+      przechowywanie plików, do których nie muszę mieć ciągle dostępu. Serwer
+      przechowywał stare pliki projektów oraz jakieś multimedia. Było to dobre
+      rozwiązanie, jednak nie podobał mi się swobodny dostęp do plików.
+      Ten NAS nie wspiera szyfrowania, a dane były zaszyfrowane tylko w 
+      momencie gdy urządzenie jest wyłączone. NAS musi je odszyfrować podczas
+      uruchamiania, aby zapewnić dostęp do danych. Od biedy i takie rozwiązanie
+      by się sprawdziło. Wystarczy korzystać z udostępnionych przez niego
+      danych tylko gdy potrzeba do nich dostępu, poźniej urządzenie można
+      przecież wyłączyć. Jednak w przypadku tego modelu z tego rozwiązania nici.
+      Wpadł jednak do głowy mi jeden pomysł: a co jeśli sam NAS nie będzie
+      wystawiać danych, a jedynie urządzenie blokowe (udział będzie widoczny
+      jako zwykły dysk w systemie). W ten sposób działa przecież protokół
+      <strong>iSCSI</strong>. Założyłem to w ciemno i jakie było moje
+      zdziwienie, że mój model NAS-u wspiera ten protokół. Więc wychodzi na to,
+      że jest to lepsze niż samo szyfrowanie przez urządzenie. To klient będzie
+      decydować o finalnej konfiguracji systemu plików oraz szyfrowania.
+      Technologia iSCSI działa w architekturze
+      klient-serwer oraz wprowadza swoją własną terminologię. Bowiem z
+      przestrzeni dyskowej można wydzielić jej fragment i tak udostępnione
+      miejsce będzie osobny urządzeniem dyskowym w systemie, natomiast w
+      przypadku tego protokołu nazywane jest <strong>LUN</strong>-em
+      (<em>Logical Unit Number</em>). Zasobem udostępnianym przez
+      serwery iSCSI jest tzw. <strong>target</strong> posiada on swoją unikalną
+      nazwę (<strong>IQN</strong>) i jest powiązany z LUN-em. Klienci natomiast
+      noszą nazwę <strong>initiators</strong> (ang. inicjatorzy) i taką
+      konfiguracją zajmiemy się w tym artykule.
+    </p>
+    <p>
+      Oczywiście aby móc sprawdzić czy nasza konfiguracja jest poprawna
+      potrzebujemy serwera, gdzie utworzymy LUN oraz wystawimy <em>target</em>.
+      W przypadku urządzeń NAS, możemy to wyklikać z poziomu konfiguracji
+      urządzenia. Link do materiału źródłowego odnoszącego się do konfiguracji
+      w moim modelu urządzenia NAS znajduje się na samym dole
+      artykułu na pierwszej pozycji na liście.
+    </p>
+    <p>
+      Konfigurację inicjatora rozpoczynami od zainstalowania odpowiedniego
+      oprogramowania. Z repozytoriów instalujemy pakiet
+      <strong>open-iscsi</strong>. Pakiet ten jest standardem obsługi iSCSI
+      w dystrybucjach Linuksa i raczej będzie dostępny w repozytoriach
+      większości z nich. Ja w tym artykule wykorzystam dystrybucję GNU/Linux
+      Debian.
+    </p>
+<pre class="code-block">
+$ sudo apt install -y open-iscsi
+</pre>
+    <p>
+      Po zainstalowaniu pakietu wyświetlamy plik
+      <em>/etc/iscsi/initiatorname.iscsi</em>, w nim zawarte jest IQN tego
+      systemu (systemu operacyjnego klienta). Nazwy tej (w przypadku mojego 
+      urządzenia) użyjemy jako nazwy
+      użytkownika do uwierzytelnienia się podczas uzyskiwania dostępu do
+      <em>target</em>-u.
+    </p>
+<pre class="code-block">
+xf0r3m@lenovo:~$ sudo cat /etc/iscsi/initiatorname.iscsi 
+## DO NOT EDIT OR REMOVE THIS FILE!
+## If you remove this file, the iSCSI daemon will not start.
+## If you change the InitiatorName, existing access control lists
+## may reject this initiator.  The InitiatorName must be unique
+## for each iSCSI initiator.  Do NOT duplicate iSCSI InitiatorNames.
+InitiatorName=iqn.1993-08.org.debian:01:49e4f4e3b7f6
+</pre>
+    <p>
+      Ten nazwę kopiujemy do konfiguracji <em>target</em>-u. W pole 
+      <em>IQN dozwolonych do połączenia</em>. Ta wartość zostanie automatycznie
+      przepisana w pole <em>username</em> uwierzytelnienia 
+      <strong>CHAP</strong>. Następnie należy zdefiniować hasło.
+    </p>
+    <p>
+      Tutaj musimy się na chwilę zatrzymać. Konfigurując <em>target</em>,
+      zmieniając nazwę inicjatora, uzyskującego dostęp do <em>target</em>-u.
+      musimy pamiętać o tym, zawsze potwórzyć dotyczasowe hasło lub ustalić
+      nowe inaczej zostanie zapisane to co oprogramowanie wpisało w pola hasła,
+      aby przesłonić wpisane hasło. 
+    </p>
+    <p>
+      Po skonfigurowanie <em>target</em>-u, możemy przejść do wyszukiwania
+      <em>target</em>-ów na wskazanym przez nas serwerze iSCSI.
+    </p>
+<pre class="code-block">
+$ sudo iscsiadm  --mode discovery --type sendtargets --portal 192.168.1.253
+192.168.1.253:3260,1 iqn.2025-03.com.zyxel:target-1.jupsioti
+</pre>
+    <p>
+      Po odnalezieniu <em>targetów</em>, dla każdego z nich tworzony jest
+      specjalny katalog z plikiem konfiguracyjnym w katalogu
+      <em>/etc/iscsi/nodes</em> (dla Debian <em>bookworm</em>) lub
+      <em>/var/lib/iscsi/nodes</em> (dla Debian <em>trixie</em>).
+    </p>
+<pre class="code-block">
+$ sudo ls -al /etc/iscsi/nodes/
+razem 12
+drwx------ 3 root root 4096 04-04 10:38 .
+drwxr-xr-x 4 root root 4096 04-04 10:38 ..
+drwx------ 3 root root 4096 04-04 10:38 iqn.2025-03.com.zyxel:target-1.jupsioti
+</pre>
+    <p>
+      Teraz za pomocą polecenia <code class="code-inline">iscsiadm</code>
+      musimy włączyć uwierzytelnianie za pomocą CHAP oraz uzupełnić
+      konfigurację węzła o nazwę uzytkownika oraz hasło.
+    </p>
+<pre class="code-block">
+$ sudo iscsiadm  --mode node  --targetname "iqn.2025-03.com.zyxel:target-1.jupsioti" -o update -n node.session.auth.authmethod -v CHAP 
+$ sudo iscsiadm  --mode node  --targetname "iqn.2025-03.com.zyxel:target-1.jupsioti" -o update -n node.session.auth.username -v iqn.1993-08.org.debian:01:49e4f4e3b7f6
+$ sudo iscsiadm  --mode node  --targetname "iqn.2025-03.com.zyxel:target-1.jupsioti" -o update -n node.session.auth.password -v 1234Test1234
+</pre>
+    <p>
+      Teraz możemy spróbować się uwierzytelnić na wybranym wcześniej
+      <em>targecie</em>.
+    </p>
+<pre class="code-block">
+$ sudo iscsiadm  --mode node  --targetname "iqn.2025-03.com.zyxel:target-1.jupsioti" --portal "192.168.1.253:3260" --login
+Logging in to [iface: default, target: iqn.2025-03.com.zyxel:target-1.jupsioti, portal: 192.168.1.253,3260]
+Login to [iface: default, target: iqn.2025-03.com.zyxel:target-1.jupsioti, portal: 192.168.1.253,3260] successful.
+</pre>
+    <p>
+      Jak możemy zauważyć po informacjach zwrócony przez polecenie logowanie
+      powiodło się. Poniżej znajduje się wyjście polecenia
+      <code class="code-inline">dmesg</code>, zwracającego komunikaty
+      diagnostyczne jądra. 
+    </p>
+<pre class="code-block">
+$ sudo dmesg
+...
+[   47.133961] Loading iSCSI transport class v2.0-870.
+[   47.148036] iscsi: registered transport (tcp)
+[   47.149992] scsi host6: iSCSI Initiator over TCP/IP
+[   47.155204] scsi 6:0:0:0: Direct-Access     LIO-ORG  FILEIO           4.0  PQ: 0 ANSI: 5
+[   47.158543] scsi 6:0:0:0: Attached scsi generic sg1 type 0
+[   47.163012] sd 6:0:0:0: [sda] 7516192768 512-byte logical blocks: (3.85 TB/3.50 TiB)
+[   47.163184] sd 6:0:0:0: [sda] Write Protect is off
+[   47.163186] sd 6:0:0:0: [sda] Mode Sense: 43 00 10 08
+[   47.163548] sd 6:0:0:0: [sda] Write cache: enabled, read cache: enabled, supports DPO and FUA
+[   47.163713] sd 6:0:0:0: [sda] Preferred minimum I/O size 512 bytes
+[   47.163714] sd 6:0:0:0: [sda] Optimal transfer size 4194304 bytes
+[   47.167127]  sda: sda1
+[   47.167281] sd 6:0:0:0: [sda] Attached SCSI disk
+</pre>
+    <p>
+      Poniżej znajduje się wyjście polecenia lsblk:
+    </p>
+<pre class="code-block">
+xf0r3m@lenovo:~$ lsblk
+NAME          MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINTS
+sda             8:0    0   3,5T  0 disk  
+└─sda1          8:1    0   3,5T  0 part  
+  └─cryptdisk 254:0    0   3,5T  0 crypt /media
+sr0            11:0    1  1024M  0 rom   
+nvme0n1       259:0    0 238,5G  0 disk  
+├─nvme0n1p1   259:1    0 237,5G  0 part  /
+├─nvme0n1p2   259:2    0     1K  0 part  
+└─nvme0n1p5   259:3    0   976M  0 part  [SWAP]
+</pre>
+    <p>
+      Jak możemy zauważyć, ja już swój LUN zaincjowałem utworzyłem partycję
+      LUKS, a po odblokowaniu sformatowałem ją jako <em>ext4</em> i 
+      podmontowałem w katalogu <em>/media</em>.
+    </p>
+    <p>
+      <strong>Źródła:</strong><br />
+      <ol>
+        <li><a href="https://mysupport.zyxel.com/hc/en-us/articles/360005119259--NSA-NAS-How-to-configure-iSCSI-settings-on-NAS">[NSA/NAS] How to configure iSCSI settings on NAS</a> (ang.)</li>
+        <li><a href="https://en.wikipedia.org/wiki/ISCSI">iSCSI - en.wikipedia.org</a> (ang.)</li>
+        <li><a href="https://wiki.debian.org/SAN/iSCSI/open-iscsi">Debian as an iSCSI Initiator</a> (ang.)</li>
+        <li><a href="https://serverfault.com/questions/789482/linux-opensuse-iscsi-initiator-how-to-pass-a-chap-user-name-and-password">Linux (openSuSe) iSCSI Initiator: How to pass a CHAP user name and password?</a> (ang.)</li>
+      </ol>
+    </p>
+		<p>
+			~xf0r3m
+		</p>
+    </div>
+		<p class="footer">
+			2025; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+	</body>
+</html>
