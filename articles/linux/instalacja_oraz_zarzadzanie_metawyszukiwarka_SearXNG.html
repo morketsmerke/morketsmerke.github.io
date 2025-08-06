@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+	<p class="header_link">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div class="main">
+		<h1 class="title">Instalacja oraz zarządzanie metawyszukiwarką SearXNG</h1>
+		<p>
+      SearXNG jest silnikiem wyszukiwania, agregującym wyniki ze wszytkich
+      dostępnych w internecie wyszukiwarek przy czym obdziera je ze różnych 
+      elementów śledzących, dlatego jest dobre rozwiązanie dla osób chcących
+      uchronić się przed targetowaniem przez takie firmy jako Google czy
+      Microsoft. SearXNG nie wydaje się być same w sobie wyszukiwarką to tylko
+      agregat (zawierający kilka przydatnych funkcji) - dlatego w tym materiale
+      będę używać bardziej nomenklatury
+      silnik wyszukiwania, <strong>a niżeli</strong> wyszukiwarka. Do jej
+      skuteczności działania trzeba się przyzwyczaić - to nie Google, który
+      stara się odgadnąć na podstawie naszego profilowania, jakich wyników
+      będziemy od niego oczekiwać. Tutaj mamy raczej doczynienia z prawdziwym
+      wyszukiwaniem, zatem jaką frazę podamy taki wynik otrzymamy. Jeśli
+      ktoś mam doświadczenie w korzystaniu z takich wyszukiwarek jak
+      DuckDuckGo to myślę, że nie będzie mieć problemów wynikami
+      prezentowanymi przez SearXNG. Instalacja instancji SearXNG nie jest
+      trudna, a sam silnik w pewnym stopniu możemy ją dostosować do własnych
+      preferencji.
+      W tym materiale opiszę proces instalacji instancji oraz dostosowywania
+      jej w
+      przypadku, gdzie trzeba ingerować pliki projektu (zmiana ta będzie
+      wyłącznie kosmetyczna i nie wpłynie na jej działanie). Jako serwer
+      hostujący wykorzystamy Debiana 12. Zatem rozpocznijmy instalację.
+		</p>
+    <h2>1. Instalacja</h2>
+    <p>
+      Przed uruchomieniem właściwej instalacji, musimy wykonać jedną bardzo
+      ważną zmianę w naszym systemie. Mianowicie musimy dodać do 
+      systemu, repozytoria z <em>backports</em>. Dlaczego? Otóż od pewnego
+      <em>commitu</em>, SearXNG (tak, <em>commitu</em>. SearXNG to
+      <em>rolling-release</em> - nie ma klasycznego wersjonowania, a każda
+      kolejna wersja to każda kolejna zmiana. Będzie to mieć poźniej kluczowe
+      znaczenie.) przestał korzystać z bazy danych <em>Redis</em> i przeszedł
+      na <em>Valkey</em>, który nie jest dostępny w klasycznym repozytorium.
+      To może jednak ulec zmianie, ze względu na to, że jest on obecny w
+      repozytoriach przyszłej wersji stablnej, a na czas pisania tego materiału
+      jeszcze wersji testowej. Jeśli więc mamy zamiar instalować SearXNG już
+      na Debianie 13, możemy pominąć ten krok.
+    </p>
+    <p>
+      Aby włączyć repozytoria <em>backports</em>, w pliku
+      <em>/etc/apt/sources.list</em> dopisujemy poniższą linię.
+    </p>
+<pre class="code-block">
+deb http://deb.debian.org/debian bookworm-backports main contrib
+</pre>
+    <p>
+      Następnie musimy odświeżyć listę pakietów oprogramowania APT, za pomocą
+      poniższego polecenia.
+    </p>
+<pre class="code-block">
+$ sudo apt update
+</pre>
+    <p>
+      SearXNG wykorzystuje do działania <strong>WSGI</strong> co powoduje, że
+      aplikacja nie działa ciągle oraz nie oczkuje na połączenia. Zapytania
+      do aplikacji są przekazywane do WSGI, a ono uruchamia kod Pythona. 
+      Przeglądarki internetowe nie są wstanie obsłużyć WSGI, ponieważ posługują
+      się one ściśle określonym schematem jakim jest protokoł HTTP lub HTTPS.
+      Dlatego też potrzebujemy klasycznego serwera WWW w postaci <em>proxy</em>,
+      który przekaże zapytanie HTTP/S do WSGI a ono uruchomi aplikację
+      SearXNG. Tutaj panuje pełna dowolności, oczywiście o ile ktoś potrafi
+      skonfigurować swój ulubiony serwer WWW do postaci przekaźnika 
+      (konfiguracja innych serwerów WWW, znajduje się w dokumentacji
+      <em>admina</em> na stronie projektu). Dla osób
+      początkujących polecam klasycznego Apache w
+      wersji 2 i tutaj też on zostanie wykorzystany. Przy czym poza instalacją
+      pakietów, nie będziemy musieli nic robić. Skrypt instalacyjny SearXNG 
+      przygotuje za nas odpowiedni plik hostingu, który nie tylko odpowiednio
+      przekieruje, ale również włączy odpowiednie moduły serwera WWW.
+    </p>
+<pre class="code-block">
+$ sudo apt install apache2 -y
+</pre>
+    <p>
+      Po instalacji serwera WWW, możemy sklonować ze strony projektu na
+      serwisie github.com pliki projektu. Następnie przechodzimy do pobranego
+      katalogu i wydajeny następujące polecenie:
+    </p>
+<pre class="code-block">
+searxng$ sudo -H ./utils/searxng.sh install all
+</pre>
+    <p>
+      Po wydaniu tego polecenia instalacja może się nie rozpocząć, a my
+      uzyskamy następującą informację zwrotną od skryptu.
+    </p>
+<pre class="code-block">
+xf0r3m@searx:~/searxng$ sudo -H ./utils/searxng.sh install all
+/home/xf0r3m/searxng/utils/brand.sh: line 19: python: command not found
+/home/xf0r3m/searxng/utils/brand.sh: line 20: python: command not found
+/home/xf0r3m/searxng/utils/brand.sh: line 21: python: command not found
+ERROR: missing command curl
+</pre>
+    <p>
+      Pierwszy znich możemy rowiązać poprzez utworzenie dowiązania
+      symbolicznego o nazwię <code class="code-inline">python</code>
+      wskazującego na plik <em>/usr/bin/python3</em> (który również jest
+      dowiązaniem symbolicznym).
+    </p>
+<pre class="code-block">
+xf0r3m@searx:~/searxng$ sudo ln -s /usr/bin/python3 /usr/bin/python
+</pre>
+    <p>
+      Drugim problemem jest poprostu brak pakietu
+      <code class="code-inline">curl</code> w systemie i należy go doinstalować,
+      chcąc kontynuować instalację.
+    </p>
+<pre class="code-block">
+xf0r3m@searx:~/searxng$ sudo apt install curl -y.
+</pre>
+    <p>
+      Po zainstalowaniu pakietu możemy ponowić polecenie odpowiedzialne za
+      uruchomienie instalacji. Poszczególne etapy instalacji są opisane
+      przez skrypt, cały proces jest w dużym stopniu zautomatyzowany, ponieważ
+      mimo pytań o potwierdzenie użytkownika, to na nie nałożony jest
+      czas oczekiwania, jeśli nie podejmiemy decyzji w odpowiednim czasie
+      zostanie ona podjęta za nas. Na wszyskie pytania należy odpowiedzieć
+      twierdząco, chcąc zainstalować poprawnie SearXNG. Podczas nie których
+      czynności mogą pojawić się błędy. Jeśli skrypt się nie zatrzyma, nie
+      należy się nimi przejmować (tak ma być) - skrypt próbuje wykonać
+      zapytania do nieistniejącej bazy oraz skomunikować się z serwerem
+      <em>Valkey</em>, który jeszcze nie został zainstalowany. Wszystko ma na
+      celu sprawdzenie naszego środowiska i podjęcia odpowiednich kroków.
+      Brakujące pakiety takie jak <em>uwsgi</em> oraz serwer <em>Valkey</em>
+      zostaną doinstalowane w kolejnych etapach instalacji. W ostatnim etapie
+      skrypt przeprowadza kilka testów, jeśli tutaj nie pojąwią się żadne
+      błędy tudzież ostrzeżenia, to możemy uznać naszą instancję za poprawnie
+      zainstalowaną. 
+    </p>
+<pre class="code-block">
+Finalize installation
+=====================
+
+Do you want to run some checks? [YES/no] y
+INFO:  wrapper:  utils/searxng.sh instance _call searxng.check
+
+SearXNG checks
+--------------
+INFO    searx                         : max_request_timeout=None
+INFO    searx.valkeydb                : connecting to Valkey host='localhost' port=6379 db=0
+INFO    searx.valkeydb                : connected to Valkey
+</pre>
+    <p>
+      Po instalacji chcąc uzyskać do naszego silnika wyszukiwania za pomocą
+      przeglądarki musimy uruchomić przekierowanie, które prześle zapytania
+      wysłane przez klienta bezpośrednio do hosta (gdy w przeglądarce wpiszemy
+      pełną nazwę domenową hosta), tak jakby do folderu 
+      <em>/searxng<code class="code-inline">/</code></em> (zaznaczyłem tutaj
+      końcowy
+      <em>slash</em>, ponieważ od pewnego <em>commitu</em> pełni on bardzo
+      ważną rolę, o której opowiem podczas rozwiązywania problemów z
+      instancjami SearXNG). Jednak do nie jest folder, a jedynie część URL,
+      które spowoduje, że serwer WWW (<em>Apache</em>) uruchomi konfigurację
+      przygotowaną przez skrypt instalacyjny uruchamiający <em>proxy</em>,
+      które przekaże nasze żądanie do usługi UWSGI, które jak sama nazwa
+      wskazuje jest odpowiedzialne z WSGI w tym projekcie. Zatem w pliku
+      <em>/etc/apache/sites-available/000-default.conf</em> dopisujemy poniższą
+      linię.
+    </p>
+<pre class="code-block">
+Redirect / /searxng/
+</pre>
+    <p>
+      Teraz przy pomocy przeglądarki możemy już połączyć się z naszą instancją.
+      Jeśli chcemy możemy przed pierwszym <em>slashem</em> podać pełną nazwę
+      jednak nie jest to wymagane. Tak zainstalowana instancja silnika
+      wyszukiwania jest w pełni sprawna i gotowa do działania. 
+    </p>
+    <h2>2. Podstawowa customizcja</h2>
+    <p>
+      W zależności od potrzeb, możemy dostosować naszą instancję w mniejszym
+      lub wiekszym stopniu. Ja swojej instancji używam jako strony startowej
+      domyślnych profili przeglądarek internetowych zainstalowanych w
+      dystrybucji <em>immudex</em> i zmieniłem w niej logo wyświetlane na
+      stronie startowej, <em>faviconę</em>, tytuł karty/okna wyświelane przez
+      przeglądarkę oraz domyślną wyszukiwarkę, z której mają zostać pobrane
+      podpowiedzi dla wpisywanej frazy. Pierwsze dwie rzeczy zmieniamy
+      ingerując w pliki projektu zainstalowane w naszym systemie. Dwie ostatnie
+      zaś wymagają zmiany pliku ustawień <em>/etc/searxng/settings.yml</em>.
+      Zmiany w plikach projektu będą dostarczać dodatkowych problemów, o
+      których będzie szerzej w rozdziale odnośnie zarządzania. Zmiana
+      konfiguracji jest prostsza, ale wymaga restartu usługi <em>uwsgi</em>.
+      Od tych zmian zaczniemy. W wyżej wymienionym pliku edytujemy dwie
+      wartości:
+    </p>
+<pre class="code-block">
+instance_name:
+</pre>
+    <p>
+      Ta wartość znajduje się w sekcji <code class="code-inline">general:</code>
+      i odpowiada ona za ustawienie tytułu strony naszej instancji. Drugą
+      wartością jest:
+    </p>
+<pre class="code-block">
+autocomplete:
+</pre>
+    <p>
+      Ona z kolei odpowiada, za ustawienie wyszukiwarki, z której mają być
+      pobierana podpowiedzi dla wpisywanych słów kluczowych. Jako wartość
+      wpisujemy <code class="code-inline">google</code> lub
+      <code class="code-inline">duckduckgo</code> albo nazwę inne wyszukiwarki.
+      Jeśli przyjrzymy
+      się komentarzom w pliku to dostrzeżemy sposób na wykluczenie 
+      wyszukiwarek, z których nasz silnik ma pobierać wyniki wyszukiwania.
+      Po każdej zmianie w pliku <em>settings.yml</em>, należy zrestartować
+      usługę <em>uwsgi.service</em>.
+    </p>
+<pre class="code-block">
+$ sudo systemctl restart uwsgi.service
+</pre>
+    <p>
+      Kolejne zmiany tyczą się już ingerencji w pliki projektu i będą one
+      polegać na podstawieniu w odpowiednie miejsca odpowiednich plików. Zatem
+      żeby zmienić logo na głównej stronie silnika wyszukiwania należy wstawić
+      swoje logo - plik graficzny o nazwię <strong>searxng.png</strong> do
+      katalogu:
+    </p>
+<pre class="code-block">
+/usr/local/searxng/searxng-src/searx/static/themes/simple/img/
+</pre>
+    <p>
+      Obraz możebyć dowolnych rozmiarów, wówczas zostanie dostosowany wymiarów
+      narzuconych przez styl strony. Drugim elementem jest <em>favicona</em>,
+      czyli malutki obrazek wyświetlany w rogu karty/okna. Tutaj jest nieco
+      więcej czynności, ponieważ strona bardziej preferuje format SVG niż
+      PNG. Jeśli mamy naszą ikonę w tym formacie to wystarczy tak jak w
+      przypadku logo podmienić plik. Z kolei jeśli nasze logo jest np. w 
+      PNG to wówczas musimy wykonać poniższe czynności:
+    </p>
+<pre class="code-block">
+sudo cp -vv favicon.png /usr/local/searxng/searxng-src/searx/static/themes/simple/img/favicon.png
+sudo rm -v /usr/local/searxng/searxng-src/searx/static/themes/simple/img/favicon.svg
+sudo ln -s /usr/local/searxng/searxng-src/searx/static/themes/simple/img/favicon.png \
+/usr/local/searxng/searxng-src/searx/static/themes/simple/img/favicon.svg
+</pre>
+    <p>
+      Ważne jest w tych wyżej wymienionych przypadkach jest przestrzeganie
+      odpowiednich nazw plików. Nasze zmiany powinny być już widoczne, jeśli
+      nie są to na początek warto jest wczytać jeszcze raz stronę silnika
+      wyszukiwania z pominięciem pamięci podręcznej przeglądarki lub w trybie
+      prywatnym.
+    </p>
+    <h2>3. Zarządzanie</h2>
+    <p>
+      W podstawowym stopniu zarządzanie instancją sprowadza się do dwóch
+      czynności: <strong>usunięcia</strong> instancji oraz jej
+      <strong>aktualizacji</strong>. Usunięcie instancji może być przydatne
+      podczas rozwiązywania problemów. Jest to natyle prosta usługa, którą
+      możemy bez problemu reinstalować bez ryzyka utraty danych, jedyne co
+      warto zachować to plik <em>settings.yml</em> - chociaż zmiany w nim
+      poczynione są na tyle małe (oczywiście te opisane tutaj), że wczasie
+      odzyskiwania pliku z kopii, zdążylibyśmy ją skonfigurować na nowo. Innymi
+      plikami wartymi ochrony jest nasze logo oraz <em>favicona</em>.
+    </p>
+    <p>
+      Aby usunąć instancję SearXNG, należy wydać poniższe polecenie:
+    </p>
+<pre class="code-block">
+/usr/local/searxng/searxng-src$ sudo -H ./utils/searxng.sh remove all
+</pre>
+    <p>
+      Przed wydaniem polecenia, należy zwrócić uwagę, że nie jest klasyczne
+      polecenie, tylko co spotrzegawczy zauważą, że jest skrypt instalacji i
+      należy na początek przejść do folderu nadrzędnego dla jego lokalizacji
+      podobnie do instalacji instancji. Jeśli faktycznie chcemy pozbyć się
+      instancji SearXNG z naszego systemu, serwer <em>Valkey</em> będziemy
+      musieli usunąć samodzielnie. Jeśli tylko ją reinstalujemy może on
+      pozostać w systemie. Tak samo w przypadku <em>uwsgi</em>. W systemie
+      pozostaje również konfiguracja <em>proxy</em> serwera WWW i ją również
+      należy wyłączyć - oczywiście jeśli pozbywamy się instancji na dobre z
+      systemu.
+    </p>
+    <p>
+      Drugą czynnością są aktualizacje. Jak często należy je robić? To ciężko
+      okreslić. Moja instancja próbuje aktualizować się codziennie. Dlaczego?
+      Otóż nie które wyszukiwarki wymagają od zewnętrznych systemów kluczy
+      API (taką wyszukiwarką jest np. DuckDuckGo) i te klucze są wydawane
+      na jakiś okres czasu - jaki? Tego nie wiem, dlatego też aby uniknąć
+      sytuacji w której pozbawiam się z silnika jednego ze źródeł aktualizuje
+      się codziennie. Oczywiście proces jest automatyzowany przy użyciu
+      usługi <em>cron</em> oraz skryptu powłoki BASH. Sam proces aktualizacji
+      jest bardzo podobny do procesu instalacji. Klonuje pliki projektu z
+      Githuba, a następnie zamiast poleceń skryptu
+      <code class="code-inline">install all</code> wydajemy
+      <code class="code-inline">instance update</code>. Jednym pytaniem skryptu
+      będzie - czy zastąpić plik <em>settings.yml</em> nowszą wersją pochodząc
+      z pobranego kodu źródłowego. Jeśli dokonywaliśmy tam zmian, to należy
+      pozostawić dotyczasową wersję i jest opcja domyślna. Poniżej znajduje się
+      polecenie służące do przeprowadzenia aktualizacji.
+    </p>
+<pre class="code-block">
+Downloads/searxng$ sudo -H ./utils/searxng.sh instance update
+</pre>
+    <p>
+      Jeśli nasza instancja ma być dostępna publicznie w internecie, to warto
+      wykonywać regularnie te aktualizacje. Poniżej zamieszczam mój skrypt.
+      Co to regularności jego uruchamiania to już pozostawiam w waszej gestii.
+    </p>
+<pre class="code-block">
+#!/bin/bash
+
+if [ ! -d ~/Downloads ]; then mkdir ~/Downloads; fi
+cd ~/Downloads;
+
+if [ -d searxng ]; then rm -rf searxng; fi
+
+git clone https://github.com/searxng/searxng.git searxng;
+cd searxng;
+
+sed -i '358a _t="-t 1"' ~/Downloads/searxng/utils/lib.sh;
+sudo -H ./utils/searxng.sh instance update
+
+sudo cp -vv ${HOME}/searxng.png /usr/local/searxng/searxng-src/searx/static/themes/simple/img
+sudo cp -vv ${HOME}/favicon.png /usr/local/searxng/searxng-src/searx/static/themes/simple/img
+sudo rm -v /usr/local/searxng/searxng-src/searx/static/themes/simple/img/favicon.svg
+sudo ln -v -s /usr/local/searxng/searxng-src/searx/static/themes/simple/img/favicon.png /usr/local/searxng/searxng-src/searx/static/themes/simple/img/favicon.svg
+</pre>
+    <p>
+      Skrypt zmieniejsza czas oczekiwana na odpowiedź na pytanie do jednej
+      sekundy przez co plik <em>settings.yml</em> pozostaje bez zmian. Jeśli
+      nie zmienialiśmy <em>favicony</em> oraz loga to możemy pozbyć 4 ostatnich
+      linii. Jeśli dokonywaliśmy taki zmian to należy pozostawić je luzem w
+      katalogu domowym lub wskazać inną ścieżkę w tychże poleceniach. Skrypt
+      SearXNG podczas aktualizacji nadpisze nowymi plikami nasze pliki. Nie
+      sprawdza ich w żaden sposób, dlatego też te modyfikacje należy wprowadzać
+      ponownie po każdej aktualizacji.
+    </p>
+    <h2>4. Rozwiązywanie problemów</h2>
+    <p>
+      Instancję SearXNG hostuje od ok. 3 lat i w sumie nie napotkałem żadnych
+      poważnych problemów. Chociaż w przypadku oprogramowania wydawanego jako
+      <em>rolling-release</em> oraz automatycznych aktualizacji to jest to
+      pewnego rodzaju loteria - czy po kolejnej aktualizacji instancja będzie
+      zdatna w ogóle do użytku. Jednym z takich powszechniejszych problemów
+      jaki możemy napotkać to, że zamiast strony wyszukiwarki wyświetla się:
+    </p>
+<pre class="code-block">
+Internal Server Error
+</pre>
+    <p>
+      To warto na początek sprawdzić czy takie usługi jak <em>uwsgi</em> oraz
+      <em>Valkey</em> działają i ewentualnie rozwiązać problem z ich
+      działaniem, jeśli coś jest nie tak. Chociaż to się rzadko zdarza.
+      Innym rozwiązaniem, które może się sprawdzić jest reinstalacja 
+      instancji. W moim przypadku - dwóch takich problemów na przestrzeni 3 lat
+      reinstalacja pomogła w 100% lub częściowo. 
+    </p>
+    <p>
+      Ponieważ w drugim przypadku zmiana między poszczególnymi wersjami była
+      dość duża. Poprzedni silniki bazodanowy <em>Redis</em> zastąpiono
+      właśnie wymienionym tutaj <em>Valkey</em> oraz zmieniono sposób
+      dystrybucji plików statycznych (m.in. arkuszy styli CSS czy kodu
+      JavaScript) przez co mimo uruchomienia instancji po jej reinstalacji
+      wyglądała źle - nie wczytało arkuszy styli. Dlaczego się to stało? Otóż
+      winna była moja konfiguracja przekierowania żądań HTTP na konfigurację
+      proxy. Mój serwer WWW przekierowywał zapytania na
+      <em>/searxng</em> wówczas nazwy plików statycznych pozbawione już
+      poprzedzającego je <em>slasha</em> doklejały się do ciągu
+      <em>searxng</em> a takich plików nie ma. Więc ten ostatni <em>slash</em>
+      w konfiguracji jest taki ważny - od pewnej wersji.
+    </p>
+    <p>
+      Często podczas <em>troubleshootu</em> pomocna może być dokumentacja
+      admina. Dokumencja projektu SearXNG, dzieli się na trzy kategorie:
+      dokumentacje <em>usera</em>, admina oraz dewelopera. Przydatna jest
+      sekcja zgłoszeń na stronie projektu w serwisie Github.
+    </p>
+    <p>
+      Tym własnie akcentem zakończe tworzenie tego materiału. Dowiedzieliśmy
+      sie w jaki sposób zainstalować, dostosować do własnego upodobania - w
+      stopniu podstawowym, zarzadzać oraz rozwiązać problemy, które na pierwszy
+      rzut oka nie wydają się błache, ale mają takie rozwiązanie. Rozdział
+      z rozwiązywaniem problemów pozostawiam otwarty, jeśli coś jeszcze mi się
+      przydarzy z SearXNG i uda mi się to naprawić to opiszę to tam o
+      aktualizacji dowiecie się z listy zmian na stronie głównej.
+    </p>
+    <p>
+      Źródła:
+    </p>
+    <ol>
+      <li><a href="https://github.com/searxng/searxng">Strona projektu w serwisie GitHub</a></li>
+    </ol>
+		<p>
+			~xf0r3m
+		</p>
+	</div>
+	<p class="footer">
+		2025; COPYLEFT; ALL RIGHTS REVERSED;
+	</p>
+</body>
+</html>
