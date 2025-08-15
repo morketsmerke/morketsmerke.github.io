@@ -22,7 +22,8 @@
         <strong>Aktualności:</strong>
       </p>
       <ul class="reduced-list">
-      	<li>22.05.2025 - Nowa wersja immudex-sdk: 12.11</li>
+      	<li>15.08.2025 - Nowa wersja immudex-sdk: 13.0-1</li>
+	<li>22.05.2025 - Nowa wersja immudex-sdk: 12.11</li>
 	<li>16.03.2025 - immudex: nowa wersja immudex-sdk - 12.10</li>
 	<li>11.03.2025 - immudex: nowa wersja immudex-sdk - 12.9-2</li>
 	<li>19.01.2025 - Nowa wersja immudex-sdk - 12.9</li>
@@ -293,11 +294,13 @@
         zarchiwizowane. Zarchiwizowany został również stan repozytoruim
         projektu immudex przed unifikacją. Gałąź <em>main</em> projektu 
         <em>xfcedebian</em>
-        zostanie scalona z gałęzią <em>d13</em> i to ona będzie gałęzią,
-        główną projektu. Wówczas wszystkie zmiany dotyczące <em>layoutu</em>
+        została scalona z gałęzią <em>d13</em>. 
+        Wówczas wszystkie zmiany dotyczące <em>layoutu</em>
         środowiska XFCE oraz pakietów podstawowych (tych zapisanych w skrypcie
         <em>install.sh</em>) będą publikowana za pośrednictwem projektu
-        <em>xfcedebian</em>.
+        <em>xfcedebian</em> na gałęzi <em>main</em>. Pozostałe gałęzie, jeśli
+        jakiekolwiek będą, służą wyłącznie celom testowym, więc nie jest
+        zalecane, aby korzystać z nich podczas budowania immudex.
       </p>
       <p>
         <strong>Meta-Distribution Rolling-Release:</strong>
@@ -313,11 +316,11 @@
       </p> 
       <p>
         Zmiany będą publikowane nieregularnie. Tylko i wyłącznie za pomocą 
-        serwisu Git (github.com). Każda aktualizacja będzie wymagała zbudowania
+        serwisu GitHub. Każda aktualizacja będzie wymagała zbudowania
         nowego obrazu iso.
       </p>
       <p>
-        <a href="https://github.com/xf0r3m/immudex">immudex</a>
+        <a href="https://github.com/xf0r3m/immudex">https://github.com/xf0r3m/immudex</a>
       </p>
       <p>
         Zmiana podejścia jest efektem dążenia do pełnej bezkosztowości. Gdzie 
@@ -376,6 +379,17 @@
         <li>podania bazowej wersji Debiana.</li>
       </ul>
       <p>
+        Dodatkowo możemy (nie jest to wymagne, wystarczy odpowiedzieć na
+        pozostałe pytania <em>No</em>):
+      </p>
+      <ul>
+        <li>Podać dodatkowe pakiety do zainstalowania,</li>
+        <li>Podać dodatki (addony),</li>
+        <li>Podać dodatkowe polecenia do pliku bazowego,</li>
+        <li>Podać nazwę dla tego obrazu,</li>
+        <li>Podać jego wersję.</li>
+      </ul>
+      <p>
         Narzędzia służace do budowania są uruchamiane automatycznie zaraz po
         po załadowaniu systemu. System loguje się automatycznie na konto
         superużytkownika, mimo to jeśli dane logowania będą potrzebne to
@@ -394,18 +408,18 @@
       </p>
         <table border="1" style="border-collapse: collapse;">
         <tr>
-          <th colspan="3">&bull;&nbsp;immudex-sdk (Debian 12 Bookworm)&nbsp;&bull;</th>
+          <th colspan="3">&bull;&nbsp;immudex-sdk (Debian 13 Trixie)&nbsp;&bull;</th>
         </tr>
         <tr>
           <td rowspan="2">64-bit:</td>
-                    <td colspan="3"><a href="https://sourceforge.net/projects/immudex/files/immudex/sdk/immudex-sdk_12.11_amd64.iso/download">https://sourceforge.net/projects/immudex/files/immudex/sdk/immudex-sdk_12.11_amd64.iso/download</a>            <!--
+                    <td colspan="3"><a href="https://sourceforge.net/projects/immudex/files/immudex/sdk/immudex-sdk_13.0-1_amd64.iso/download">https://sourceforge.net/projects/immudex/files/immudex/sdk/immudex-sdk_13.0-1_amd64.iso/download</a>            <!--
             <a href="https://sourceforge.net/projects/immudex/files/immudex/sdk/immudex-sdk_12.4-2_amd64.iso/download">https://sourceforge.net/projects/immudex/files/immudex/sdk/immudex-sdk_12.4-2_amd64.iso/download</a>
             -->
           </td>
         </tr>
         <tr>
-          <td>CRC: 354479889</td>
-          <td>SHA1: 07aff49026493094ca8c72707adef7bd3e2ddc2c</td>
+          <td>CRC: 1950049575</td>
+          <td>SHA1: ae10154a6caec9a679bd03abe073887ef8ac4b39</td>
         </tr>
       </table>
       <p>
