@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+		<pre>
+		<span style="color: green;">     .~~.   .~~.
+		    '. \ ' ' / .'</span>
+		<span style="color: red;">     .~ .~~~..~.</span>                       _                          _
+		<span style="color: red;">    : .~.'~'.~. :</span>      ___ ___ ___ ___| |_ ___ ___ ___ _ _    ___|_|
+		<span style="color: red;">   ~ (   ) (   ) ~</span>    |  _| .'|_ -| . | . | -_|  _|  _| | |  | . | |
+		<span style="color: red;">  ( : '~'.~.'~' : )</span>   |_| |__,|___|  _|___|___|_| |_| |_  |  |  _|_|
+		<span style="color: red;">   ~ .~ (   ) ~. ~</span>                |_|                 |___|  |_|
+		<span style="color: red">    (  : '~' :  )</span>
+		<span style="color: red;">     '~ .~~~. ~'
+			 '~'</span>
+		</pre>
+
+	<p class="header_link">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+
+	<div class="main">
+    <h1 class="title">Raspberry Pi jako system powiadamiania przez SMS</h1>
+    <p>
+      Jakiś czas temu spotkała mnie dość niemiła niespodzianka, wchodzę do
+      jednej z serwerownii, którymi się opiekuje i uderzyła mnie fala gorąca.
+      Klimatyzacja przestała działać, zabezpieczenie nadprądowe klimatyzatora
+      było wyłączone. Podejrzewam je jako winowajcę, mogło się przez te lata
+      już wygrzać i stracić swoje właściwości. Nie mniej jednak udało się je
+      załączyć i klimatyzacja na obiekcie znów zaczęła pracować. Czas, przez
+      który klimatyzacja nie działała nie był długi, żadne z systemów nie
+      wyłączyło się, dlatego nikt nic nie zauważył, że coś jest nie tak.
+      Pomyślałem jednak, że potrzebuje systemu powiadania dzięki czemu będę
+      wiedzieć, że jest problem i trzeba go rozwiązać.
+    </p>
+    <p>
+      Mógłbym użyć czujnika temperatury wykorzystywanego
+      w elektronicznych projektach hobbystycznych oraz skorzystać z zakupionego
+      jakiś czas temu modemu LTE. Na potrzeby tego rozwiązania wykorzystałem
+      czujnik temperatury <strong>DS18B20</strong> podobno bardzo dokładny.
+      Wykorzystuje on magistralę <strong>1-wire</strong>, dzięki czemu za
+      pomocą jednego przewodu jest w stanie przesłać dane do
+      <em>Raspberry Pi</em>. Innym czujnikiem jest LM35, wymaga on konwertera
+      analogowo-cyfrowego i dużo więcej zabawy z lutownicą i programowania a
+      moje umiejętności elektronicze nie są na najwyższym poziomie. Przy
+      czujniku DS18B20, jeśli wszystko dobrze podłączymy to temperaturę
+      można odczytać z pliku za pomocą zwykłego polecenia
+      <code class="code-inline">cat</code>.
+    </p>
+    <p>
+      Czujnik DS18B20 ma trzy wyprowadzenia, jego zasilanie wymaga 3,3V. Jednak
+      aby móc odczytać z niego temperaturę musimy połączyć linię danych z
+      zasilaniem przez <strong>rezystor 4,7k&#8486;</strong>. Ja do połączenia
+      wykorzystałem kabel stykowe i wcisnąłem rezystor razem z wyprowadzeniami
+      czujnika i zakleiłem to taśmą izolacyjną z drugiej strony - ze zględu na
+      to, że potrzebujemy pierwszego pinu (zasilania 3,3V), czwartego pinu
+      (pin magistrali <em>1-wire</em> <em>Raspberry Pi</em>) oraz piątego pinu
+      (masy - GND) wewnętrznego rzędu pinów GPIO <em>Raspberry Pi</em> - 
+      zmontowałem sobie taką elegancką wtyczkę uzupełniając przerwę
+      między pinami pustymi plastikowymi wtykami kabeli stykowych i wszystko
+      zakleiłem taśmą izolacyjną, kabel stykowe również dodtakowo zaizolowałem
+      tworząc prowizoryczną sondę.
+    </p>
+    <p>
+      Oczywiście przed sklejeniem wszystko złożyłem używając płytki
+      prototypowej i przetestowałem. Instalacji <em>RaspiOS</em> oraz jej
+      początkowej konfiguracji nie będę tutaj opisywał. Nie mniej jednak
+      obsługa magistrali <em>1-wire</em> jest domyśnie wyłączona i należy
+      włączyć przy użyciu narzędzia <strong>raspi-config</strong>. Z menu
+      wybieramy kolejno:
+    </p>
+<pre class="code-block">
+xf0r3m@sms-alert:~$ sudo raspi-config
+5 Interfacing Options -&gt; P7 1-Wire
+</pre>
+    <p>
+      Potwierdzamy włączenie interfejsu, ze względu na to, że włączyliśmy
+      sterownik (moduł jądra), przy opuszczaniu programu, będzie on sugerować
+      potrzebę ponownego uruchamiania. Przystajemy na tę sugestię. Po ponownym
+      uruchomieniu urządzenia, po wydaniu polecenia
+      <code class="code-inline">lsmod</code>, powinniśmy zobaczyć w wierszu
+      dla modułu <em>wire</em> taki ciąg znaków jak: <strong>w1_therm</strong>.
+    </p>
+<pre class="code-block">
+xf0r3m@sms-alert:~ $ lsmod
+...
+wire                   40960  2 w1_gpio,w1_therm
+...
+</pre>
+    <p>
+      Jeśli nie ma takiego ciągu znaków, oznacza to że urządzenie (czujnik
+      temperatury) nie korzysta z tego modułu, a to oznacza że mamy problemy
+      z komunikacją między czujnikiem a <em>Raspberry Pi</em>. Często powodem
+      takiego działania jest źle dobrany rezystor. Jeśli natomiast czujnik
+      się zgłosił, to możemy przjeść do odczytu temperatury, na ścieżce
+      <em>/sys/bus/w1/devices</em>, możemy znaleźć wszystkie urządzenia
+      podłączone do <em>1-wire</em>. Magistrala ta wysyła w ramkach
+      unikatowy identyfikator przez co można do niej podłączyć wiele urządzeń.
+      Wspominam o tym dlatego, że katalog przenaczony dla naszego czujnika
+      jest opisany właśnie tym identyfikatorem:
+    </p>
+<pre class="code-block">
+xf0r3m@sms-alert:~ $ ls /sys/bus/w1/devices/
+28-0316850291ff  w1_bus_master1
+</pre>
+    <p>
+      Katalog <code class="code-inline">28-0316850291ff</code> jest katalogiem
+      naszego czujnika, z którego możemy możemy odczytać temperature. Starsze
+      wersje sterowanika <em>1-wire</em> umieszczały dane z ramki w pliku
+      <em>w1_slave</em> i tam możemym odczytać temperaturę w drugiej linii
+      jako wartość <strong>t</strong>.
+    </p>
+<pre class="code-block">
+f0r3m@sms-alert:~ $ cat /sys/bus/w1/devices/28-0316850291ff/w1_slave 
+32 01 4b 46 7f ff 0c 10 8f : crc=8f YES
+32 01 4b 46 7f ff 0c 10 8f t=19125
+</pre>
+    <p>
+      Ta wartość, aby była przydana musi zostać wyłuskana za pomocą dodatkowych
+      poleceń powłoki. Obecnie sterownik umieszcza czysty odczyt temperatury
+      w oddzielnym pliku.
+    <p>
+<pre class="code-block">
+xf0r3m@sms-alert:~ $ cat /sys/bus/w1/devices/28-0316850291ff/temperature 
+18937
+</pre>
+    <p>
+      Temperatura podawana jest z dokładnością do części tysięcznej stopnia
+      celsjusza, aby otrzymać lepiej czytelny dla nas wynik możemy podzielić
+      wartość zwracaną z czujnika przez 1000, przy użyciu narzędzia
+      <em>bc</em>, koniecznie z właczoną biblioteką zmiennoprzecinkową
+      dodaną opcją <code class="code-inline">-l</code>.
+    </p>
+<pre class="code-block">
+xf0r3m@sms-alert:~ $ echo "$(cat /sys/bus/w1/devices/28-0316850291ff/temperature) / 1000" | bc -l | cut -c 1-6
+19.000
+</pre>
+    <p>
+      Teraz wiedząc jak odczytwać temperaturę, chciałbym ją przesłać do siebie
+      najlepiej z jakimś komunikatem. Oczywistym sposobem przesłanie takich
+      danych może być poczta elektronicza. Jak ze względu na ilość wiadomości
+      jakie już przychodzą na moje skrzynki od różnych systemów, powiadomienia
+      z poczty mam wyłączone, a one i tak mogą zagubić się między innymi
+      wiadomościami. Skuteczne w tym przypadku wydają się wiadomości SMS.
+      Do tego jednak potrzebujemy urządzenia oraz oprogramowania do obsługi
+      sieci komórkowej. Oczywiście tutaj mogłem skorzystać z modułu GSM za
+      parę groszy, ale wolałem skorzystać modemu 4G Huawei. Korzystając z
+      modemu cały <em>backend</em> komunikacji szeregowej z modemem spoczywa na
+      opgramowaniu a nie na mnie (sam bym musiał to pisać, korzystając z 
+      poleceń AT) gratis mam połączenie internetowe z dobrą przepustowością.
+    </p>
+    <p>
+      Do korzystania z modemu LTE, wykorzystamy oprogramowanie
+      <strong>ModemManager</strong>, które jest już zainstalowane na naszym
+      <em>Raspberry</em>. Po podłączeniu modemu do portu USB, należy wydać
+      następuje polecenie, aby zobaczyć czy nasz modem jest wykrywalny przez
+      <em>ModemManager</em>.
+    </p>
+<pre class="code-block">
+$ mmcli --list-modems
+  /org/freedesktop/ModemManager1/Modem/0 [huawei] E3272
+</pre>
+    <p>
+      Aby dowiedzieć się wiecej na temat samego połączenia GSM lub czy np.
+      nie trzeba aktywować modemu lub podać numeru PIN, możemy wydać 
+      następujące polecenie:
+    </p>
+<pre class="code-block">
+$ mmcli -m 0
+</pre>
+    <p>
+      To polecenie zwróci nam informacje nt. połączenia GSM. 
+      <code class="code-inline">0</code> jest indeksem, dzieki któremu możemy
+      odwołać się do modemu. Uzyskujemy go z poprzedniego polecenia, jest to
+      ostatni element ścieżki zwróconej przez polecenie.
+      Obecne karty
+      SIM, szczególnie te <em>prepaidowe</em>, nie wymagają kodu PIN. Ale
+      w przypadku kart abonamentowych czy telemetrycznych ten kod może być
+      wymagany. Wówczas takie połączenie będzie <strong>niezarejestrowane</strong>
+      u operatora. Aby odblokować kartę sim należy wydać poniższe polecenie.
+    </p>
+<pre class="code-block">
+$ mmcli -m 0 | grep SIM
+SIM | path: '/org/freedesktop/ModemManager1/SIM/0'
+$ mmcli -i 0 --pin=1111
+successfully sent PIN code to the SIM
+</pre>
+    <p>
+      Na początku musimy pobrać indeks karty SIM, następnie odwołując się 
+      po przez ten indeks, odblokowujemy kartę SIM podając kod PIN. Tak
+      odblokowana karta powinna się zarejestrować u operatora w ten sposób
+      uzyskaliśmy połączenie GSM. Inna przydatną umiejętnością poza samym 
+      wysyłaniem
+      SMS będzie także ich odczyt. Na początku musimy wyświetlić listę
+      otrzymanych SMS, aby poznać ich indeksy.
+    </p>
+<pre class="code-block">
+$ mmcli -m 0 --messaging-list-sms
+    /org/freedesktop/ModemManager1/SMS/1 (received)
+    /org/freedesktop/ModemManager1/SMS/0 (received)
+</pre>
+    <p>
+      Odczyt wiadomości SMS, realizujemy poprzez poniższe polecenie.
+    </p>
+<pre class="code-block">
+$ mmcli -m 0 --sms 0
+</pre>
+    <p>
+      To polecenie wyświetli nam szczegóły wiadomości wraz z jej treścia.
+    </p>
+    <p>
+      Teraz możemy przjeść do wysyłania wiadomości. Pierwszą czynnością jest
+      jej utworzenie. Niestety nie jest to zbyt wygodne, należy jednak
+      pamiętać, że klasyczny SMS ma ograniczenie do 160 znaków, po
+      przekroczeniu tej wartości wiadomość jest dzielona. Nie mniej jednak
+      nie testowałem tego w przypadku modemu. Tak zachowują się telefony.
+      Aby wysłać SMS należy wydać następujące polecenie:
+    </p>
+<pre class="code-block">
+$ mmcli -m 2 --messaging-create-sms="text='Hello, World!',number='+1234567890'" 
+  Successfully created new SMS: /org/freedesktop/ModemManager1/SMS/5
+</pre>
+    <p>
+      Tak utworzonej wiadomości został nadany indeks
+      <code class="code-inline">5</code>, odwołując się do wiadomości za pomocą
+      indeksu wyślemy ją do odbiorcy.
+    </p>
+<pre class="code-block">
+$ mmcli -s 5 --send
+</pre>
+    <p>
+      Tutaj nie podajemy nawet modemu, ponieważ wszystko jest już zapisane w
+      wiadomości. Wracając jeszcze do poprzedniego polecenia, zwróćmy uwagę
+      w jaki sposób zapisana jest treść wiadomości. Taki sposób nie jest zbyt
+      wygodny dlatego też możemy wysłać za pomocą SMS zawartość pliku, który
+      przekażemy za pomocą ścieżki.
+    </p>
+<pre class="code-block">
+$ mmcli -m 2 --messaging-create-sms="number='+1234567890'" --messaging-create-sms-with-data=temp.txt
+Successfully created new SMS: /org/freedesktop/ModemManager1/SMS/6
+$ mmcli -s 6 --send
+successfully sent the SMS
+</pre>
+    <p>
+      Teraz już wiemy w jaki sposób możemy wysłać SMS. Dodatkowo w prosty
+      sposób możemy wykorzystać nasz modem do dodatkowego połączenia z
+      internetem. Wystarczy jedno polecenie, jeśli przyjrzeliśmy się
+      szczegółom dotyczącym modemu, to tam znajduje się również nazwa
+      interfejsu jaki został utworzony w systemie właśnie na potrzeby
+      połączenia z internetem. W przypadku <em>Raspberry Pi</em> jest to
+      <em>wwan0</em>. Jeśli połączenie zostanie zestawione wówczas
+      należy pobrać od operatora adres IP i tak podłączony modem będzie
+      zapeniać dostęp do internetu.
+    </p>
+<pre class="code-block">
+$ mmcli -m 2 --simple-connect="apn=plus"
+successfully connected the modem
+$ sudo dhclient wwan0
+</pre>
+    <p>
+      Polecenie do połączenia internetowego (w przypadku LTE), wymaga nazwy
+      APN, możemy ją znaleźć w recznej konfiguracji transmisji danych dla
+      telefonów komórkowych na stronie swojego operatora.
+      Teraz wiedząc jak odczytywać temperaturę oraz jak wysłać SMS napisałem
+      dwa skrypty, jeden z nich jest uruchamiany przez <em>cron</em> co 5
+      minut i bada temperaturę jeśli przekroczy ustawioną wartość wówczas
+      uruchomi ten drugi skrypt który wyśle SMS z temperaturą do określonego
+      odbiorcy. Poniżej znajduje się skrypt monitorujący temperature: 
+    </p>
+<pre class="code-block">
+#!/bin/bash
+
+MAX_TEMP=
+
+currentTemp=$(cat /sys/bus/w1/devices/28-0316850291ff/temperature);
+if [ $currentTemp -ge $MAX_TEMP ]; then
+  /usr/local/bin/send-temperature-alert &gt; /dev/null 2&gt;&amp;1;
+fi
+</pre>
+    <p>
+      Skrypt wysyłający powiadomienie SMS:
+    </p>
+<pre class="code-block">
+#!/bin/bash
+
+if [ -f /tmp/temp.txt ]; then
+  sudo rm /tmp/temp.txt;
+fi
+
+echo -e "Uwaga! W serwerownii temperatura powietrza wynosi: \
+$(echo "$(cat /sys/bus/w1/devices/28-0316850291ff/temperature) / 1000" \
+| bc -l \
+| cut -c 1-6) oC.\nTa wiadomosc zostala wygenerowana automatycznie prosze na nia nie odpowiadac."\
+| sudo tee /tmp/temp.txt &gt; /dev/null 2&gt;&amp;;
+
+RECV=""
+sudo mmcli -s $(basename \
+$(sudo mmcli -m 0 --messaging-create-sms="number=\"${RECV}\"" \
+--messaging-create-sms-with-data=/tmp/temp.txt | cut -d ":" -f 2)) --send;
+</pre>
+    <p>
+      Źródła:
+    </p>
+    <ol>
+      <li><a href="https://forbot.pl/blog/kurs-raspberry-pi-czujnik-temperatury-ds18b20-id26430">Podłączenie DS18B20 do Raspberry Pi</a></li>
+      <li><a href="https://gist.github.com/FinnWoelm/3396d09eec2ce1ba676b789308b345c1">How to read text messages from USB modem</a></li>
+      <li><a href="https://www.freedesktop.org/software/ModemManager/man/1.0.0/mmcli.8.html">mmcli - manpage</a></li>
+    </ol>
+    <p>
+      ~xf0r3m
+    </p>
+	</div>
+		<p class="footer">
+			2025; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+
+	</body>
+	</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+			<link rel="stylesheet" type="text/css" href="/style.css">
+		</head>
+		<body>
+<pre>
+  _______            ___   ______     _      __
+ /_  __(_)___  _____( _ ) /_  __/____(_)____/ /_______
+  / / / / __ \/ ___/ __ \/|/ / / ___/ / ___/ //_/ ___/
+ / / / / /_/ (__  ) /_/  &lt;/ / / /  / / /__/ ,&lt;(__  )
+/_/ /_/ .___/____/\____/\/_/ /_/  /_/\___/_/|_/____/
+     /_/
+</pre>
+
+		<p class="header_links">
+			&#9760;&nbsp;<a href="https://morketsmerke.github.io/">morketsmerke</a>&nbsp;&#9760;
+		</p>
+
+		<div class="main"> 
+      <h1 class="title">Obrócenie wyświetlania konsoli w dystrybucjach Linuksa</h1>
+      <p>
+        W obecnym miesjcu gdzie pracuje nie ma zbyt wiele miejsca, dlatego też
+        jeden z monitorów PC-ta, które na co dzień używam do gier musiałem
+        obrócić o 90 stopni w prawo. Wszytko było w porzątku kiedy korzystałem
+        na tym komputerze z systemu MS Windows (Blizzard ma w nosie granie na
+        Linuksie). Niestety pewnego dnia trzeba było wyjść ze strefy komfortu
+        i uruchomić na nim Debian w wersji LiveCD, pół biedy jeśli była by to
+        wersja z jakimś środowiskiem graficznym, ale na co to komu. OK, mam
+        drugi monitor więc mogę zrobić to co potrzeby bez przeszkód prawda?
+        No własnie nie. Monitor podstawowy tego komputera został już podłączony
+        do laptopa, a ja do dyspozycji mam tylko ten obrócony ekran. Od biedy
+        mogłem na obróconym ekranie uruchomić SSH i połączyć się z tym
+        systemem, ja jednak postanowiłem zadać pytanie: jak mogę obróć obraz
+        konsoli?
+      </p>
+      <p>
+        Po wrzuceniu do wszukiwarki frazy <em>rotate linux console</em>,
+        natrafiłem na stronę <em>askubuntu.com</em>, na której to pytający
+        zadał pytanie jak może obrócić obraz nie korzystając z serwera
+        wyświetlania X.org. Jeden z użytkowników tej platformy odpowiedział
+        mu, że może obrócić wirtualne bufory ramek, wykorzystując
+        <strong>fbcon</strong> - moduł bufora ramek konsoli. W moim przypadku
+        nie chciałem wprowadzać zmian w zainstalowanym już systemie, ale
+        przy uruchamianiu LiveCD, i odpowiadający zawarł również odpowiedź na
+        nurtujące mnie pytanie, mianowicie dodał linię konfigurjącą wiersz
+        polecenia uruchamiania jądra Linuks przez program rozruchowy GRUB.
+        Więc to co on zapisał ja przestowałem u siebie dopisując do wiersza
+        polecenia GRUB poniższą opcję: 
+      </p>
+<pre class="code-block">
+fbcon="rotate:3"
+</pre>
+      <p>
+        Skąd to <code class="code-inline">3</code>, otóż wirtualny bufor ramek
+        konsoli możemy obróć 3-kronie:
+      </p>
+      <ul>
+        <li><code class="code-inline">0</code> - normalny obraz, bez obracania.</li>
+        <li><code class="code-inline">1</code> - obraz obrócony zgodnie z
+          ruchem wskazówek zegara.</li>
+        <li><code class="code-inline">2</code> - obraz obrócony do góry nogami.</li>
+        <li><code class="code-inline">3</code> - obraz obrócony przeciwnie do
+          ruchu wskazówek zegara.</li>
+      </ul>
+      <p>
+        Mogło by się wydawać, że poprawną wartością w moim przypadku
+        jest <code class="code-inline">1</code>, ale
+        tutaj obracamy obrazem. Pozycja wyściowa <code class="code-inline">0</code>
+        to normalnie ustawiony monitor w poziomie. Jeśli użyjemy wartości
+        <code class="code-inline">1</code>, to tekst konsoli będzie znajdować
+        się do góry nogami i rozpoczynać się w prawym dolnym rogu (względem
+        mojego ustawienia monitora). Ten tryb
+        zgadzał by się z rzeczywistością jeśli obrócił bym monitor w lewo,
+        a ja obróciłem w prawo. To oznacza, że musimy obraz obrócić w kierunku
+        przeciwnym do wskazówek zegara.
+      </p>
+      <p>
+        Źródła:
+      </p>
+      <ol>
+        <li><a href="https://askubuntu.com/questions/237963/how-do-i-rotate-my-display-when-not-using-an-x-server">Strona na askubuntu.com rozwiązujaca problem</a></li>
+        <li><a href="https://www.kernel.org/doc/Documentation/fb/fbcon.txt">Definicja fbcon</a></li>
+      </ol>
+      <p>
+        ~xf0r3m
+      </p>
+		</div>
+		<p class="footer">
+			2025; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+		</body>
+	</html>
