@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+	<p class="header_link">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div class="main">
+		<h1 class="title">Ripowanie płyt CD Audio w dystrybucjach Linuksa</h1>
+    <p>
+      W dobie serwisów streamingowych kupowanie płyt CD z muzyka, stało się
+      swoistą cegiełką dla naszych ulubionych artystów. Mimo rozbudowanej
+      biblioteki utworów, albumów czy wykonawców, niektórych tytułów może
+      brakować lub kiedyś one występowały ale ze względu na zawirowania w
+      prawach autorskich przestały być dostępne. Duże serwisy streamingowe
+      raczej starają się posiadać bibliotekę najbardziej topowych utworów
+      aby wygenerować jak najwięcej ruchu. Sam koncept takich serwisów jest
+      fenomenalny. Za drobną opłatą mamy dostęp do bardzo dużej ilość róznej
+      maści muzyki w naprawdę dobrej jakości. Oczywiście te serwisy nie są
+      bez wad, jedną z nich napewno może sposób w jaki strumień dzwięku trafia
+      na nasze urządzenia. Wykorzystywana jest tutaj technologia DRM, która
+      jest zabezpieczeniem nie pozwalającym na odtworzenie utworów poza
+      środowiskiem serwisu. To sprawia, że utwory znajdują się na naszym
+      dysku, ale my poza aplikacjami związanym z tym serwiesem nie możemy
+      nic z tym zrobić istny <em>bloat</em>. Pliki są zaszyfrowane a klucze
+      deszyfrujące są zaszyte w aplikacji. Inną wadą jest czasami poprostu
+      brak tego czego chcielibyśmy posłuchać - wspominałem już o tym. Więc
+      jeśli czegoś tam niema to szukamy na innych serwisach. Niektóre z nich
+      pozwalają na pobranie treści w bardziej lub mniej oficjalny sposób.
+      Więc jeśli chcemy zabezpieczyć je przed
+      potencjalnym zniknięciem, możemy je ściągnąć - co oczywiście nie jest
+      zgodne z literą prawa oraz nie zbyt <em>fair</em> wobec twórcy.
+      Bardziej legalnym sposobem jest zakup albumy w wersji cyfrowej 
+      (w formie dostępu do możliwości zapisania utworów na dysku w kilku
+      popularnych formatach) - 
+      istnieją do tego specjalne sklepy takie jak np. księgarnie internetowe.
+      Istnieje również serwis streamingowy, który umożliwia jedne darmowy
+      odsłuch albumu, jego zakup w wersji cyfrowej oraz ewentualny zakup
+      innych gadżetów wykonawcy (<em>merchu</em>) takich jak koszulki czy
+      nawet fizyczne nośniki z muzyką. Inną metodą jest najzwyczajniej
+      w świecie zakupić fizyczny nośnik. W tym przypadku prawo autorskie
+      pozwala na utworzenie jednej kopii bezpieczeństwa na użytek własny, ze
+      wzbronieniem rozpowszechniania takiej kopii.
+    </p>
+    <p>
+      Osobiście moja kolekcja płyt nieco urosła, większość z nich to cegiełki,
+      ale znajduje się w niej kilka rarytasów, których próżno szukać na
+      serwisach streamingowych. Sam nie jestem fanem nośników fizycznych.
+      Zabierają one zmiejsce, mogą ulec zniszczeniu oraz coraz mniej sprzętu,
+      na którym na co dzień operuje posiada możliwość odtworzenia takiej
+      płyty. Póki co jescze istnieje taka możliwość więc po zakupie takiego
+      nośnika przystępuje do utworzenia jego kopii na komputerze. Zgrywanie
+      płyt CD Audio (bo w tym formacie występują płyty kompaktowe z muzyką)
+      nazywane jest <strong>ripowaniem</strong>. Temat ripowania płyt
+      poruszałem 4 lata temu przy okazji dziennika OpenBSD i wówczas robione
+      było to na tym systemie. Teraz zrobimy to na dystrybucji Linuksa, ja
+      wykorzystam do tego GNU/Linux Debian, natomast Ty możesz wykorzystać
+      do tego dystrybucje, której teraz  używasz. Do ripowania płyt wykorzystam
+      polecenie <strong>cdda2wav</strong>, które znajduje się w pakiecie
+      <strong>icedax</strong>, chciaż tutaj występuje prostsza opcja z
+      wykorzystaniem pakietu <em>cdparanoia</em>, którego poza zgrywaniem
+      jedną z funkcji jest minimalizacja zniekształceń związanych z
+      uszkodzeniami fizcznego nośnika. Polecenie <em>cdda2wav</em> również
+      wykonuje te czynności, korzystając nawet z biblioteki <em>cdparanoia</em>
+    </p>
+    <p>
+      W najprostszy sposób płytę możemy zgrać wykorzystując pakiet
+      <strong>cdparanoia</strong>. Na Debianie jest on do zainstalowania
+      z oficjalnego głównego repozytorium. Po zainstalowaniu pakietu, na
+      początku wydajemy polecenia sprawdzającego nasz napęd CD.
+    </p>
+<pre class="code-block">
+user@debian:~$ cdparanoia -A
+cdparanoia III release 10.2 (September 11, 2008)
+
+Using cdda library version: 10.2
+Using paranoia library version: 10.2
+Checking /dev/cdrom for cdrom...
+	Testing /dev/cdrom for SCSI/MMC interface
+		SG_IO device: /dev/sr0
+
+CDROM model sensed sensed: TSSTcorp CDDVDW SH-224DB SB01 
+ 
+
+Checking for SCSI emulation...
+	Drive is ATAPI (using SG_IO host adaptor emulation)
+
+Checking for MMC style command set...
+	Drive is MMC style
+	DMA scatter/gather table entries: 1
+	table entry size: 131072 bytes
+	maximum theoretical transfer: 55 sectors
+	Setting default read size to 27 sectors (63504 bytes).
+
+Verifying CDDA command set...
+	Expected command set reads OK.
+
+Attempting to set cdrom to full speed... 
+	drive returned OK.
+
+=================== Checking drive cache/timing behavior ===================
+
+Seek/read timing:
+	[44:03.69]:   26ms seek, 0.41ms/sec read [32.7x]                 
+	[40:00.00]:   27ms seek, 0.41ms/sec read [32.7x]                 
+	[30:00.00]:   31ms seek, 0.44ms/sec read [30.0x]                 
+	[20:00.00]:   29ms seek, 0.52ms/sec read [25.7x]                 
+	[10:00.00]:   33ms seek, 0.63ms/sec read [21.2x]                 
+	[00:00.00]:   47ms seek, 0.81ms/sec read [16.4x]                 
+
+Analyzing cache behavior...
+	Drive does not cache nonlinear access                            
+
+Drive tests OK with Paranoia.
+</pre>
+    <p>
+      Teraz chcąc rozpocząć zgrywanie ścieżek audio z płyty wydajemy
+      następujące polecenie:
+    </p>
+<pre class="code-block">
+user@debian:~$ cdparanoia -XB
+cdparanoia III release 10.2 (September 11, 2008)
+
+ 
+Ripping from sector       0 (track  1 [0:00.00])
+	  to sector  199309 (track  8 [5:54.11])
+
+outputting to track01.cdda.wav
+
+ (== PROGRESS == [                              | 030137 00 ] == :^D * ==)   
+
+outputting to track02.cdda.wav
+
+ (== PROGRESS == [                              | 065541 00 ] == :^D * ==)   
+
+outputting to track03.cdda.wav
+
+ (== PROGRESS == [                              | 072106 00 ] == :^D * ==)   
+
+outputting to track04.cdda.wav
+
+ (== PROGRESS == [                              | 096500 00 ] == :^D * ==)   
+
+outputting to track05.cdda.wav
+
+ (== PROGRESS == [                              | 131993 00 ] == :^D * ==)   
+
+outputting to track06.cdda.wav
+
+ (== PROGRESS == [                              | 154448 00 ] == :^D * ==)   
+
+outputting to track07.cdda.wav
+
+ (== PROGRESS == [                              | 172747 00 ] == :^D * ==)   
+
+outputting to track08.cdda.wav
+
+ (== PROGRESS == [                              | 199309 00 ] == :^D * ==)   
+
+Done.
+</pre>
+    <p>
+      Podczas zgrywania każdej ze ścieżek wyświeltany jest pasek postępu, na
+      tym pasku zaznaczane również będą ewentualne błedy nośnika. Tak
+      zgrane ściezki przezentują się następujący sposób.
+    </p>
+<pre class="code-block">
+user@debian:~$ ls
+cdparanoia.log    track02.cdda.wav  track04.cdda.wav  track06.cdda.wav  track08.cdda.wav
+track01.cdda.wav  track03.cdda.wav  track05.cdda.wav  track07.cdda.wav
+</pre>
+    <p>
+      Teraz pozostało nazwać jakoś te pliki i robota zrobiona. To wszystko.
+      W tym momencie wiemy w jaki sposób możemy zgrywać płyty z muzyką.
+    </p>
+    <p>
+      Tutaj faktycznie mógłbym skończyć ten artykuł, ale np. załóżmy że mamy
+      38 płyt. Pół biedy jeśli chcemy je tylko zripować do podpisanego
+      katalogu, ale co jeśli każdy utwór miałby być podpisany w określony
+      sposób. Dajmy na to numerem ścieżki, wykonawcą i tytułem utworu. To
+      przy wyżej opisanym poziomie musimy wyszukać w internecie dany album
+      i zmieniać po kolei nazwy plików, co więcej bieda kiedy nasz
+      album to reedycja oryginalnego albumu a na przestrzeni lat było ich
+      kilka. Tak zdarzają się i takie płyty.
+    </p>
+    <p>
+      W internecie w czas początku sieci WWW powstała baza danych dla róznych
+      programów służących do zgrywania płyt CD Audio, która zawiera informacje
+      o wykonawcy, albumie oraz utworach. Jeśli jakiegoś albumu nie ma w takiej
+      bazie to może zostać przez posiadacza płyty dodany, bowiem wartością
+      porządkującą w takiej bazie indeks obliczany na podstawie algorytmu,
+      wykorzystującego miedzy innymi długość ścieżek na płycie. Na przestrzeni
+      laty bazy przechodziły wiele perturbacji, co spowodwało że bezproblemowo
+      możemy skorzystać z dwóch źródeł danych - bazy <strong>gnudb.org</strong>
+      oraz bazy <strong>musicbrainz</strong>.
+      Oprogramowaniem odpytującym bazę może być wspomniane
+      wcześniej polecenie <strong>cdda2wav</strong>. Polecenie nawet podczas
+      ripowania odpytuje bazy danych pozostawiając po sobie dwa dodatkowe
+      pliki. Jeden zawiera informacje uzyskane z bazy <em>gnudb.org</em> na
+      podstawie wartości <strong>DISCID</strong> (<em>audio.cddb</em>). Drugi 
+      natomiast jest plikiem
+      w formacie XML, zawierający dane z bazy <em>musicbrainz</em> na
+      podstawie wartości <strong>CDINDEX</strong> (<em>audio.cdindex</em>).
+      Zgrywanie płyty wraz z
+      odpytaniem bazy możemy przeprowadzić za pomocą następującego polecenia:
+    </p>
+<pre class="code-block">
+$ cdda2wav -vall cddb=1 speed=4 -paranoia paraopts=no-verify -B -D /dev/sr0
+</pre>
+    <p>
+      Działanie tego polecenia jest podobne, jednak poza plikami dźwiekowymi
+      mamy równie dwa wspomnianie wcześniej pliki.
+    </p>
+<pre class="code-block">
+user@debian:~$ ls
+audio_01.inf  audio_02.wav  audio_04.inf  audio_05.wav  audio_07.inf  audio_08.wav
+audio_01.wav  audio_03.inf  audio_04.wav  audio_06.inf  audio_07.wav  audio.cddb
+audio_02.inf  audio_03.wav  audio_05.inf  audio_06.wav  audio_08.inf  audio.cdindex
+</pre>
+    <p>
+      W tych plikach mamy wszystkie informacje pozostaje je tylko z nich
+      wyciągnąć.
+    </p>
+    <p>
+      Ze względu to na, że raczej będę uzupełniać swoją kolekcję o kolejne
+      tytuły, to żeby nie musieć ręcznie opisywać po kolei wszystkich utworów
+      napisałem skrypt, który zrobi to za mnie. Skrypt ten jest również
+      jednym z narzędzi dostępnych w dystrybucji <em>immudex</em>.
+    </p>
+<pre class="code-block">
+#!/bin/bash
+
+function XMLScrap() {
+  echo -n $(grep -o "&lt;${1}&gt;.*&lt;/${1}&gt;" $2 \
+  | sed "s,&lt;${1}&gt;,," \
+  | sed "s,&lt;/${1}&gt;,," \
+  | sed 's,&amp;,and,g');
+}
+
+function help() {
+  echo "immudex-cdrip - bash script for collection audio tracks from Audio CD.";
+  echo "morketsmerke.org @ 2025";
+  echo;
+  echo "Usage:";
+  echo "  $ immudex-cdrip --rip-n-rename";
+  echo;
+  echo "Options:";
+  echo "  --rip-only - Rips audio tracks from Audio CD, without quering CDIndex";
+  echo "  (MusicBrainz) database.";
+  echo;
+  echo "  --get-disc-info - Getting info from CDIndex (MusicBrainz) database";
+  echo "  about Audio CD without ripping.";
+  echo;
+  echo "  --rip-n-rename - Rips audio tracks from Audio CD, create Artist/Album folders";
+  echo "  and rename tracks according to data get CDIndex (MusicBrainz)";
+  echo "  database (normal usage).";
+  echo;
+  echo "Script using CDDA2WAV tool from icedax package and libparanoia library (GNU/Linux Debian).";
+}
+
+function multipleArtistDisc() {
+
+  FILE="$1";
+  ARTIST="VA";
+  ALBUM=$(XMLScrap "Title" $FILE);
+  NUMTRACKS=$(XMLScrap "NumTracks" $FILE);
+  TRACKPATH="${ARTIST} - ${ALBUM}";
+
+  mkdir -vp "${TRACKPATH}";
+
+  i=1;
+  while [ $i -le $NUMTRACKS ]; do
+    artist=$(grep -o "&lt;Artist&gt;.*&lt;/Artist&gt;" $FILE \
+    | sed -n "${i}p" \
+    | sed 's,&lt;Artist&gt;,,' \
+    | sed 's,&lt;/Artist&gt;,,');
+ 
+    trackName=$(grep -o "&lt;Name&gt;.*&lt;/Name&gt;" $FILE \
+    | sed -n "${i}p" \
+    | sed 's,&lt;Name&gt;,,' \
+    | sed 's,&lt;/Name&gt;,,');
+  
+    if [ $i -lt 10 ]; then
+      trackNumber="0${i}";
+    else
+      trackNumber=${i};
+    fi
+
+    audioFilename="audio_${trackNumber}.wav";
+    infFilename=$(echo $audioFilename | sed 's/wav/inf/');
+     
+    mv -v $audioFilename "${TRACKPATH}/${trackNumber}. ${artist} - ${trackName}.wav";
+    rm -v ${infFilename};
+    i=$(expr $i + 1);
+  done
+
+  rm -v audio.cddb;
+  rm -v ${FILE};  
+}
+
+if [ ! -x /usr/bin/cdda2wav ]; then
+  sudo apt-get install icedax cdparanoia -y;
+fi
+
+if [ "$1" ] &amp;&amp; [ "$1" = "--rip-only" ]; then
+  cdda2wav -vall cddb=-1 speed=4 -paranoia paraopts=no-verify -B -D /dev/sr0;
+  exit 0;
+fi
+
+if [ "$1" ] &amp;&amp; [ "$1" = "--get-disc-info" ]; then
+  cdda2wav -J -D /dev/sr0;
+  exit 0;
+fi
+
+if [ "$1" ] &amp;&amp; [ "$1" = "--rip-n-rename" ]; then
+  cdda2wav -vall cddb=1 speed=4 -paranoia paraopts=no-verify -B -D /dev/sr0;
+
+  FILE="audio.cdindex";
+
+  if $(grep -q '&lt;MultipleArtistCD&gt;' $FILE); then
+    multipleArtistDisc $FILE;
+  else  
+    ARTIST=$(XMLScrap "Artist" $FILE);
+    ALBUM=$(XMLScrap "Title" $FILE);
+    NUMTRACKS=$(XMLScrap "NumTracks" $FILE);
+    TRACKPATH="${ARTIST}/${ALBUM}";
+
+    mkdir -vp "${TRACKPATH}";
+
+    i=1;
+    while [ $i -le $NUMTRACKS ]; do
+      trackName=$(grep -o "&lt;Name&gt;.*&lt;/Name&gt;" $FILE \
+      | sed -n "${i}p" \
+      | sed 's,&lt;Name&gt;,,' \
+      | sed 's,&lt;/Name&gt;,,');
+
+      if [ $i -lt 10 ]; then
+        audioFilename="audio_0${i}.wav";
+        trackNumber="0${i}";
+      else
+        audioFilename="audio_${i}.wav";
+        trackNumber="${i}";
+      fi
+      infFilename=$(echo "$audioFilename" | sed 's/wav/inf/');
+      mv -v $audioFilename "${TRACKPATH}/${trackNumber}. ${ARTIST} - ${trackName}.wav";
+      rm -v $infFilename;
+      i=$(expr $i + 1);
+    done
+ 
+    rm -v audio.cddb;
+    rm -v audio.cdindex;
+  fi
+  exit 0;
+fi
+
+help;
+</pre>
+    <p>
+      Źródła:
+    </p>
+    <ol>
+      <li><a href="https://linuxconfig.org/how-to-rip-an-audio-cd-from-the-command-line-using-cdparanoia">How to rip an audio CD from the command line using cdparanoia</a></li>
+      <li><a href="https://wiki.archlinux.org/title/Rip_Audio_CDs">Rip Audio CDs</a></li>
+    </ol>
+		<p>
+			~xf0r3m
+		</p>
+	</div>
+	<p class="footer">
+		2025; COPYLEFT; ALL RIGHTS REVERSED;
+	</p>
+</body>
+</html>
