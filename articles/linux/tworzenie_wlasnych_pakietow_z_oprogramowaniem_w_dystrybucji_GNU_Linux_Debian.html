@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+	<p class="header_link">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div class="main">
+		<h1 class="title">Towrzenie własnych pakietów z oprogramowaniem w dystrybucji GNU/Linux Debian</h1>
+    <p>
+      Pracując na Linuksie, niezależnie od dystrybucji prędzej czy później 
+      zaczniemy tworzyć narzędzia sprowadzające wiele czynności wykonywanych
+      w systemie. Mogą to być zarówno skrypty języków interpretowanych lub
+      kompilowane programy. Chcąc korzystać z naszych narzędzi na innych
+      urządzeniach niż nasz komputer powinniśmy zapewnić im jakiś system
+      dystrybucji. Przychodzącym na myśl rozwiązaniem wydaje się system
+      kontroli wersji Git, jednak ten system został opracowanym z myślą o
+      zarządzniu kodem źródłowym i utrzymaniu w nim porządku. Sposobem jaki
+      możemy wykorzystać na rozpowszechnienie naszego oprogramowania lub
+      ułatwnienie dostępu do niego jest ten wbudowany w nasz system
+      (dystrybucję). Repozytoria Git często zawierą kod
+      źródłowy, który musi zostać skompilowany a do tego mogą być wymagane
+      dodatkowe biblioteki. Skrypty również mogą wymagać dostępności
+      oprogramowania, które będzie wymagać dodatkowej instalacji. Pakiety
+      oprogramowania posiadają zależności, które powodują wymóg na programie
+      zarządzającym pakietami zainstalowanie wymaganych bibliotek/programów
+      przed instalacją. Pakiety oprogramowania zapewniają środowisko do
+      uruchomienia aplikacji, dla której zostały zbudowane.
+    </p>
+    <p>
+      W tym materiale poruszymy proces przygotowania pakietów dla skryptów
+      języków interpretowanych, a nie programóm kompilowanych. Przygotowanie
+      pakietów dla tego rodzaju oprogramowanie jest bardziej złożonym
+      zagadnieniem, do którego odsyłam do źródeł. Uruchomienie programu
+      odpowiedzialnego za złożenie pakietu w przypadku programów kompilowanych
+      rozpoczyna proces kompilacji, dlatego też potocznie używa się zwrotu
+      "budowanie pakietów" na określenie przygotowywania pakietów. Tutaj
+      również takie wyrażenie może się pojawić. 
+    </p>
+    <p>
+      Na początek potrzebujemy pakietu, który nazywa się <strong>lintian</strong>
+      - on będzie weryfikować poprawność utworzonego pakietu. Utworzenie pakietu
+      dystrybucji Debiana sprowadza się do operacji na plikach, katalogach
+      oraz uruchomieniu jednego ewentualnie dwóch programów. Dlatego też
+      na początku instalujemy pakiet <em>lintian</em>.
+    </p>
+<pre class="code-block">
+xf0r3m@debian:~$ sudo apt install -y lintian
+</pre>
+    <p>
+      Po zainstalowaniu tego programu to tak naprawdę mamy gotowe środowisko
+      do tworzenia pakietów. Być może będziemy potrzebować dodatkowego
+      pakietu ale o tym poźniej. Proces budowania pakietu najlepiej 
+      rozpocząć od utworzenia odpowiedniej struktury katalogowej.
+    </p>
+    <p>
+      Na początku tworzymy katalog z nazwą skryptu/pakietu. Wewnątrz niego
+      tworzymy katalogi dla skryptu, informacji o zmianach oraz prawach
+      autorskich i stronie podręcznika.
+    </p>
+<pre class="code-block">
+xf0r3m@debian:~/helloworld$ mkdir -p "usr/{bin,share/{doc/helloworld,man/man1}}"
+</pre>
+    <p>
+      Pakiety Debiania na instalują programów w katalogu <em>/usr/local/bin</em>.
+      Struktura katalogowa <em>/usr/local</em> służy wyłącznie użytkownikowi i
+      jest przeznaczona dla lokalnie przez niego instalowanych programów. 
+      Inaczej jest w przypadku katalogu <em>/usr/bin</em>. Nasze narzędzia będą
+      zazwyczaj poleceniami użytkownika stąd też odpowiedni rozdział 
+      podręcznika <code class="code-inline">man1</code>.
+    </p>
+    <p>
+      Następnym katalogiem do utworzenia jest katalog o nazwie
+      <strong>DEBIAN</strong>. Przechowywał on będzie wszelkie informacje o
+      pakiecie i nie wchodzi on w skład środowiska aplikacji przygotowywanego
+      podkatalogach katalogu <em>/usr</em>. Pełni on jedynie funkcje
+      konfiguracyno-informacyjną.
+    </p>
+<pre class="code-block">
+xf0r3m@debian:~/helloworld$ mkdir DEBIAN
+</pre>
+    <p>
+      Pliki oraz katalogi w pakietach muszą mieć odpowiednie uprawnienia.
+      Katalogi 755, pliki wykonywalne 775, pliki regularne 644. Oczywiście
+      zmiany uprawnień możemy dokonać przez samym budowaniem, jednak będzie
+      to uciążliwe, ponieważ dla każdego z elementów będziemy musieli wydać
+      jedno polecenie dla każdego z elementów. Jeśli zrobimy to teraz,
+      wówczas wydamy jedno polecenie dla całej struktury. 
+    </p>
+<pre class="code-block">
+xf0r3m@debian:~/helloworld$ chmod -R 755 .
+<pre>
+    <p>
+      Po utworzeniu struktury, może skopiować nasz skrypt do katalogu
+      <em>usr/bin</em> pomijając jego rozszerzenie, jeśli takowe posiada. Pliki
+      w <em>usr/bin</em> nie posiadają rozszerzeń. Pliki wykonywalne powinny
+      mieć również ustawione uprawnienia na 755, więc należy na to zwrócić
+      uwagę.
+    </p>
+<pre class="code-block">
+xf0r3m@debian:~/helloworld$ cp ~/helloworld.sh usr/bin/helloworld
+xf0r3m@debian:~/helloworld/usr/bin$ chmod 755 helloworld
+</pre>
+    <p>
+      Następnie możemy przjeść do plików dokumentacji naszego skryptu. Debian
+      wymaga, aby każdy pakiet posiadał opis zmian oraz informacje na temat
+      praw autorskich zawartych w nim plików. Tego rodzaju informacje są
+      przechowywane w katalogu <em>usr/share/doc/helloworld</em>. Na początek
+      przyjrzymy się opisowi zmian. Plik nosi nazwę <em>changelog</em> i
+      po zakończeniu jego edycji musi on zostać skompresowany. Na początek
+      jednak znajmiemy się jego treścią ponieważ układ jest dość specyficzny,
+      a co gorsza pakiet <em>lintian</em> sprawdza poprawność zapisu pliku
+      zmian. Poniżej znajduje się przykładowa zawartość pliku zmian.
+    </p>
+<pre class="code-block">
+helloworld (0.0.1) stable; urgency=low
+
+ 	[ xf0r3m ]
+ 	* Create a dummy script for print 'Hello, World!'
+ 	  Requesting for better changelogs.
+
+ -- xf0r3m &lt;xf0r3m@gmail.com&gt;  Wed, 31 Dec 2025 15:53:00 +0100
+
+</pre>
+    <p>
+      Każdy wpis w opisie zmian składa się z nagłówka, informacji o dokonanych
+      zmianach oraz ze stopki. W nagłówku znajdują się kolejno nazwa pakietu,
+      w nawiasach jego wersja, nastęnie dystrybucja dla której przygotowano
+      ten pakiet - oznaczenie dystrybucji musi kończyć się średnikiem
+      (<strong>;</strong>) oraz metadane. Metadane są listą informacji
+      przekazywanych w formacie <em>klucz=wartość</em>. W tym przypadku mamy
+      informacje związne ze stopniem wymuszania zmian w repozytorium, co jest
+      związane z wagą zmian dokonanych w projekcie. Jeśli zmiany nie są
+      ważne, pakiet może zostać zaktualizowany w następnej kolejności.
+      Pod nagłówkiem znajduje się sam informacja o dokonanych zmianach. Może 
+      ona zawierać nagłówek,
+      choć nie jest on obowiązkowy. Kazdy temat w informacji powinien zaczynać
+      się od gwiazdki (<strong>*</strong>) odzielonej od treści spacją. Dalszy
+      opis pownien ropoczynać się od tej samej pozycji co temat. Informacja
+      oddzielona jest od krawędzi okna jednym znakiem tabulacji. Wpis do opisu
+      zmian kończy stopka, która oddzielona jest od krawędzi okna jedną
+      spacją rozpoczyna się on podwójnego myślnika (<strong>--</strong>)
+      następnie występuje nazwa opiekuna pakietu oraz jego adres email. Po tych
+      informacjach znajduje się data (hipotetycza) zmian. Data jest oddzielona
+      od adresu e-email opiekuna dwoma znakami spacji.
+    </p>
+    <p>
+      Ten plik ma dość specyficzną formę i chwilę nam zajmie opanowanie tego.
+      Zamiast czekać na zrzut błędów <em>linitiana</em>, nasz opis zmian możemy
+      sprawdzić za pomocą polecenia <strong>dpkg-parsechangelog</strong>. Plus
+      jest w tym taki, że jeśli opanujemy jeden plik to będziemy mogli go
+      edytować na potrzeby innych pakietów a nie tworzyć od zera. Dodatkowo
+      istnieje polecenie, które jest nam w stanie wygenererować taki opis
+      zmian. Po więcej informacji zapraszam do materiałów źródłowych. Na
+      koniec plik należy skompresować i nadać mu odpowiednie uprawnienia.
+    </p>
+<pre class="code-block">
+xf0r3m@debian:~/helloworld/usr/share/doc/helloworld$ gzip --best -n changelog
+xf0r3m@debian:~/helloworld/usr/share/doc/helloworld$ chmod 644 changelog.gz
+</pre>
+    <p>
+      Drugim plikiem jest informacja o prawach autorskich, na podstawie których
+      rozpowszechaniane są pliki w pakiecie. Tutaj możemy użyć poniższego
+      gotowca. Wystarczy tylko zmienić nazwę pakietu, datę i informacje o
+      opiekunie.
+    </p>
+<pre class="code-block">
+helloworld
+
+Copyright: 2025 xf0r3m &lt;xf0r3m@gmail.com&gt;
+
+2025-12-31
+
+The entire code base may be distributed under the terms of the GNU General
+Public License (GPL), which appears immediately below.  Alternatively, all
+of the source code as any code derived from that code may instead be
+distributed under the GNU Lesser General Public License (LGPL), at the
+choice of the distributor. The complete text of the LGPL appears at the
+bottom of this file.
+
+See /usr/share/common-licenses/(GPL|LGPL)
+</pre>
+    <p>
+      Po utworzniu plików dokumentacji, możemy utworzyć plik z podręcznikiem
+      użytkownika. Generalnie to każdy plik wykonywalny w Debianie powinien
+      mieć taki utworzony i tutaj szkoły są dwie. Na początek możemy utworzyć
+      stronę podręcznika ręcznie. Powinna ona wyglądać jak poniżej
+      (w notatniku)
+    </p>
+<pre class="code-block">
+ .\"					Hey, EMACS: -*- nroff -*-
+.\" Copyleft 2025 xf0r3m &lt;xf0r3m@gmail.com&gt;
+.\"
+.TH HELLOWORLD 1
+.SH NAME
+helloworld \- Dummy script for printing 'Hello, World!'
+.SH SYNOPSIS
+.B helloworld
+.SH DESCRIPTION
+The
+.B helloworld
+prints 'Hello, World!' string on stdout.
+.SH SEE ALSO
+.BR echo (1).
+.SH AUTORS
+The
+.B helloworld
+script was written by xf0r3m &lt;xf0r3m@gmail.com&gt;
+.PP
+This document was written by xf0r3m &lt;xf0r3m@gmail.com&gt; for Debian.
+</pre>
+    <p>
+      Jest to jak najbardziej poprawna strona podręcznika użytkownika zgodna
+      z wymogami Debiana. Poniżej znajdują są opisy poszczególnych instrukcji.
+      Pierwsze trzy linie zawierają komentarz. W pierwszej linii znajduje się 
+      instrukcja dla edytora Emacs, następnie znajduje się informacja o autorze.
+      Następnie występują już instrukcje odpowiedzialne za stronę podręcznika
+      mamy zatem:
+    </p>
+    <ul>
+      <li><code class="code-inline">.TH</code> - odpowiedzialne za nagłówki
+      tytułowe, wyświetla podany tekst w trzech rogach strony, na kolejny 
+      argument wyświetlany jest w nawiasie.</li>
+      <li><code class="code-inline">.SH</code>- odpowiedzialne za nagłówki 
+      sekcji, wyświetla pogrubiony tekst. Dzieli dzieli strone na typowe 
+      dlatego formatu sekcje. Wszystko co znajduje się między 
+      <code class="code-inline">.SH</code>traktowane jest jak tekst tej 
+      sekcji.</li>
+      <li>"<code class="code-inline">.B</code> - wyświetla pogrubiony tekst,
+      podany jako argumenty.</li>
+      <li><code class="code-inline">.BR</code> - wyświetla pogrubiony tekst, 
+      alfanumeryczny do piewszego odstępu i usuwa odstęp. Jeśli za odstęp znów
+      znajdują się znaki alfanumeryczne to również zostaną pogrubione.</li>
+      <li><code class="code-inline">.PP</code> - wprowadza wszystko poniżej od
+      nowego akapitu. Zmiana tematu, ale nie zmiana sekcji.<li>
+    </ul>
+    <p>
+      Drugim podejściem do tworzenia stron podręcznika jest automatyzacja za
+      pomocą narzędzia help2man. To narzędzie jest w stanie utworzyć stronę
+      podręcznik bazując na infrormacjach wyświetlonych przez program
+      uruchomiony z opcja <strong>--help</strong>. Program ten wymaga, aby
+      były dostępne funkcję <em>--help</em> oraz <strong>--version</strong>.
+      Wyświelające dane sformatowane w taki sam sposób jak na podręczniku
+      dotyczącym tego narzędzia - link w źródłach. Ten sposób nie jest
+      pozbawiony wad, otóż w nazwie jako krótki opis tekst:
+      <code class="code-inline">program - manual page for program</code>,
+      oczywiście zamiast nazwy progran w stawiana jest nazwa naszego
+      skryptu oraz na końcu jego wersja. Ten zapis generuje ostrzeżenie
+      <em>lintiana</em> o <em>useless-whatis-entry</em>. Aby polecenie
+      <em>help2man</em> użyło naszego krótkiego opisu musimy użyć opcji
+      <code class="code-inline">-n</code>.
+    </p>
+Zabawę zaczynamy od utworzenia katalogu o nazwie naszego programu. W nim 
+tworzymy dwa podkatalog 'usr/bin'. 
+
+Pakiety Debiana nie instalują niczego w
+/usr/local/bin - więc ta lokalizacja odpada. Nie możemy również korzystać ze
+starego katalogu /bin (tak jak ma to miejsce w jednym ze źródeł).
+
+Plik wykonywalny nie może zawierać żadnego rozszerzenia. Po główym/nych plikach
+programu, przechodzimy do plików pomocniczych, które pakiet musi (powinien)
+zawierać (narzędzie lintian, brak pewnych plików traktuje jako ostrzeżenia (W),
+a nie błędy (E)). Głownym plikiem pomocniczym jest plik 'control', który musi
+znajdować się w katalogu 'DEBIAN' w katalogu głównym naszego pakietu.
+('DEBIAN/control') - ten plik zawiera wszytkie informacje wymagane przez APT do
+zarządzania tym pakietem. Poniżej znajduje się plik jednego z przykładowych
+pakietów - utworzonych teraz.
+
+Package: helloworld
+Version: 0.0.1
+Section: utils
+Priority: optional
+Architecture: all
+Maintainer: xf0r3m <xf0r3m@gmail.com>
+Description: This is test script 
+ for .deb package building
+
+Złamana linia opisu (Description), nie jest błędem ani fanaberią. Wymagane jest,
+aby opis zawierał co najmniej dwie linie. Jednoliniowy opis jest zwracany 
+przez 'lintian' jako błąd. Ten plik może zawierać jeszcze więcej pól, jednym z
+takich pól jest pole zależności (Depends:) - wskazania wymaganych pakietów 
+dodatkowych
+oraz ich minimalnych wersji. W przypadku skrytu wypisującego 'Hello, World!',
+jakie mogą być zależności - można by napisać, że bash - w końcu to skrypt tej
+powłoki.
+
+Do gotowego pakietu potrzeujemy jeszcze dwóch plików: pliku zmian ('changelogu')
+oraz pliku licencji.
+
+Plik zmian musi znajdować się w katalogu 'usr/share/doc/pkg' - gdzie 'pkg' to
+nazwa naszego pakietu - musi on mieć odpowiednią nazwę - 'changelog' i zostać
+skompresowany przy użyciu programu gzip, co zmieni jego nazwę na 'changelog.gz'
+Ta nazwa jest wymagana.
+
+Każda zmiana w projekcie powinna być opisywana za pomocą wpisów do pliku o
+poniższym formacie:
+
+helloworld (0.0.1) stable; urgency=low
+
+ 	[ xf0r3m ]
+ 	* Create a dummy script for print 'Hello, World!'
+ 	  Requesting for better changelogs.
+
+ -- xf0r3m <xf0r3m@gmail.com>  Wed, 31 Dec 2025 15:53:00 +0100
+
+W pierwszej linii znajduje się nazwa projektu, w nawiasie wersja, której
+dotyczą zmiany, dystrybucja dla której przygotowano pakiet oraz metadane.
+W tym przypadku 'urgency' donosi się do stopnia wymuszania zmian w repozytorium,
+ponieką jest związane z wagą doknanych w projekcie zmian. Jeśli nie są one
+pilne, pakiet może zostać zamieniony w dalszej kolejności.
+
+W nawiasach kwadratowych znajduje się nagłówek opisu zmian a podnim opis zmian.
+Nagłówek jak i opis zmian muszą być odsunięte od lewej krawędzi jednym znakiem
+tabulacji.
+
+Na końcu wpisu znajduje się stopka. Zawiera ona informacje o opiekunie pakietu
+oraz datę wprowadzonych zmian. Stopka musi być odsunięta od lewej krawędzi
+za pomocą 1 znaku spacji (odstępu) i rozpoczynać się od podwójnego myślnika
+(--). W stopce między adresem e-mail opiekuna a częścią zawierającą datę
+znajdują się dwa znaki odstępu (spacji). 
+
+Tworząc wpisy w pliku zmian, możemy posiłkować się specjalnym narzędzie, które
+sprawdzi plik pod kątem poprawności składni, aby poprawić bo przed złożeniem
+pakietu. Narzędzie uruchamia się poniższym poleceniema i w przypadku błędów
+będzie brakować informacji (o datach, o opiekunie lub o zmianach) oraz zostaną
+na wyświetlone odpowiednie podpowiedzi:
+
+xf0r3m@repo:~$ dpkg-parsechangelog -l changelog.Debian 
+Source: helloworld
+Version: 0.0.1
+Distribution: stable
+Urgency: low
+Maintainer: xf0r3m <xf0r3m@gmail.com>
+Timestamp: 1767192780
+Date: Wed, 31 Dec 2025 15:53:00 +0100
+Changes:
+ helloworld (0.0.1) stable; urgency=low
+ .
+  	[ xf0r3m ]
+  	* Create a dummy script for print 'Hello, World!'
+  	  Requesting for better changelogs.
+
+Drugim plikiem jest plik licencji. 
+Plik ten musi znajdować się w tym samym katalogu co pliki zmian i musi mieć
+nazwę 'copyright'. W jego przypadku możemy skorzystać z gotowca
+dla licencji GPL, wystarczy podstawić swoje dane w miejscu moich i
+zaktualizować datę.
+
+helloworld
+
+Copyright: 2025 xf0r3m <xf0r3m@gmail.com>
+
+2025-12-31
+
+The entire code base may be distributed under the terms of the GNU General
+Public License (GPL), which appears immediately below.  Alternatively, all
+of the source code as any code derived from that code may instead be
+distributed under the GNU Lesser General Public License (LGPL), at the
+choice of the distributor. The complete text of the LGPL appears at the
+bottom of this file.
+
+See /usr/share/common-licenses/(GPL|LGPL)
+
+I tak naprawdę - jeśli się uprzemy to pakiet jest gotowy. Zostanie on zbudowany,
+jednak celem tego materiału jest nauczenie się tworzenia paczek .deb zgodnie
+z wytycznymi dystrybucji Debian. Do tego właśnie służy program 'lintian'. Teraz
+w ramach sprawdzenia utworzymy sobie pakiet Debiana.
+
+$ dpkg-deb --root-owner-group --build pkg
+
+Gdzie pkg to nazwa pakietu/projektu. Tak utworzony pakiet poddamy kontroli
+za pomocą narzędzia 'lintian'.
+
+$ lintian --tag-display-limit 0 pkg.deb
+
+Za pewne nie mamy błędów (linii rozpoczynających się od 'E:'), ale mamy kilka
+ostrzeżeń (linii zaczynających się od 'W:'). Część znich dotyczy uprawnienień.
+W pliki w paczkach Debiana i powinny miec ustawionego bitu zapisu dla grupy
+oraz pozostałych - 0755 - dla katalogów plików wykonywalnych oraz 0644 dla
+plików regularnych. Drugim ostrzeżeniem jest brak pliku podręcznika
+użytkownika.
+
+Pliki podręcznika mają swój specyficzny format. Poniżej znajduje się
+przygotowany plik dla mojego pakietu testowego:
+
+.\"					Hey, EMACS: -*- nroff -*-
+.\" Copyleft 2025 xf0r3m <xf0r3m@gmail.com>
+.\"
+.TH HELLOWORLD 1
+.SH NAME
+helloworld \- Dummy script for printing 'Hello, World!'
+.SH SYNOPSIS
+.B helloworld
+.SH DESCRIPTION
+The
+.B helloworld
+prints 'Hello, World!' string on stdout.
+.SH SEE ALSO
+.BR echo (1).
+.SH AUTORS
+The
+.B helloworld
+script was written by xf0r3m <xf0r3m@gmail.com>
+.PP
+This document was written by xf0r3m <xf0r3m@gmail.com> for Debian.
+
+Pierwsze trzy linie zawierają komentarz. W pierwszej linii znajduje się 
+instrukcja dla edytora Emacs, następnie znajduje się informacja o autorze.
+Następnie występują już instrukcje odpowiedzialne za stronę podręcznika mamy
+zatem 
+* ".TH" - odpowiedzialne za nagłówki tytułowe, wyświetla podany tekst
+  w trzech rogach strony, na kolejny argument wyświetlany jest w nawiasie,
+* ".SH" - odpowiedzialne za nagłówki sekcji, wyświetla pogrubiony tekst. Dzieli
+  dzieli strone na typowe dla tego formatu sekcje. Wszystko co znajduje się
+  między .SH traktowane jest jak tekst tej sekcji.
+* ".B" - wyświetla pogrubiony tekst, podany jako argumenty.
+* ".BR" - wyświetla pogrubiony tekst, alfanumeryczny do piewszego odstępu i
+  usuwa odstęp. Jeśli za odstęp znów znajdują się znaki alfanumeryczne to
+  również zostaną pogrubione.
+* ".PP" - wprowadza wszystko poniżej od nowego akapitu. Zmiana tematu, ale nie
+  zmiana sekcji.
+
+Warto zwrócić uwagę na zastosowanie pogrubienia, aby pogrubiony był tylko jeden
+wyraz, trzeba złamać linię w dwóch miejscach.
+
+Podglądu naszej strony podręcznika możemy dokonać uruchamiając plik przez
+polecenie man.
+
+$ man ./pkg.1
+
+Tak zapisany plik, należy umieścić w odpowiednim rozdziale w naszym pakiecie.
+Strony podręcznika dzielą się na poszczególne foldery, których nazwy kończą się
+numerem rozdziału. Ze względu że mój skrypt to polecenie to stronę podręcznika
+umieszczę w pierwszym rozdziale - usr/share/man/man1 - w strukturze katalogowej
+pakietu.
+
+Po poprawieniu uprawnienień i odpowiednim załadowaniu pliku podręcznika, możemy
+ponownie złożyć pakiet. Teraz przy sprawdzeniu narzędziem 'lintian' nie
+powinno być żadnych problemów - polecenie niezwróci wówczas nic. Na początku
+informacje zwrace przez narzędzie mogą być nie zrozumiałem, jednak do
+dyspozycji mamy odpowiedni serwis internetowe, gdzie możemy dowiedzieć się
+więcej odnośnie informacji zwracanych przez 'lintian'
+(https://lintian.debian.org/index.html).
+
+Źródła:
+
+1. https://www.baeldung.com/linux/create-debian-package
+2. https://morfikov.github.io/post/poradnik-maintainera-czyli-jak-zrobic-pakiet-deb/
+3. https://lintian.debian.org/index.html
+ 
+        <p>
+            ~xf0r3m
+        </p>
+    </div>
+		<p class="footer">
+			2021; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+</body>
+</html>
