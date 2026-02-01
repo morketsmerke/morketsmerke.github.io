@@ -41,7 +41,7 @@
         to struktura katalogów dostępna gdzieś na serwerach w internecie
         przechowywująca pakiety z oprogramowaniem w taki sposób, aby było
         dostępne przy użyciu takich programów jak APT. Zatem obecnie
-        wykorzystujemy pakiety .deb, to wygodnej i niezawodnej instalacji
+        wykorzystujemy pakiety .deb, do wygodnej i niezawodnej instalacji
         naszego opgrogramowanie na różnych maszynach, to teraz dowiemy się w
         jaki sposób skonfigurować repozytorium, aby także w najlepszy sposób
         dostarczać swoje oprogramowanie w postaci pakietów do owych systemów.
@@ -56,7 +56,7 @@
         repozytorium to rzeczona aktualizacja również zostanie zainstalowana.
       </p>
       <p>
-        Do wykonania repozytorium dla naszego własnego oprogramowania
+        Do wykonania repozytorium dla własnego oprogramowania
         instalowanego za pomocą paczek .deb, potrzebujemy trzech składników:
       </p>
       <ol>
@@ -96,7 +96,7 @@ xf0r3m@debian:~$ gpg --gen-key
       </p>
       <p>
         Aby przedłużyć ważność klucza musimy uruchomić program
-        <code class="code-inline">gpg</code> w trybie edycji klucz za pomocą
+        <code class="code-inline">gpg</code> w trybie edycji klucza za pomocą
         poniższego polecenia. Polecenie będzie wymagać podania
         <em>user-id</em> w tym przypadku jest adres poczty elektronicznej
         podany podczas generowania klucza.
@@ -118,7 +118,7 @@ Czy wszystko się zgadza (t/N)? t
 </pre>
       <p>
         W ten sposób przedłużyliśmy klucz prywatny (tajny), a co z kluczem
-        publicznym. W trybie edycji zawsze domyślnie wybierany jest
+        publicznym? W trybie edycji zawsze domyślnie wybierany jest
         pierwszy klucz prywatny. Musimy zmienić klucz i ponownie wydać
         polecenie <code class="code-inline">expire</code>. Dokonamy tego
         poprzez wydanie polecenia <strong>key</strong> i podając jako
@@ -152,7 +152,7 @@ Czy wszystko się zgadza (t/N)? t
         <strong>addkey</strong>. Nowy klucz musi być kluczem RSA z funkcją
         wyłącznie do podpisywania. Debian wymaga, aby listy pakietów były
         podpisane kluczami o niekrótszymi niż 4096 bitów. Dla własnej wygody
-        ustawiamy, aby klucz nie wygasał nigdy.
+        ustawiamy, aby klucz nigdy nie wygasał.      
       </p>
 <pre class="code-block">
 gpg&gt;addkey
@@ -219,7 +219,7 @@ gpg: wysyłanie klucza ABB37426FDFBD4BD na hkp://keyserver.ubuntu.com
         certyfikat na serwerze kluczy. Aby to zrobić uruchamiamy przeglądarkę
         i przechodzimy pod adres
         <a href="https://keyserver.ubuntu.com">https://keyserver.ubuntu.com</a>
-        w polu wyszukiwania podajmy identyfikator klucz prywatnego poprzedzony
+        w polu wyszukiwania podajemy identyfikator klucz prywatnego poprzedzony
         znakami <strong>0x</strong>. Jeśli serwer, odpowiada <em>Not Found</em>,
         oznacza, że jeszcze przetwarza klucz i należy spróbwać za jakie
         10 - 15 min. Po przedtworzeniu powinna nam się pokazać strona jak na
@@ -280,7 +280,7 @@ xf0r3m@debian:~$ mkdir /var/www/html/debian/conf
         Utworzyłem również podkatalog <code class="code-inline">conf</code>,
         który będzie przechowywać pliki konfiguracyjne repozytorium. Mając
         utworzone katalogi możemy przejść do tworzenia plików. Pliki potrzebne
-        są dwa pierwszy znich <strong>options</strong> zawiera opcje
+        są dwa, pierwszy z nich <strong>options</strong> zawiera opcje
         konfiguracyjne dla programu <code class="code-inline">reprepro</code>.
         Drugi - <strong>distributions</strong>, w nim znajdują się definicje
         repozytoriów dla poszczególnych wersji dystrybucji Debiana. Dla każdej
@@ -298,7 +298,7 @@ verbose
         nakazuje programowi, aby uruchmiał GPG wraz opcją pytania o hasło
         do klucza podczas podpisywania list pakietów. Trzecia natomiast
         nakazuje wyswietlanie komunikatów diagnostycznych - mimo tej opcji nie
-        ich zbyt wiele.
+        ma ich zbyt wiele.
       </p>
       <p>
         Drugi plik <em>distributions</em> będzie opiewać w nieco więcej 
@@ -319,13 +319,13 @@ SignWith: BAEF7E64274DBF27
 </pre>
         <p>
           Ten plik na pierwszy rzut oka może okazać się dość skomplikowany, dla
-          osób nie zaznajomionych z tematem. Panuje tutaj jednak dość duża
-          swoboda przy wypełnianiu tych pól. Ważne jest aby dobrzez ustawić
+          osób niezaznajomionych z tematem. Panuje tutaj jednak dość duża
+          swoboda przy wypełnianiu tych pól. Ważne jest aby dobrze ustawić
           architektury dla których to repozytorium będzie przechowywać
           pakiety oraz komponenty, określające prawa autorskie oprogramowania
           przechowywanego w danym repozytorium. Komponent
           <code class="code-inline">main</code>, przechowuje wyłącznie
-          oprogramowania otwartoźródłowe. Oznaczenia są takie sam jak byśmy
+          oprogramowanie otwartoźródłowe. Oznaczenia są takie same jak byśmy
           konfigurowali repozytoria w naszych systemach klienckich. Więc tak:
           w polu <code class="code-inline">Origin:</code> podałem nazwę hosta,
           którą będzie udostępniać repozytorium,
@@ -341,7 +341,7 @@ SignWith: BAEF7E64274DBF27
           W polu <code class="code-inline">Description</code> znajduje się
           opis repozytorium. W ostatnim polu
           <code class="code-inline">SignWith</code> znajduje się identyfikator
-          klucz, którego program użyć do podpisu listy pakietów.
+          klucz, którego program ma użyć do podpisu listy pakietów.
         </p>
         <p>
           Teraz to repozytorium jest gotowe na przyjęcie pakietów od ich
@@ -355,7 +355,7 @@ Exporting indices...
 </pre>
         <p>
           Po wydaniu powyższego polecenia, zostaniemy poproszeni o hasło
-          klucza prywatnego i pojego poprawny wpisaniu pakiet zostanie dodany
+          klucza prywatnego i po wpisaniu, pakiet zostanie dodany
           do repozytorium. Aby sprawdzić zawartość repozytorium wykorzystujemy
           poniższe polecenie.
         </p>
@@ -368,8 +368,8 @@ trixie|main|armhf: helloworld 0.0.1
 </pre>
         <p>
           Ze względu na to, że repozytorium skonfigurowane jest dla czterech
-          różnych architektur, pakiet na liście pokazny jest dla każdej z nich.
-          Teraz nasz testowy pakiet jest gotowy do pobranie i instalacji, tylko
+          różnych architektur, pakiet na liście pokazany jest dla każdej z nich.
+          Teraz nasz testowy pakiet jest gotowy do pobrania i instalacji, tylko
           na początek trzeba go jeszcze w dobry sposób udostępnić.
         </p>
         <p>
@@ -474,7 +474,7 @@ Hello, World!
           W ten oto sposób, jaki został pokazany w powyższym artykule
           zapeniliśmy naszym pakietom najlepszy możliwy sposób zarządzania nimi
           przez właśnie repozytorium APT. Teraz za pomocą tego jednego
-          narzędzia będzie my mogli instalować nowe pakiet, usuwać wadli, oraz
+          narzędzia będzie my mogli instalować nowe pakiet, usuwać wadliwe, oraz
           je aktualizować. Wiele repozytoriów obecnie wykorzystuje zarówno
           protokół HTTP jak HTTPS do przysłania pakietów, jeśli chcielibyśmy
           w swoim systemie skorzystać repozytorium przez protokoł HTTPS to
