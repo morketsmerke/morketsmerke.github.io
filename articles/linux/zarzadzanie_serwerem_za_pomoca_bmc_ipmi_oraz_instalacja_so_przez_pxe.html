@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+	<p class="header_link">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div class="main">
+		<h1 class="title">Zarządzenie serwerem za pomocą BMC/IPMI oraz instalacja systemu operacyjnego przez PXE.</h1>
+        <p>
+          Pojęcie serwera w informatyce może odnosić się do programu
+          komputerowego świadczącego usługi użytkownikom sieci wykorzystując
+          przy tym zasoby komputera udostępnione przez system operacyjny, na
+          który rezyduje. Ten rozdzaj serwerów potocznie nazywany jest
+          usługą. Serwerem nazywamy również specjalnie przystosowane
+          komputery/systemy komputerowe, których zadaniem jest utrzymanie 
+          działania oraz udostępnienie zasobów (poprzez system operacyjny)
+          sprzętowych usługom. Przystoswanie komputera do roli serwera, czasmi
+          sprowadza się wyłącznie do zainstalowania odpowiedniego systemu
+          operacyjnego - do tego celu najczęciej wykorzystywane są dystrybucje
+          Linuksa, ale również system BSD. Rzadziej w wykorzystywany jest do
+          tego system MS Windows Server. Głowni producenci sprzętu
+          komputerego jak Dell, Fujitsu (dawniej Fujitsu-Siemens), HP czy
+          Lenovo (dawniej IBM) oferują dedykowany sprzęt do roli serwerów.
+          Serwery mogą mieć różne rozmiary do klasycznych skrzynek
+          przypominających nam klasyczne komputery stacjonarne do tych
+          montowanych w specjalistycznych szafach teleinformatycznych
+          nazywanych od standardu - szafami <strong>RACK</strong>. 
+          Serwery poza wyposażeniem
+          bardzo często odróżnia od klasycznych pecetów waga tych urządzeń.
+          Mogą one często ważyć nawet powyżej 30 kilogramów. Ich obudowy
+          wykonane są czesto z grubszej blachy mającej na celu odbiór ciepła
+          z wnętrza obudowy.
+          Serwery RACK
+          zazwyczaj różnią się od siebie wysokością, która wyrażana jest w
+          jednostkach (<strong>U - unit</strong>). Często jest tak, że
+          wyższe serwery niż 1U, dają możliwość podłączenia większej ilości
+          dysków. Serwery mają również różne głębokości - ten parametr tycz
+          się głównie serwerów RACK - najczęsciej serwery mają głębokość
+          powyżej 70cm, ale nie przekraczają 80cm - oczywiście istnieją
+          wyjątki, nie które z nich mogą nie przekraczać 40 cm. Serwery
+          montowane są do szaf za pomocą specjalnych mechanizmów zwanych
+          <strong>szynami</strong>, które umożliwiają całkowite lub częściowe
+          wysunięcie serwera z szafy, aby bez jego demontarzu dokonać wymiany
+          uszkodzonego komponentu. Wymiana nie których komponetów w serwerach
+          może być realizowana za pomocą techniki <strong>Hot-Swap</strong>,
+          pozwalającej na wymianę określonych przez producenta częsci bez
+          wyłączania serwera, ba nawet bez zamykania systemu operacyjnego
+          działającego na nim. Sama konstrukcja serwerów RACK oparta jest o
+          <strong>kierunek przepływu powietrza</strong>. Wysokoobrotowe
+          zestawy wentylatorów montowane są za zatokami dysków twardych,
+          poniękąd zasysając powietrze z otoczenia i następnie przepuszają je
+          przez radiatory procesorów, pamięci RAM czy na końcu karty
+          rozszerzeń czy zasilacze. Serwery mogą mieć ustalone przez
+          producenta kanały powietrzne, które posiadają swój dedykowany
+          zestaw wentylatorów. Praca tych wentylatorów jest regulowana odczytem
+          temperatury otoczenia i często generują one bardzo dużo hałasu w
+          pomieszczenia w których pracują. Podczas rozruchu serwera,
+          wentylatory są testowane, więc zaraz po jego uruchomieniu możemy
+          usłyszeć ich pracę na pełnych obrotach. Rzadko dochodzi do tego, aby
+          serwer pracował z maksymalną mocą wentylatorów - najczęsciej
+          zwróci <em>over temp</em> (przekroczenie temperatury pracy) i się
+          wyłączy. Serwery rack mają określoną temperaturę pracy i żeby
+          zapewnić im konfortowe warunki pracy oraz zmniejszyć zużycie
+          energii (im cieplejszy serwer, tym większy pobór mocy) pracują one
+          w klimatyzowanych pomieszczeniach. 
+        </p>
+        <p>
+          Serwery, nie tylko te wersje RACK-owe różnią się wyposażeniem, które
+          może być mniej lub bardziej bogate. Serwery w zależności od
+          konfiguracji mogą posiadać różne np. kontrolery macieży dyskowych.
+          Dodatkowym wyposażeniem są moduły zarządzania serwerami.
+          Tak zwane <strong>LOM-y (<em>ang. Light Out Management</em>)</strong>.
+          Wiodący
+          producenci posiadają dedykowane rozwiązania, które nie wchodzą w
+          skład standardowego wyposzażenia - chociaż to wszystko zależy od
+          producenta i źródła, u które zaopatrujemy się w sprzęt. Jeśli
+          kupujemy sprzęt wyłącznie używany, poleasingowy to próżno szukać
+          takich rozwiązań jeśli można je w prosty sposób wymontować z
+          serwera. Lepiej dla nas jest w przypadku rozwiązń wbudowanych -
+          chociaż i tu prawdopodobnie otrzymamy przywróconą do stany 
+          pierwotnego pamięc LOM-u, tracąc np. licencje na usługi dodatkowe.
+          W przypadku chęci wykorzystania LOM-ów, musimy również wziąć
+          poprawkę na wiek naszej maszyny. Może okazać się, że poza wartością
+          inwenataryzacjną, LOM będzie baz użyteczny - może wymagać bardzo
+          starych technologii internetowych takich jak Firefox w wersji 2 czy
+          Java w wersji 5.
+        </p>
+        <p>
+          LOM-y pozostają jednak wyposażeniem opcjonalnym, więc czy mamy inne
+          możliwości? Otóż, tak. Wiekszość serwerów oprócz lub obok LOM-u
+          posiada <strong>kontroler BMC</strong>, dzięki którymu możemym
+          zarządać serwerem w podobny sposób do LOM-u - LOM-y oferują możliwość
+          sterowania przy użyciu interfejsu WWW lub SSH. W przypadku BMC do
+          dyspozycji będziemy mieć <strong>interfejs IPMI</strong> - można to
+          uznać za interfejs poleceń, przez który możemy pobierać informacje
+          z serwera (jak status zasilania) lub kontrolować go np.
+          włączając/wyłączając (jak byśmy naciskali guzik na panelu) lub
+          zmieniając tymczasowo kolejkę rozruchu jeszcze przed włączeniem
+          serwera. W przypadku rozwiązań LOM możemy mieć dostęp do konsoli
+          serwera przy użyciu strony internetowej LOM-u lub wirtualnego portu
+          szeregowego dostępnego przez SSH lub Telnet. Natomiast dla BMC/IPMI
+          mamy technologię
+          <strong>SOL (ang. <em>Serial Over LAN</em>)</strong>.
+          Warto mieć na uwadze fakt, że LOM-y to komercyjne
+          implementacje rozwiązania BMC/IPMI, wówczas gdy klasyczne rozwiązanie
+          pozostaje swojego rodzaju standardem instalowanym na płytach serwerów.
+          Komercyjne rozwiązania LOM, często w urządzeniu posiadają dedykowany
+          interfejs sieciowy RJ-45, gdy w przypadku BMC/IPMI jest on
+          współdzielony z kartą sieciową serwera - co może powodować pewne
+          komplikacje, kiedy korzystamy SOL.
+        </p>
+        <p>
+          Po tym długim i wyjaśniającym technikali, jakimi będziemy mieć dziś
+          styczność, w tym artykuje, przygotujemy serwer RACK - konkretnie to:
+          IBM System x3550 Type 7978 do możliwości kontrolowania go za pomocą
+          technologii BMC/IPMI (mój egzeplarz, nie ma LOM-u. Zamówiłem go, ale
+          do czasu pisania tego materału jeszcze nie dotarł. Jeśli dotrze to
+          pojawi się kolejny artykuł tym razem dedykowany rozwiązaniu RSA od
+          IBM) oraz zainstalujemy Debiana 13 przy użyciu PXE oraz SOL.
+        </p>
+        <p>
+          Na początek musimy uruchomić nasz serwer i w jego biosie musimy
+          ustawić przekierowanie konsoli szeregowej (aby działał SOL) oraz
+          ustawić BMC (aby w ogóle, móc kontrolować serwer przez IPMI). Aby
+          wejść do systemu BIOS serwera należy nacisnąc przycisk
+          <strong>F1</strong> podczas wyświetlania ekranu powitalnego serwera.
+        </p>
+        <p>
+          Po załadowaniu BIOS-u przechodzimy do ustawień:
+          <code class="code-inline">Device and I/O Ports</code>. Ustawiamy
+          port <code class="code-inline">Serial Port A</code> na
+          <code class="code-inline">Auto configure</code>. Następnie wybieramy
+          opcję <code class="code-inline">Remote Console Redirection</code>.
+          W oknie przekierowania konsoli ustawiamy kolejno:
+        </p>
+<pre class="code-block">
+Remote Console Active&nbsp;&nbsp;&nbsp;&nbsp;[ Enabled ]
+Remote Console COM Port&nbsp;&nbsp;&nbsp;&nbsp;[ COM 1 ]
+Remote Console Baud Rate&nbsp;&nbsp;&nbsp;&nbsp;[ 57600 ]
+Remote Console Data Bits&nbsp;&nbsp;&nbsp;&nbsp;[ 8 ]
+Remote Console Partiy&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ None ]
+Remote Console Stop Bits&nbsp;&nbsp;&nbsp;&nbsp;[ 1 ]
+Remote Console Text Emulation&nbsp;&nbsp;&nbsp;[ VT100/VT200 ]
+Remote Console Keyboard Emulation&nbsp;&nbsp;[ VT100/VT200 ]
+Remote Console Active After Boot&nbsp;&nbsp;&nbsp;[ Enabled ]
+Remote Console Flow Control&nbsp;&nbsp;&nbsp;&nbsp;[ Disabled ]
+</pre>
+        <p>
+          Opuszczamy wyżej opisane okna poprzez naciśnięcie klawisza
+          <strong>Esc</strong>, aż do menu głónego systemu BIOS. W tym menu
+          przechodzimy do ustawień <code class="code-inline">Start Options</code>.
+          W opcji <code class="code-inline">Planar Ethernet PXE/DHCP</code>
+          ustawiamy <code class="code-inline">Planar Ethernet 2</code>. W tym
+          miejsu warto się na chwilę zatrzymać i wspomnieć o tym, że
+          BMC/IPMI współdzieli port karty sieciowej serwera w przypadku tego
+          IBM-a, jest pierwsza karta (port pierwszej karty) i tą kartę jestem
+          w stanie poświęcić na rzecz BMC/IPMI. Do serwera dokładam też
+          drugą ponieważ podczas instalacji, instalator Debiana podczas
+          sprawdzenia stanu łącza - mimo sterowników - zawiesił nie tylko się,
+          ale i SOL i jedyne co mogłem zrobić to zrestartować serwer z IPMI.
+          Więc po zmianach w BIOS-ie, wyłączamy nasz serwer i dokładamy w port
+          PCI-e drugą kartę sieciową, jaką? To już od nas zależy, ja dodałem
+          kartę TP-Link z układem Realtek-a i musiałem do initrd dograć
+          sterownik. Pokażę w dalszej częsci jak to zrobić. W przypadku kart
+          Intela, wszystko powinno działać od ręki. Wracając do konfiguracji
+          w BIOS-ie, po ustawieniu odpowiedniej karty, wracamy ponownie do
+          menu głównego i wybieramy
+          <code class="code-inline">Advanced Setup</code> i następnie
+          <code class="code-inline">Baseboard Management Controler (BMC) Settings</code>
+          Ustawienia BMC powinny wyglądać w następujący sposób:
+        </p>
+<pre class="code-block">
+BMC POST Watchdog&nbsp;&nbsp;&nbsp;&nbsp;[ Disabled ]
+BMC POST Watchdog Timeout&nbsp;&nbsp;&nbsp;[ 5 Minutes ]
+System*BMC Serial Port Sharing&nbsp;&nbsp;&nbsp;[ Enabled ]
+BMC Serial Port Access Mode&nbsp;&nbsp;&nbsp;[ Shared ]
+Reboot System on NMI&nbps;&nbsp;&nbsp;&nbsp;[ Enabled ]
+Power Restore Policy&nbsp;&nbsp;&nbsp;&nbsp;[ Always On ]
+BMC Fan Acoustic Mode&nbsp;&nbsp;&nbsp;&nbsp;[ Standard ]
+</pre>
+        <p>
+          Jeśli ustawienia wyglądają tak samo, to nic nie zmieniamy,
+          przechodzimy do konfiguracji sieciowej BMC wybierając
+          <code class="code-inline">BMC Network Configuration</code>. Tutaj
+          pozostawiam dowolność. Możemy ustawić to co uznamy za słusze dla
+          naszego środowiska sieciowego. Na koniec, zapisujemy ustawienia
+          wybierając:
+          <code class="code-inline">Save Network Settings in BMC</code>.
+          Ostatnią czynnością jest utworzenie użytkownika IPMI, po zamknięciu
+          ustawień sieciowych BMC, pozostajemy w jego konfiguracji i wybieramy
+          ostatnią opcję:
+          <code class="code-inline">User Account Settings</code>. Maksymalnie
+          możemy zdefiniować 4 użytkowników, wyłączamy użytkownika
+          <code class="code-inline">NULL</code>, wybieramy jedno z pól
+          (klawiszem <em>Enter</em>),
+          <code class="code-inline">UNUSED</code> i definiujemy nowego
+          użytkownika podajemy jego nazwę oraz hasło i ustawiamy mu uprawnienia
+          administratora i zapisujemy wybierając
+          <code class="code-inline">Save User Account Settings in BMC</code>.
+          Teraz możemy upuścić ustawienia, aż do menu głónego BIOS-u, gdzie
+          wybieramy opcję <code class="code-inline">Save Settings</code> i
+          klawiszem <em>Esc</em> opuszcamy BIOS serwera, potwierdzając.
+        </p>
+        <p>
+          W ten sposób zarządzanie za pomocą BMC/IPMI jest już gotowe, aby
+          przetestować czy wszystko działa, potrzebujemy w naszym systemie
+          klienckim takie narzędzia jak <strong>ipmitool</strong>, dla
+          dystrybucji Debian jest ono dostępne w oficjalnym repozytorium.
+        </p>
+<pre class="code-block">
+$ sudo apt update &amp;&amp; sudo apt install -y ipmitool
+</pre>
+        <p>
+          Po instalacji narzędzia możemy sprawdzić czy mamy dostęp do maszyny
+          wykorzystującej BMC/IPMI za pomocą poniższego polecenia.
+        </p>
+<pre class="code-block">
+xf0r3m@sms-alert:~ $ ipmitool -I lanplus -H 192.168.0.119 -U admin chassis power status
+Password: 
+Chassis Power is off
+</pre>
+        <p>
+          Aby móc skorzystać z BMC/IPMI potrzebuje określić wersje interfejsu
+          IPMI, adres IP, użytkownika oraz hasło. Obecnie wykorzystywaną wersją
+          jest IPMI jest 2.0, więc opcja <code class="code-inline">-H</code>
+          będzie przyjnować wyłącznie wartość
+          <code class="code-inline">lanplus</code>, aczkolwiek mogą zdarzyć się
+          takie systemy, które nie są kompatybilne z wersją 2.0 dlatego też
+          warto zapoznać się z dokumentacją producenta odnośnie zdalnego
+          dostępu do tego rodzaju maszyny. Inne rodzaje interfejsów znajdują
+          się na stronie podręcznika. Opcja <code class="code-inline">-H</code>
+          wymaga podania adresu IP docelowego BMC, a opcja
+          <code class="code-inline">-U</code> nazwy użytkownika. Do naszych
+          celów potrzebny będzie taki z uprawnienia administracyjnymi.
+          Użytkowników BMC tworzymy w BIOS-ie, a proces został opisany powyżej.
+          Po nazwie użytkownika, występuje <strong>polecenie IPMI</strong>.
+           Wszystko co dotyczy
+          zasilania, w tym przypadku tyczy się obudowy (ang. <em>chassis</em>).
+          W powyższym przykładzie wydałem zapytanie o stan zasilania serwera.
+          Po wydaniu polecenia, poprosi nas ono o hasło użytkownika BMC.
+          Po podaniu hasła program wysyła zapytanie do serwera. Tam serwer
+          weryfikuje hasło i użytkownika. Po poprawnej weryfikacji IPMI wydaje
+          odpowiednie instrukcje do BMC na podstawie naszego polecenia. Jak
+          możemy zauważyć po serwer działa, ale jest nie operacyjny. 
+        </p>
+        <p>
+          Kiedy mamy już skonfigurowane BMC/IPMI, możemy przjeść do
+          przygotowania środowiska instalacji. Aby móc zainstalować zdalnie
+          system operacyjny - w tym przypadku będzie dystrybucja
+          GNU/Linux Debian - musimy jakoś uzyskać dostęp konsoli serwera.
+          W tym celu ustawialiśmy przekierowanie konsoli szeregowej i uzyskamy
+          do niej dostęp poprzez rozwiązanie wbudowane w BMC jakim jest
+          wcześniej wymieniony SOL. Jednak dystrybucje Linux i ich instalatory
+          nie są domyślnie przystosowane, aby korzystać z konsoli szeregowej.
+          Naszym zadaniem będzie dostosowanie specjalnego obrazu Debiana do
+          rozruchu z sieci, aby można było nim manipulować za pomocą
+          konsoli. 
+        </p>
+        <p>
+          Pierwszym naszym zadaniem jest stworzenie serwera PXE, jeśli go nie
+          mamy to <a href="https://morketsmerke.github.io/articles/linux/uruchamianie_LiveCD_z_dystrybucja_Linuksa_przez_siec.html">tutaj</a>
+          znajduje się instrukcja. Kiedy nasz serwer PXE będzie już 
+          funkcjonalny, to pobieramy <a href="https://d-i.debian.org/daily-images/amd64/daily/netboot/netboot.tar.gz">stąd</a> i umiesczamy
+          go w naszym katalogu serwera TFTP, aby był osiągalny dla komputerów
+          uruchamiających się sieci. Możemy przeznaczyć dla niego odpowiedni
+          katalog.
+        </p>
+<pre class="code-block">
+xf0r3m@pxe:~$ ls -al /pxeboot/
+total 20
+drwxr-xr-x  5 root root 4096 Feb 17 07:27 .
+drwxr-xr-x 19 root root 4096 Feb 18 09:20 ..
+drwxr-xr-x  2 root root 4096 Apr 11  2025 config
+drwxr-xr-x  3 root root 4096 Feb 17 00:02 debian
+drwxr-xr-x  2 root root 4096 Apr 11  2025 firmware
+
+xf0r3m@pxe:~$ ls -al /pxeboot/debian/
+total 58276
+drwxr-xr-x 3 root root     4096 Feb 17 00:02 .
+drwxr-xr-x 5 root root     4096 Feb 17 07:27 ..
+drwxr-xr-x 3 root root     4096 Feb 17 00:02 debian-installer
+lrwxrwxrwx 1 root root       47 Feb 17 00:02 ldlinux.c32 -&gt; debian-installer/amd64/boot-screens/ldlinux.c32
+-rw-r--r-- 1 root root 59655736 Feb 17 00:02 netboot.tar.gz
+lrwxrwxrwx 1 root root       33 Feb 17 00:02 pxelinux.0 -&gt; debian-installer/amd64/pxelinux.0
+lrwxrwxrwx 1 root root       35 Feb 17 00:02 pxelinux.cfg -&gt; debian-installer/amd64/pxelinux.cfg
+lrwxrwxrwx 1 root root       47 Feb 17 00:02 splash.png -&gt; debian-installer/amd64/boot-screens//splash.png
+-rw-r--r-- 1 root root       64 Feb 17 00:02 version.info
+</pre>
+      <p>
+        Tworzymy kopię zapasową (może przydać się w przysłości) pliku
+        <em>debian-installer/amd64/boot-screens/syslinux.cfg</em>. I zmieniamy
+        go w taki sposób aby wyglądał tak ten na przykładzie poniżej.
+      </p>
+<pre class="code-block">
+xf0r3m@pxe:~$ cat /pxeboot/debian/debian-installer/amd64/boot-screens/syslinux.cfg 
+# D-I config version 2.0
+# search path for the c32 support libraries (libcom32, libutil etc.)
+path debian-installer/amd64/boot-screens/
+prompt 0
+timeout 1
+include debian-installer/amd64/boot-screens/txt.cfg
+default debian-installer/amd64/boot-screens/vesamenu.c32
+</pre>
+      <p>
+        Plik ten rózni się od orygiału dodaniem jednej sekundy opóźnienia przed
+        wyborem domyślnej wartości (normalnie to opóźnienie jest wyłączone -
+        czeka na reakcje użytkownika) oraz zmieniłem menu obecnie tak aby była
+        tam tylko jedna interesująca nas opcja. Dzięki temu instalacja startuje
+        z automatu co ma sens. Z tego względu, że wyświetlonego menu nie możemy
+        kontrolować z poziomu konsoli, więc nie udało by się zdalnie
+        zainstalować systemu na serwerze. Następnie przechodzimy do pliku
+        <em>debian-installer/amd64/boot-screens/txt.cfg</em>. Modyfikujemy go
+        aby wyglądał tak jak na przykładzie.
+      </p>
+<pre class="code-block">
+xf0r3m@pxe:~$ cat /pxeboot/debian/debian-installer/amd64/boot-screens/txt.cfg         
+label install
+        menu label ^Install
+        kernel debian-installer/amd64/linux
+        append console=ttyS0,57600n8 DEBIAN_FRONTEND=text initrd=debian-installer/amd64/initrd.gz 
+</pre>
+      <p>
+        Jeśli chodzi o rozruch instalatora dystrybucji Linuksa. Teraz wystarczy
+        tylko ustawić parametr <em>filename</em> na serwerze DHCP dla naszego
+        hosta wskzaujący na <em>/debian/pxelinux.0</em>.
+      </p>
+      <p>
+        Jeśli chodzi o ten serwer to nie uda nam się zainstalować systemu
+        zdalnie bez pewnej sprytnej sztuczki. Potrzebujemy do niej
+        zarządzalnego przełącznika, wspomnianej wcześniej dodatkowej karty
+        sieciowej oraz dwóch kabli RJ-45 do podłączenia owego przełącznika
+        z serwerem. Jeśli nasza karta sieciowa wymaga dodatkowych sterowników
+        to dodamy je teraz do obrazu <em>initrd</em>.
+      </p>
+      <p>
+        Utwórzmy na serwerze PXE specjalny katalog i tam 
+        pobieramy <a href="https://d-i.debian.org/daily-images/amd64/daily/netboot/debian-installer/amd64/initrd.gz">stąd</a>
+        czysty obraz <em>initrd</em>. Tworzy kolejny podkatalog, aby wypakować
+        do niego obraz ramdysku.
+      </p>
+<pre class="code-block">
+xf0r3m@pxe:~/i-x3550$ mkdir tmp
+xf0r3m@pxe:~/i-x3550$ cd tmp
+xf0r3m@pxe:~/i-x3550/tmp$ zcat ../initrd.gz | cpio -iv
+</pre>
+      <p>
+        To katalogu głównego w moim przypadku <em>i-x3550</em> pobieram
+        pakiet .deb z firmwarem dla mojej karty w tym przypadku będzie
+        firware <em>Realtek</em> dla uruchamianej wersji Debiana. Ta wersja, to
+        wersja stablina - <em>Trixie</em>. Po sprawdzeniu na stronie z
+        pakietami Debiana wersji pakietu dla wersji stablinej Debiana
+        (20250410-2), pobieram pakiet z serwera lustrzanego najszybszego dla
+        mojej lokalizacji.
+      </p>
+<pre class="code-block">
+xf0r3m@pxe:~/i-x3550$ wget https://ftp.icm.edu.pl/debian/pool/non-free-firmware/f/firmware-nonfree/firmware-realtek_20250410-2_all.deb
+</pre>
+      <p>
+        Pakiety Debiana zawierają pełną strukturę katalogową rozpoczynającą się
+        od katalogu głównego, więc mogę przejsć do katalogu gdzie wypakowałem
+        ramdysk i wydać następujące polecenie, które wypakuje firmware do
+        tego katalogu.
+      </p>
+<pre class="code-block">
+xf0r3m@pxe:~/i-x3550$ cd tmp
+xf0r3m@pxe:~/i-x3550/tmp$ dpkg-deb -x ../firmware-realtek_20250410-2_all.deb . 
+xf0r3m@pxe:~/i-x3550/tmp$ ls -al usr/lib/firmware/
+total 44
+drwxr-xr-x  8 xf0r3m xf0r3m 4096 Apr 24  2025 .
+drwxr-xr-x 26 xf0r3m xf0r3m 4096 Apr 24  2025 ..
+drwxr-xr-x  3 xf0r3m xf0r3m 4096 Apr 24  2025 realtek
+-rw-r--r--  1 xf0r3m xf0r3m 6308 Feb 21 16:56 regulatory.db
+-rw-r--r--  1 xf0r3m xf0r3m 1118 Feb 21 16:56 regulatory.db.p7s
+drwxr-xr-x  2 xf0r3m xf0r3m 4096 Feb 21 17:06 rtl_bt
+drwxr-xr-x  2 xf0r3m xf0r3m 4096 Apr 24  2025 rtl_nic
+drwxr-xr-x  2 xf0r3m xf0r3m 4096 Feb 21 17:06 rtlwifi
+drwxr-xr-x  2 xf0r3m xf0r3m 4096 Apr 24  2025 rtw88
+drwxr-xr-x  2 xf0r3m xf0r3m 4096 Apr 24  2025 rtw89
+</pre>
+      <p>
+        Teraz pozostając w tym katalogu spakujemy ramdysk ponownie do archiwum.
+        Użyjemy do tego strumienia. Na początek wyświetlimy listę plików w
+        taki sposób, aby białe znaki nie mogły wpłynąć na interpretacje ich
+        nazw przez program pakujący archwum. Do tego użyjemy polecenia
+        <strong>find</strong>: <code class="code-inline">find . -print0<code>.
+        Następnie przekażemy tę listę plików do programu pakującego wskazując
+        mu ogranicznik nazwy plików oraz format archiwum, za pomocą odpowienich
+        opcji nakażemy programowi aby utworzył nowe archiwum:
+        <code class="code-inline">cpio -0 -H newc -ov</code>. Na koniec
+        przekażemy strumień danych do programu kompresującego, a on nadpisze
+        pobrany wcześniej czysty obraz:
+        <code class="code-inline">gzip -c &gt; ../initrd.gz<code>
+      </p>
+<pre class="code-block">
+xf0r3m@pxe:~/i-x3550/tmp$ find . -print0 | cpio -0 -H newc -ov | gzip -c &gt; ../initrd.gz
+...
+./usr/lib/udev/brltty.sh
+./usr/lib/udev/v4l_id
+./usr/lib/modprobe.d
+./usr/lib/modprobe.d/aliases.conf
+./usr/lib/modprobe.d/scsi-mod-scan-sync.conf
+./run
+./proc
+./lib
+./tmp
+175919 blocks
+</pre>
+      <p>
+        Tak utworzony plik możemy podmienić w katalogu przeznaczonym dla
+        Debiana w folderze serwera TFTP. 
+      </p>
+      <p>
+        Teraz należy podłączyć oba kable do serwera i do przełącznika.
+        Następnie podłączyć przełącznik do sieci. Ryzko pętli nie istnieje,
+        ponieważ nie ma przekazywania pakietów między interfejsami chyba
+        że zostaną tak skonfigurowane. Po podłączeniu serwera możemy mu wymusić
+        rozruch z sieci i go uruchomić.
+      </p>
+<pre class="code-block">
+xf0r3m@sms-alert:~ $ ipmitool -I lanplus -H 192.168.0.118 -U Administrator chassis bootdev pxe
+Password: 
+Set Boot Device to pxe
+xf0r3m@sms-alert:~ $ ipmitool -I lanplus -H 192.168.0.118 -U Administrator chassis power on
+Password: 
+Chassis Power Control: Up/On
+</pre>
+      <p>
+        Po uruchomieniu serwera, możemy sesję SOL (<em>Serial Over LAM</em>).
+      </p>
+<pre class="code-block">
+xf0r3m@sms-alert:~ $ ipmitool -I lanplus -H 192.168.0.118 -U Administrator sol activate
+Password:
+</pre>
+      <p>
+        Teraz w terminalu będą wyświetlane kolejne informacje wyświetlane
+        normalnie przez serwer na monitorze podczas uruchamiania, minus kolory
+        czy ewentualne grafiki, teraz musimy poczekać śledząc poszczególne
+        ekrany będziemy mogli obserwować proces rozruchu sieci o uruchomieniu
+        jądra oraz instalatora, powinniśmy otrzymać taki wynik jak poniżej.
+        Taki format instalatora jest wynikiem opcji jądra podanych w pliku
+        <em>debian-installer/amd64/boot-screens/txt.cfg</em>, a mianowicie
+        <code class="code-inline">DEBIAN_FRONTEND=text</code>, ta opcja
+        uruchamia najlżejszą formę instalatora dającą się przepchać przez
+        57,6 kilobodu. Teraz przejdziemy przez cały proces instalacji. 
+      </p>
+<pre class="code-block">
+[            (1*installer)  2 shell  3 shell  4- log           ][ Feb 21 18:40 ]
+Select a language                                                               
+-----------------                                                               
+                                                                                
+Choose the language to be used for the installation process. The selected       
+language will also be the default language for the installed system.            
+Language:                                                                       
+  1: C,                                                                         
+  2: English [*],                                                               
+Prompt: '?' for help, default=2&gt;
+</pre>
+      <p>
+        W tym formacie instalatora nie uswiądczymy wszystkich możliwych opcji
+        jakie są klasycznie na płycie. To nie jest problem, ponieważ poźniej
+        możemy te niuanse poprawić. Tymi nuansami są opcje lokalizacyjne.
+      </p> 
+<pre class="code-block">
+[            (1*installer)  2 shell  3 shell  4- log           ][ Feb 21 18:52 ]
+  2: English [*],                                                               
+Prompt: '?' for help, default=2>                                                
+                                                                                
+                                                                                
+Select your location                                                            
+--------------------                                                            
+                                                                                
+The selected location will be used to set your time zone and also for example   
+to help select the system locale. Normally this should be the country where you 
+live.                                                                           
+                                                                                
+This is a shortlist of locations based on the language you selected. Choose     
+"other" if your location is not listed.                                         
+Country, territory or area:                                                     
+  1: Antigua and Barbuda,      2: Australia,         3: Botswana,               
+  4: Canada,                   5: Hong Kong,         6: India,                  
+  7: Ireland,                  8: Israel,            9: New Zealand,    
+ 10: Nigeria,                 11: Philippines,      12: Seychelles,    
+ 13: Singapore,               14: South Africa,     15: United Kingdom,    
+ 16: United States [*],       17: Zambia,          
+ 18: Zimbabwe,                19: other,           
+Prompt: '?' for help, default=16>
+19
+
+The selected location will be used to set your time zone and also for example 
+to help select the system locale. Normally this should be the country where you
+live.
+
+Select the continent or region to which your location belongs.
+Continent or region:
+  1: Africa,              2: Antarctica,         3: Asia,    
+  4: Atlantic Ocean,      5: Caribbean,          6: Central America,    
+  7: Europe,              8: Indian Ocean,       9: North America [*],
+ 10: Oceania,            11: South America,    
+Prompt: '?' for help, default=9> 
+7
+ 15: Faroe Islands,              16: Finland,    
+ 17: France,                     18: Georgia,    
+ 19: Germany,                    20: Gibraltar,    
+ 21: Greece,                     22: Greenland,    
+ 23: Guernsey,                   24: Holy See (Vatican City State),    
+ 25: Hungary,                    26: Iceland,    
+ 27: Ireland,                    28: Isle of Man,    
+ 29: Italy,                      30: Jersey,    
+ 31: Latvia,                     32: Liechtenstein,    
+ 33: Lithuania,                  34: Luxembourg,    
+ 35: Malta,                      36: Moldova,    
+ 37: Monaco,                     38: Montenegro,    
+ 39: Netherlands,                40: North Macedonia,    
+ 41: Norway,                     42: Poland,    
+ 43: Portugal,                   44: Romania,    
+ 45: Russian Federation,         46: San Marino,    
+ 47: Serbia,                     48: Slovakia,    
+ 49: Slovenia,                   50: Spain,    
+ 51: Svalbard and Jan Mayen,     52: Sweden,    
+ 53: Switzerland,                54: Ukraine,    
+ 55: United Kingdom,             56: land Islands,    
+Prompt: '?' for help> 
+42
+selected. You can now select your preference from the locales available for the
+selected language. The locale that will be used is listed in the second column.
+Country to base default locale settings on:
+  1: Antigua and Barbuda  -  en_AG,    
+  2: Australia            -  en_AU.UTF-8,    
+  3: Botswana             -  en_BW.UTF-8,    
+  4: Canada               -  en_CA.UTF-8,    
+  5: Hong Kong            -  en_HK.UTF-8,    
+  6: India                -  en_IN,    
+  7: Ireland              -  en_IE.UTF-8,    
+  8: Israel               -  en_IL,    
+  9: New Zealand          -  en_NZ.UTF-8,    
+ 10: Nigeria              -  en_NG,    
+ 11: Philippines          -  en_PH.UTF-8,    
+ 12: Seychelles           -  en_SC.UTF-8,    
+ 13: Singapore            -  en_SG.UTF-8,    
+ 14: South Africa         -  en_ZA.UTF-8,    
+ 15: United Kingdom       -  en_GB.UTF-8,    
+ 16: United States        -  en_US.UTF-8 [*],
+ 17: Zambia               -  en_ZM,    
+ 18: Zimbabwe             -  en_ZW.UTF-8,    
+Prompt: '?' for help, default=16> 
+
+ 45: Khmer,                      46: Kirghiz,    
+ 47: Korean,                     48: Kurdish (F layout),    
+ 49: Kurdish (Q layout),         50: Lao,    
+ 51: Latin American,             52: Latvian,    
+ 53: Lithuanian,                 54: Macedonian,    
+ 55: Malayalam,                  56: Nepali,    
+ 57: Northern Sami,              58: Norwegian,    
+ 59: Persian,                    60: Philippines,    
+ 61: Polish,                     62: Portuguese,    
+ 63: Punjabi,                    64: Romanian,    
+ 65: Russian,                    66: Serbian (Cyrillic),    
+ 67: Sindhi,                     68: Sinhala,    
+ 69: Slovak,                     70: Slovenian,    
+ 71: Spanish,                    72: Swedish,    
+ 73: Swiss French,               74: Swiss German,    
+ 75: Tajik,                      76: Tamil,    
+ 77: Telugu,                     78: Thai,    
+ 79: Tibetan,                    80: Turkish (F layout),    
+ 81: Turkish (Q layout),         82: Taiwanese,    
+ 83: Ukrainian,                  84: Uyghur,    
+ 85: Vietnamese,                
+Prompt: '?' for help, default=1> 
+61
+
+Detecting network hardware  ... 2%... 95%... 100%
+Detect network hardware
+-----------------------
+
+Some of your hardware needs non-free firmware files to operate. The firmware 
+can be loaded from removable media, such as a USB stick or floppy.
+
+The missing firmware files are: bnx2/bnx2-mips-06-6.2.3.fw
+
+If you have such media available now, insert it, and continue.
+Load missing firmware from removable media?
+  1: Yes [*]  2: No
+Prompt: '?' for help, default=1>
+2
+
+Detecting link on enp3s0; please wait...  ... 0%... 16%... 25%... 33%... 41%... 50%... 66%... 75%... 83%... 91%
+Detecting link on enp5s0; please wait...  ... 0%... 16%... 25%... 33%... 41%... 50%... 66%... 75%... 83%... 91%
+Detecting link on ens1f0; please wait...  ... 0%... 16%... 25%... 33%... 41%... 50%
+Configure the network
+---------------------
+
+Your system has multiple network interfaces. Choose the one to use as the 
+primary network interface during the installation. If possible, the first 
+connected network interface found has been selected.
+Primary network interface:
+  1: enp3s0: Broadcom Inc. and subsidiaries NetXtreme II BCM5708 Gigabit Ethernet,    
+  2: enp5s0: Broadcom Inc. and subsidiaries NetXtreme II BCM5708 Gigabit Ethernet,    
+  3: ens1f0: Intel Corporation 82571EB/82571GB Gigabit Ethernet Controller D0/D1 (copper applications) [*],
+  4: ens1f1: Intel Corporation 82571EB/82571GB Gigabit Ethernet Controller D0/D1 (copper applications),    
+Prompt: '?' for help, default=3> 
+
+Detecting link on ens1f0; please wait...  ... 0%... 16%... 25%... 33%... 41%... 50%
+Waiting for link-local address...  ... 8%... 16%... 25%... 33%... 41%... 50%... 100%
+Attempting IPv6 autoconfiguration...  ... 8%... 16%... 25%... 33%... 41%... 50%... 66%... 75%... 83%... 91%... 100%
+Configuring the network with DHCP  ... 4%... 12%... 20%... 100%
+Please enter the hostname for this system.
+
+The hostname is a label that identifies your system. It may be either a single 
+word giving it a unique name within the local network, or a fully qualified 
+domain name (FQDN) which combines the hostname and domain name in one string, 
+separated by periods.
+
+If you don't know what your hostname should be, consult your network 
+administrator. If you are setting up your own home network, you can make up the
+hostname yourself.
+Hostname:
+Prompt: '?' for help, default=debian> 
+i-x3550
+
+The domain name is the part of your Internet address to the right of your host 
+name.  It is often something that ends in .com, .net, .edu, or .org.  If you 
+are setting up a home network, you can make something up, but make sure you use
+the same domain name on all your computers.
+Domain name:
+Prompt: '?' for help> 
+morketsmerke.org
+
+ 50: Puerto Rico,    
+ 51: Romania,    
+ 52: Russian Federation,    
+ 53: Runion,    
+ 54: Saudi Arabia,    
+ 55: Serbia,    
+ 56: Singapore,    
+ 57: Slovakia,    
+ 58: Slovenia,    
+ 59: South Africa,    
+ 60: South Korea,    
+ 61: Spain,    
+ 62: Sweden,    
+ 63: Switzerland,    
+ 64: Taiwan,    
+ 65: Thailand,    
+ 66: Ukraine,    
+ 67: United Kingdom,    
+ 68: United States,    
+ 69: Uruguay,    
+ 70: Vietnam,    
+Prompt: '?' for help, default=48>
+
+Please select a Debian archive mirror. You should use a mirror in your country 
+or region if you do not know which mirror has the best Internet connection to 
+you.
+
+Usually, deb.debian.org is a good choice.
+Debian archive mirror:
+  1: deb.debian.org [*],
+  2: ftp.pl.debian.org,    
+  3: ftp.task.gda.pl,    
+  4: ftp.agh.edu.pl,    
+  5: ftp.icm.edu.pl,    
+  6: ftp.psnc.pl,    
+  7: debian-archive.trafficmanager.net,    
+Prompt: '?' for help, default=1>
+5
+
+The proxy information should be given in the standard form of 
+"http://[[user][:pass]@]host[:port]/".
+HTTP proxy information (blank for none):
+Prompt: '?' for help>
+
+Loading additional components  ... 0%... 10%... 20%... 30%... 40%... 50%... 60%... 70%... 80%... 90%... 100%
+Set up users and passwords
+--------------------------
+
+Some account needs to be available with administrative super-user privileges. 
+The password for that account should be something that cannot be guessed.
+
+To allow direct password-based access via the 'root' account, you can set the 
+password for that account here.
+
+Alternatively, you can lock the root account's password by leaving this setting
+empty, and instead use the system's initial user account (which will be set up 
+in the next step) to gain administrative privileges. This will be enabled for 
+you by adding that initial user to the 'sudo' group.
+
+Note: what you type here will be hidden (unless you select to show it).
+Root password:
+
+Please enter the same root password again to verify that you have typed it 
+correctly.
+Re-enter password to verify:
+
+A user account will be created for you to use instead of the root account for 
+non-administrative activities.
+
+Please enter the real name of this user. This information will be used for 
+instance as default origin for emails sent by this user as well as any program 
+which displays or uses the user's real name. Your full name is a reasonable 
+choice.
+Full name for the new user:
+Prompt: '?' for help> 
+
+xf0r3m
+
+Select a username for the new account. Your first name is a reasonable choice. 
+The username should start with a lower-case letter, which can be followed by 
+any combination of numbers and more lower-case letters.
+Username for your account:
+Prompt: '?' for help, default=xf0r3m> 
+
+Make sure to select a strong password that cannot be guessed.
+Choose a password for the new user:
+
+Setting up the clock  ... 0%... 100%
+Detecting disks and all other hardware  ... 2%... 95%... 100%
+Loading additional components  ... 12%... 25%... 37%... 50%... 62%... 75%... 87%... 100%
+Loading additional components  ... 25%... 50%... 75%... 100%
+Starting up the partitioner  ... 4%... 12%... 20%... 33%... 41%... 50%... 62%... 70%... 83%... 91%... 100%
+Partition disks
+---------------
+
+The installer can guide you through partitioning a disk (using different 
+standard schemes) or, if you prefer, you can do it manually. With guided 
+partitioning you will still have a chance later to review and customise the 
+results.
+
+If you choose guided partitioning for an entire disk, you will next be asked 
+which disk should be used.
+Partitioning method:
+  1: Guided - use entire disk,    
+  2: Guided - use entire disk and set up LVM,    
+  3: Guided - use entire disk and set up encrypted LVM,    
+  4: Manual,    
+Prompt: '?' for help> 
+
+Note that all data on the disk you select will be erased, but not before you 
+have confirmed that you really want to make the changes.
+Select disk to partition:
+  1: SCSI3 (1,0,0) (sda) - 73.4 GB HP LOGICAL VOLUME,    
+  2: SCSI3 (1,0,1) (sdb) - 1.2 TB HP LOGICAL VOLUME,    
+Prompt: '?' for help> 
+
+Selected for partitioning:
+
+SCSI3 (1,0,0) (sda) - HP LOGICAL VOLUME: 73.4 GB
+
+The disk can be partitioned using one of several different schemes. If you are 
+unsure, choose the first one.
+Partitioning scheme:
+  1: All files in one partition (recommended for new users) [*],
+  2: Separate /home partition,    
+  3: Separate /home, /var, and /tmp partitions,    
+  4: Separate /var and /srv, swap < 1GB (for servers),    
+  5: Small-disk (< 10GB) partitioning scheme,    
+Prompt: '?' for help, default=1> 
+1
+Guided partitioning  ... 20%... 40%... 60%... 80%
+This is an overview of your currently configured partitions and mount points. 
+Select a partition to modify its settings (file system, mount point, etc.), a 
+free space to create partitions, or a device to initialize its partition table.
+  1: Guided partitioning,    
+  2: Configure software RAID,    
+  3: Configure the Logical Volume Manager,    
+  4: Configure encrypted volumes,    
+  5: Configure iSCSI volumes,    
+  6: ,    
+  7: SCSI3 (1,0,0) (sda) - 73.4 GB HP LOGICAL VOLUME,    
+  8: >     #1  primary  69.6 GB    f  ext4    /     ,    
+  9: >     #5  logical   3.8 GB    f  swap    swap  ,    
+ 10: SCSI3 (1,0,1) (sdb) - 1.2 TB HP LOGICAL VOLUME,    
+ 11: ,    
+ 12: Undo changes to partitions,    
+ 13: Finish partitioning and write changes to disk [*],
+Prompt: '?' for help, default=13> 
+
+If you continue, the changes listed below will be written to the disks. 
+Otherwise, you will be able to make further changes manually.
+
+The partition tables of the following devices are changed:
+   SCSI3 (1,0,0) (sda)
+
+The following partitions are going to be formatted:
+   partition #1 of SCSI3 (1,0,0) (sda) as ext4
+   partition #5 of SCSI3 (1,0,0) (sda) as swap
+Write the changes to disks?
+  1: Yes      2: No [*]
+Prompt: '?' for help, default=2> 
+1
+
+Partitions formatting  ... 33%
+Partitions formatting  
+Installing the base system  ... 0%... 6%... 17%... 20%... 30%... 40%... 50%... 60%... 70%... 79%... 83%... 91%... 100%
+Configuring apt  ... 7%... 14%... 14%... 21%... 35%... 42%... 50%... 61%... 71%... 82%... 92%... 100%
+Select and install software  ... 1%... 10%... 12%
+Configuring popularity-contest
+------------------------------
+
+The system may anonymously supply the distribution developers with statistics 
+about the most used packages on this system. This information influences 
+decisions such as which packages should go on the first distribution CD.
+
+If you choose to participate, the automatic submission script will run once 
+every week, sending statistics to the distribution developers. The collected 
+statistics can be viewed on https://popcon.debian.org/.
+
+This choice can be later modified by running "dpkg-reconfigure 
+popularity-contest".
+Participate in the package usage survey?
+  1: Yes      2: No [*]
+Prompt: '?' for help, default=2> 
+
+... 15%
+Software selection
+------------------
+
+At the moment, only the core of the system is installed. To tune the system to 
+your needs, you can choose to install one or more of the following predefined 
+collections of software.
+Choose software to install:
+  1: Debian desktop environment,    
+  2: ... GNOME,    
+  3: ... Xfce,    
+  4: ... GNOME Flashback,    
+  5: ... KDE Plasma,    
+  6: ... Cinnamon,    
+  7: ... MATE,    
+  8: ... LXDE,    
+  9: ... LXQt,    
+ 10: web server,    
+ 11: SSH server [*],
+ 12: standard system utilities [*],
+ 13: Choose a Debian Blend for installation,    
+Prompt: '?' for help, default=11 12> 
+
+... 15%... 20%... 30%... 40%... 50%... 60%... 70%... 80%... 90%... 100%
+Installing GRUB boot loader  ... 16%... 33%
+Configuring grub-pc
+-------------------
+
+It seems that this new installation is the only operating system on this 
+computer. If so, it should be safe to install the GRUB boot loader to your 
+primary drive (UEFI partition/boot record).
+
+Warning: If your computer has another operating system that the installer 
+failed to detect, this will make that operating system temporarily unbootable, 
+though GRUB can be manually configured later to boot it.
+Install the GRUB boot loader to your primary drive?
+  1: Yes [*]  2: No
+Prompt: '?' for help, default=1> 
+
+You need to make the newly installed system bootable, by installing the GRUB 
+boot loader on a bootable device. The usual way to do this is to install GRUB 
+to your primary drive (UEFI partition/boot record). You may instead install 
+GRUB to a different drive (or partition), or to removable media.
+Device for boot loader installation:
+  1: Enter device manually,    
+  2: /dev/sda  (scsi-3600508b1001031383520202020200009),    
+  3: /dev/sdb  (scsi-3600508b100103138352020202020000a),    
+Prompt: '?' for help> 
+2
+... 50%... 66%... 83%... 100%
+Finishing the installation  ... 3%... 11%... 23%... 30%... 34%... 42%
+Finish the installation
+-----------------------
+
+Installation complete
+
+Installation is complete, so it is time to boot into your new system. Make sure
+to remove the installation media, so that you boot into the new system rather 
+than restarting the installation.
+
+Please choose <Continue> to reboot.
+[Press enter to continue]
+<
+  1: Choose language,    
+  2: Access the installer using a Braille display,    
+  3: Configure the keyboard,    
+  4: Detect network hardware,    
+  5: Configure the network,    
+  6: Choose a mirror of the Debian archive,    
+  7: Download installer components,    
+  8: Set up users and passwords,    
+  9: Configure the clock,    
+ 10: Detect disks,    
+ 11: Partition disks,    
+ 12: Install the base system,    
+ 13: Configure the package manager,    
+ 14: Select and install software,    
+ 15: Install the GRUB boot loader,    
+ 16: Continue without boot loader,    
+ 17: Finish the installation [*],
+ 18: Change debconf priority,    
+ 19: Save debug logs,    
+ 20: Execute a shell,    
+ 21: Abort the installation,    
+Prompt: '?' for help, default=17> 
+20
+Execute a shell
+---------------
+
+Interactive shell
+
+After this message, you will be running "ash", a Bourne-shell clone. 
+
+The root file system is a RAM disk. The hard disk file systems are mounted on 
+"/target". The editor available to you is nano. It's very small and easy to 
+figure out. To get an idea of what Unix utilities are available to you, use the
+"help" command.
+
+Use the "exit" command to return to the installation menu.
+[Press enter to continue]
+
+
+BusyBox v1.37.0 (Debian 1:1.37.0-10) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+~ # chroot /target /bin/bash
+root@hp-dl360g5-1:/# vi /etc/default/grub
+
+root@hp-dl360g5-1:/# head -n15 /etc/default/grub
+# If you change this file or any /etc/default/grub.d/*.cfg file,
+# run 'update-grub' afterwards to update /boot/grub/grub.cfg.
+# For full documentation of the options in these files, see:
+#   info -f grub -n 'Simple configuration'
+
+GRUB_DEFAULT=0
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR=`( . /etc/os-release && echo ${NAME} )`
+GRUB_CMDLINE_LINUX_DEFAULT="console=ttyS1,115200n8"
+GRUB_CMDLINE_LINUX=""
+
+# If your computer has multiple operating systems installed, then you
+# probably want to run os-prober. However, if your computer is a host
+# for guest OSes installed via LVM or raw disk devices, running
+# os-prober can cause damage to those guest OSes as it mounts
+
+root@hp-dl360g5-1:/# update-grub
+Generating grub configuration file ...
+Found linux image: /boot/vmlinuz-6.12.73+deb13-amd64
+Found initrd image: /boot/initrd.img-6.12.73+deb13-amd64
+Found linux image: /boot/vmlinuz-6.12.63+deb13-amd64
+Found initrd image: /boot/initrd.img-6.12.63+deb13-amd64
+Warning: os-prober will not be executed to detect other bootable partitions.
+Systems on them will not be added to the GRUB boot configuration.
+Check GRUB_DISABLE_OS_PROBER documentation entry.
+Adding boot menu entry for UEFI Firmware Settings ...
+done
+
+root@hp-dl360g5-1:/# exit
+~ # exit
+
+
+ 15: Install the GRUB boot loader,    
+ 16: Continue without boot loader,    
+ 17: Finish the installation [*],
+ 18: Change debconf priority,    
+ 19: Save debug logs,    
+ 20: Execute a shell,    
+ 21: Abort the installation,    
+Prompt: '?' for help, default=17> 
+
+
+Finishing the installation  ... 3%... 11%... 23%... 30%... 34%... 42%
+Finish the installation
+-----------------------
+
+Installation complete
+
+Installation is complete, so it is time to boot into your new system. Make sure
+to remove the installation media, so that you boot into the new system rather 
+than restarting the installation.
+
+Please choose <Continue> to reboot.
+[Press enter to continue] 
+
+The system is going down NOW!.. 80%... 92%
+Sent SIGTERM to all processes
+Sent SIGKILL to all processes
+Requesting system reboot
+                        [ 1674.263533] reboot: Restarting system
+
+</pre>
+        <p>
+            ~xf0r3m
+        </p>
+    </div>
+		<p class="footer">
+			2021; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+</body>
+</html>
