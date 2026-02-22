@@ -7,12 +7,12 @@
 	</head>
 	<body>
 <pre>
-  _____ _   _ _    _    ___      _
- / ____| \ | | |  | |  / / |    (_)
-| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
-| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
-| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
- \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+  _______            ___   ______     _      __
+ /_  __(_)___  _____( _ ) /_  __/____(_)____/ /_______
+  / / / / __ \/ ___/ __ \/|/ / / ___/ / ___/ //_/ ___/
+ / / / / /_/ (__  ) /_/  &lt;/ / / /  / / /__/ ,&lt; (__  )
+/_/ /_/ .___/____/\____/\/_/ /_/  /_/\___/_/|_/____/
+     /_/
 </pre>
 	<p class="header_link">
 		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
@@ -30,18 +30,18 @@
           sprzętowych usługom. Przystoswanie komputera do roli serwera, czasmi
           sprowadza się wyłącznie do zainstalowania odpowiedniego systemu
           operacyjnego - do tego celu najczęciej wykorzystywane są dystrybucje
-          Linuksa, ale również system BSD. Rzadziej w wykorzystywany jest do
+          Linuksa, ale również systemy BSD. Rzadziej w wykorzystywany jest do
           tego system MS Windows Server. Głowni producenci sprzętu
-          komputerego jak Dell, Fujitsu (dawniej Fujitsu-Siemens), HP czy
+          komputerowego jak Dell, Fujitsu (dawniej Fujitsu-Siemens), HP czy
           Lenovo (dawniej IBM) oferują dedykowany sprzęt do roli serwerów.
           Serwery mogą mieć różne rozmiary do klasycznych skrzynek
-          przypominających nam klasyczne komputery stacjonarne do tych
+          przypominających nam komputery stacjonarne do tych
           montowanych w specjalistycznych szafach teleinformatycznych
           nazywanych od standardu - szafami <strong>RACK</strong>. 
-          Serwery poza wyposażeniem
-          bardzo często odróżnia od klasycznych pecetów waga tych urządzeń.
-          Mogą one często ważyć nawet powyżej 30 kilogramów. Ich obudowy
-          wykonane są czesto z grubszej blachy mającej na celu odbiór ciepła
+          To co może odróżnić serwery (poza wyposażeniem) od klasycznych 
+          pecetów 
+          jest ich waga - może ona przekroczyć 30 kilogramów. Ich obudowy
+          wykonane są z grubszej blachy mającej na celu odbiór ciepła
           z wnętrza obudowy.
           Serwery RACK
           zazwyczaj różnią się od siebie wysokością, która wyrażana jest w
@@ -62,7 +62,7 @@
           <strong>kierunek przepływu powietrza</strong>. Wysokoobrotowe
           zestawy wentylatorów montowane są za zatokami dysków twardych,
           poniękąd zasysając powietrze z otoczenia i następnie przepuszają je
-          przez radiatory procesorów, pamięci RAM czy na końcu karty
+          przez radiatory procesorów, pamięci RAM i na końcu karty
           rozszerzeń czy zasilacze. Serwery mogą mieć ustalone przez
           producenta kanały powietrzne, które posiadają swój dedykowany
           zestaw wentylatorów. Praca tych wentylatorów jest regulowana odczytem
@@ -72,7 +72,7 @@
           usłyszeć ich pracę na pełnych obrotach. Rzadko dochodzi do tego, aby
           serwer pracował z maksymalną mocą wentylatorów - najczęsciej
           zwróci <em>over temp</em> (przekroczenie temperatury pracy) i się
-          wyłączy. Serwery rack mają określoną temperaturę pracy i żeby
+          wyłączy. Serwery RACK mają określoną temperaturę pracy i żeby
           zapewnić im konfortowe warunki pracy oraz zmniejszyć zużycie
           energii (im cieplejszy serwer, tym większy pobór mocy) pracują one
           w klimatyzowanych pomieszczeniach. 
@@ -94,7 +94,7 @@
           pierwotnego pamięc LOM-u, tracąc np. licencje na usługi dodatkowe.
           W przypadku chęci wykorzystania LOM-ów, musimy również wziąć
           poprawkę na wiek naszej maszyny. Może okazać się, że poza wartością
-          inwenataryzacjną, LOM będzie baz użyteczny - może wymagać bardzo
+          inwenataryzacjną, LOM będzie bez użyteczny - może wymagać bardzo
           starych technologii internetowych takich jak Firefox w wersji 2 czy
           Java w wersji 5.
         </p>
@@ -123,8 +123,8 @@
           komplikacje, kiedy korzystamy SOL.
         </p>
         <p>
-          Po tym długim i wyjaśniającym technikali, jakimi będziemy mieć dziś
-          styczność, w tym artykuje, przygotujemy serwer RACK - konkretnie to:
+          Po tym długim i wyjaśniającym technikalia, jakimi będziemy mieć dziś
+          styczność, w tym artykule, przygotujemy serwer RACK - konkretnie to:
           IBM System x3550 Type 7978 do możliwości kontrolowania go za pomocą
           technologii BMC/IPMI (mój egzeplarz, nie ma LOM-u. Zamówiłem go, ale
           do czasu pisania tego materału jeszcze nie dotarł. Jeśli dotrze to
@@ -132,7 +132,7 @@
           IBM) oraz zainstalujemy Debiana 13 przy użyciu PXE oraz SOL.
         </p>
         <p>
-          Na początek musimy uruchomić nasz serwer i w jego biosie musimy
+          Na początek musimy uruchomić nasz serwer i w jego BIOS-ie musimy
           ustawić przekierowanie konsoli szeregowej (aby działał SOL) oraz
           ustawić BMC (aby w ogóle, móc kontrolować serwer przez IPMI). Aby
           wejść do systemu BIOS serwera należy nacisnąc przycisk
@@ -178,8 +178,8 @@ Remote Console Flow Control&nbsp;&nbsp;&nbsp;&nbsp;[ Disabled ]
           Intela, wszystko powinno działać od ręki. Wracając do konfiguracji
           w BIOS-ie, po ustawieniu odpowiedniej karty, wracamy ponownie do
           menu głównego i wybieramy
-          <code class="code-inline">Advanced Setup</code> i następnie
-          <code class="code-inline">Baseboard Management Controler (BMC) Settings</code>
+          <code class="code-inline">Advanced Setup</code>, następnie
+          <code class="code-inline">Baseboard Management Controler (BMC) Settings</code>.
           Ustawienia BMC powinny wyglądać w następujący sposób:
         </p>
 <pre class="code-block">
@@ -205,7 +205,7 @@ BMC Fan Acoustic Mode&nbsp;&nbsp;&nbsp;&nbsp;[ Standard ]
           <code class="code-inline">User Account Settings</code>. Maksymalnie
           możemy zdefiniować 4 użytkowników, wyłączamy użytkownika
           <code class="code-inline">NULL</code>, wybieramy jedno z pól
-          (klawiszem <em>Enter</em>),
+          (klawiszem <em>Enter</em>)
           <code class="code-inline">UNUSED</code> i definiujemy nowego
           użytkownika podajemy jego nazwę oraz hasło i ustawiamy mu uprawnienia
           administratora i zapisujemy wybierając
@@ -263,17 +263,18 @@ Chassis Power is off
           GNU/Linux Debian - musimy jakoś uzyskać dostęp konsoli serwera.
           W tym celu ustawialiśmy przekierowanie konsoli szeregowej i uzyskamy
           do niej dostęp poprzez rozwiązanie wbudowane w BMC jakim jest
-          wcześniej wymieniony SOL. Jednak dystrybucje Linux i ich instalatory
+          wcześniej wymieniony SOL. Jednak dystrybucje Linuksa i ich instalatory
           nie są domyślnie przystosowane, aby korzystać z konsoli szeregowej.
           Naszym zadaniem będzie dostosowanie specjalnego obrazu Debiana do
           rozruchu z sieci, aby można było nim manipulować za pomocą
           konsoli. 
         </p>
         <p>
-          Pierwszym naszym zadaniem jest stworzenie serwera PXE, jeśli go nie
-          mamy to <a href="https://morketsmerke.github.io/articles/linux/uruchamianie_LiveCD_z_dystrybucja_Linuksa_przez_siec.html">tutaj</a>
+          Pierwszym naszym zadaniem jest stworzenie serwera PXE. Jeśli go nie
+          mamy, to <a href="https://morketsmerke.github.io/articles/linux/uruchamianie_LiveCD_z_dystrybucja_Linuksa_przez_siec.html">tutaj</a>
           znajduje się instrukcja. Kiedy nasz serwer PXE będzie już 
-          funkcjonalny, to pobieramy <a href="https://d-i.debian.org/daily-images/amd64/daily/netboot/netboot.tar.gz">stąd</a> i umiesczamy
+          funkcjonalny, to pobieramy <a href="https://d-i.debian.org/daily-images/amd64/daily/netboot/netboot.tar.gz">stąd</a>
+          obraz instalatora i umiesczamy
           go w naszym katalogu serwera TFTP, aby był osiągalny dla komputerów
           uruchamiających się sieci. Możemy przeznaczyć dla niego odpowiedni
           katalog.
@@ -317,7 +318,7 @@ default debian-installer/amd64/boot-screens/vesamenu.c32
       <p>
         Plik ten rózni się od orygiału dodaniem jednej sekundy opóźnienia przed
         wyborem domyślnej wartości (normalnie to opóźnienie jest wyłączone -
-        czeka na reakcje użytkownika) oraz zmieniłem menu obecnie tak aby była
+        czeka na reakcje użytkownika) oraz zmieniłem menu, tak aby była
         tam tylko jedna interesująca nas opcja. Dzięki temu instalacja startuje
         z automatu co ma sens. Z tego względu, że wyświetlonego menu nie możemy
         kontrolować z poziomu konsoli, więc nie udało by się zdalnie
@@ -333,9 +334,12 @@ label install
         append console=ttyS0,57600n8 DEBIAN_FRONTEND=text initrd=debian-installer/amd64/initrd.gz 
 </pre>
       <p>
-        Jeśli chodzi o rozruch instalatora dystrybucji Linuksa. Teraz wystarczy
+        Po zapisaniu zmian w pliku, wystarczy
         tylko ustawić parametr <em>filename</em> na serwerze DHCP dla naszego
-        hosta wskzaujący na <em>/debian/pxelinux.0</em>.
+        hosta wskzaujący na <em>/debian/pxelinux.0</em> oraz adres IP serwera
+        TFTP w parametrze <em>next-server</em> aby każdy uruchmiający się z
+        sieci komputer w tej domenie
+        rozgłoszeniowej wystartował z tego obrazu. Trzeba mieć to na uwadze.
       </p>
       <p>
         Jeśli chodzi o ten serwer to nie uda nam się zainstalować systemu
@@ -348,7 +352,7 @@ label install
       <p>
         Utwórzmy na serwerze PXE specjalny katalog i tam 
         pobieramy <a href="https://d-i.debian.org/daily-images/amd64/daily/netboot/debian-installer/amd64/initrd.gz">stąd</a>
-        czysty obraz <em>initrd</em>. Tworzy kolejny podkatalog, aby wypakować
+        czysty obraz <em>initrd</em>. Tworzymy kolejny podkatalog, aby wypakować
         do niego obraz ramdysku.
       </p>
 <pre class="code-block">
@@ -359,9 +363,9 @@ xf0r3m@pxe:~/i-x3550/tmp$ zcat ../initrd.gz | cpio -iv
       <p>
         To katalogu głównego w moim przypadku <em>i-x3550</em> pobieram
         pakiet .deb z firmwarem dla mojej karty w tym przypadku będzie
-        firware <em>Realtek</em> dla uruchamianej wersji Debiana. Ta wersja, to
+        firmware <em>Realtek</em> dla uruchamianej wersji Debiana. Ta wersja, to
         wersja stablina - <em>Trixie</em>. Po sprawdzeniu na stronie z
-        pakietami Debiana wersji pakietu dla wersji stablinej Debiana
+        pakietami Debiana wersji pakietu dla Debiana <em>Trixie</em>
         (20250410-2), pobieram pakiet z serwera lustrzanego najszybszego dla
         mojej lokalizacji.
       </p>
@@ -393,16 +397,16 @@ drwxr-xr-x  2 xf0r3m xf0r3m 4096 Apr 24  2025 rtw89
       <p>
         Teraz pozostając w tym katalogu spakujemy ramdysk ponownie do archiwum.
         Użyjemy do tego strumienia. Na początek wyświetlimy listę plików w
-        taki sposób, aby białe znaki nie mogły wpłynąć na interpretacje ich
-        nazw przez program pakujący archwum. Do tego użyjemy polecenia
-        <strong>find</strong>: <code class="code-inline">find . -print0<code>.
+        taki sposób, aby białe znaki nie mogły wpłynąć na interpretacje 
+        nazw plików przez program pakujący archwum. Do tego użyjemy polecenia
+        <strong>find</strong>: <code class="code-inline">find . -print0</code>.
         Następnie przekażemy tę listę plików do programu pakującego wskazując
         mu ogranicznik nazwy plików oraz format archiwum, za pomocą odpowienich
         opcji nakażemy programowi aby utworzył nowe archiwum:
         <code class="code-inline">cpio -0 -H newc -ov</code>. Na koniec
         przekażemy strumień danych do programu kompresującego, a on nadpisze
         pobrany wcześniej czysty obraz:
-        <code class="code-inline">gzip -c &gt; ../initrd.gz<code>
+        <code class="code-inline">gzip -c &gt; ../initrd.gz</code>
       </p>
 <pre class="code-block">
 xf0r3m@pxe:~/i-x3550/tmp$ find . -print0 | cpio -0 -H newc -ov | gzip -c &gt; ../initrd.gz
@@ -425,36 +429,66 @@ xf0r3m@pxe:~/i-x3550/tmp$ find . -print0 | cpio -0 -H newc -ov | gzip -c &gt; ..
       <p>
         Teraz należy podłączyć oba kable do serwera i do przełącznika.
         Następnie podłączyć przełącznik do sieci. Ryzko pętli nie istnieje,
-        ponieważ nie ma przekazywania pakietów między interfejsami chyba
+        ponieważ nie ma przekazywania pakietów między interfejsami, chyba
         że zostaną tak skonfigurowane. Po podłączeniu serwera możemy mu wymusić
-        rozruch z sieci i go uruchomić.
+        rozruch z sieci i go uruchomić. Musimy również zapamiętać, do którego
+        portu podłączyliśmy kartę wbudowaną, a do którego tą dodatkową.
       </p>
 <pre class="code-block">
-xf0r3m@sms-alert:~ $ ipmitool -I lanplus -H 192.168.0.118 -U Administrator chassis bootdev pxe
+xf0r3m@sms-alert:~ $ ipmitool -I lanplus -H 192.168.0.119 -U admin chassis bootdev pxe
 Password: 
 Set Boot Device to pxe
-xf0r3m@sms-alert:~ $ ipmitool -I lanplus -H 192.168.0.118 -U Administrator chassis power on
+xf0r3m@sms-alert:~ $ ipmitool -I lanplus -H 192.168.0.119 -U admin chassis power on
 Password: 
 Chassis Power Control: Up/On
 </pre>
       <p>
-        Po uruchomieniu serwera, możemy sesję SOL (<em>Serial Over LAM</em>).
+        Po uruchomieniu serwera, możemy skonfigurować prędkości konsoli 
+        szeregowej, a następnie zestawić sesję SOL (<em>Serial Over LAN</em>).
       </p>
 <pre class="code-block">
-xf0r3m@sms-alert:~ $ ipmitool -I lanplus -H 192.168.0.118 -U Administrator sol activate
+xf0r3m@sms-alert:~ $ ipmitool -I lanplus -H 192.168.0.119 -U admin sol set non-volatile-bit-rate 57.6
 Password:
+xf0r3m@sms-alert:~ $ ipmitool -I lanplus -H 192.168.0.119 -U admin sol set volatile-bit-rate 57.6
+Password:
+xf0r3m@sms-alert:~ $ ipmitool -I lanplus -H 192.168.0.119 -U admin sol activate
+Password:
+[SOL Session operational.  Use ~? for help]
 </pre>
       <p>
         Teraz w terminalu będą wyświetlane kolejne informacje wyświetlane
         normalnie przez serwer na monitorze podczas uruchamiania, minus kolory
-        czy ewentualne grafiki, teraz musimy poczekać śledząc poszczególne
-        ekrany będziemy mogli obserwować proces rozruchu sieci o uruchomieniu
+        czy ewentualne grafiki. Śledząc poszczególne
+        ekrany będziemy mogli obserwować proces rozruchu sieci, przedstawiony
+        na przykładzie w trzech fazach (niestety jest to inny serwer niż
+        omwiany tutaj IBM, z IBM-a nie byłem wstanie tego ściągnąć przez SOL.
+        Rożnica występuje wyłącznie w nagłówku - tam mamy karty sieciowe od
+        Broadcom-a.). Ostatnia linia przykładu prezentuje nam już uruchomienie
+        programu ładującego z obrazu instalatora.
+      </p>
+<pre class="code-block">
+Intel(R) Boot Agent GE v1.2.36
+Copyright (C) 1997-2005, Intel Corporation
+
+#1: Initializing and establishing link...
+
+#2: CLIENT MAC ADDR: 00 1F 29 56 BF 88  GUID: 41483631 3841 4742 3838 32304E313531 
+    DHCP.../
+
+#3: CLIENT MAC ADDR: 00 1F 29 56 BF 88  GUID: 41483631 3841 4742 3838 32304E313531 
+    CLIENT IP: 192.168.1.68  MASK: 255.255.255.0  DHCP IP: 192.168.1.1             
+    GATEWAY IP: 192.168.1.1 
+                                                                               
+    PXELINUX 6.04 PXE 20250811 Copyright (C) 1994-2015 H. Peter Anvin et al
+</pre>
+      <p>
+        Po o uruchomieniu
         jądra oraz instalatora, powinniśmy otrzymać taki wynik jak poniżej.
         Taki format instalatora jest wynikiem opcji jądra podanych w pliku
         <em>debian-installer/amd64/boot-screens/txt.cfg</em>, a mianowicie
         <code class="code-inline">DEBIAN_FRONTEND=text</code>, ta opcja
         uruchamia najlżejszą formę instalatora dającą się przepchać przez
-        57,6 kilobodu. Teraz przejdziemy przez cały proces instalacji. 
+        57,6 kilobodu. Teraz przejdziemy przez cały proces instalacji.
       </p>
 <pre class="code-block">
 [            (1*installer)  2 shell  3 shell  4- log           ][ Feb 21 18:40 ]
@@ -469,14 +503,26 @@ Language:
 Prompt: '?' for help, default=2&gt;
 </pre>
       <p>
-        W tym formacie instalatora nie uswiądczymy wszystkich możliwych opcji
+        W tym formacie instalatora nie uswiadczymy wszystkich możliwych opcji
         jakie są klasycznie na płycie. To nie jest problem, ponieważ poźniej
-        możemy te niuanse poprawić. Tymi nuansami są opcje lokalizacyjne.
-      </p> 
+        możemy te niuanse poprawić, w tym przypadku są to opcje lokalizacyjne.
+        Po
+        wyświetleniu się tego, wyłączamy port na przełączniku podłączony do
+        wbudowanej karty sieciowej, z której dokonaliśmy rozruchu przez PXE.
+      </p>
+      <p>
+        Na poniższym przykładzie znajduje się proces instalacji sieciowej
+        dystrybucji Debiana przez PXE. Ponownie niestety, na innym serwerze
+        tym razem na HP DL360 G5, ponieważ rzeczony IBM pełni już funkcję
+        operacyjną ;). Instalacja jest analogiczna, różni się wyłącznie wybraną
+        kartą sieciową oraz oznaczeniem dysków. Uwaga, tam gdzie nie ma
+        odpowiedzi (pod promptem) oznacza to, że pozostawiono wartość domyślną
+        (sugerowaną przez instalator).
+      </p>
 <pre class="code-block">
 [            (1*installer)  2 shell  3 shell  4- log           ][ Feb 21 18:52 ]
   2: English [*],                                                               
-Prompt: '?' for help, default=2>                                                
+Prompt: '?' for help, default=2&gt;                                               
                                                                                 
                                                                                 
 Select your location                                                            
@@ -496,7 +542,7 @@ Country, territory or area:
  13: Singapore,               14: South Africa,     15: United Kingdom,    
  16: United States [*],       17: Zambia,          
  18: Zimbabwe,                19: other,           
-Prompt: '?' for help, default=16>
+Prompt: '?' for help, default=16&gt;
 19
 
 The selected location will be used to set your time zone and also for example 
@@ -509,7 +555,7 @@ Continent or region:
   4: Atlantic Ocean,      5: Caribbean,          6: Central America,    
   7: Europe,              8: Indian Ocean,       9: North America [*],
  10: Oceania,            11: South America,    
-Prompt: '?' for help, default=9> 
+Prompt: '?' for help, default=9&gt; 
 7
  15: Faroe Islands,              16: Finland,    
  17: France,                     18: Georgia,    
@@ -532,7 +578,7 @@ Prompt: '?' for help, default=9>
  51: Svalbard and Jan Mayen,     52: Sweden,    
  53: Switzerland,                54: Ukraine,    
  55: United Kingdom,             56: land Islands,    
-Prompt: '?' for help> 
+Prompt: '?' for help&gt; 
 42
 selected. You can now select your preference from the locales available for the
 selected language. The locale that will be used is listed in the second column.
@@ -555,7 +601,7 @@ Country to base default locale settings on:
  16: United States        -  en_US.UTF-8 [*],
  17: Zambia               -  en_ZM,    
  18: Zimbabwe             -  en_ZW.UTF-8,    
-Prompt: '?' for help, default=16> 
+Prompt: '?' for help, default=16&gt;
 
  45: Khmer,                      46: Kirghiz,    
  47: Korean,                     48: Kurdish (F layout),    
@@ -578,7 +624,7 @@ Prompt: '?' for help, default=16>
  81: Turkish (Q layout),         82: Taiwanese,    
  83: Ukrainian,                  84: Uyghur,    
  85: Vietnamese,                
-Prompt: '?' for help, default=1> 
+Prompt: '?' for help, default=1&gt; 
 61
 
 Detecting network hardware  ... 2%... 95%... 100%
@@ -593,7 +639,7 @@ The missing firmware files are: bnx2/bnx2-mips-06-6.2.3.fw
 If you have such media available now, insert it, and continue.
 Load missing firmware from removable media?
   1: Yes [*]  2: No
-Prompt: '?' for help, default=1>
+Prompt: '?' for help, default=1&gt;
 2
 
 Detecting link on enp3s0; please wait...  ... 0%... 16%... 25%... 33%... 41%... 50%... 66%... 75%... 83%... 91%
@@ -610,7 +656,7 @@ Primary network interface:
   2: enp5s0: Broadcom Inc. and subsidiaries NetXtreme II BCM5708 Gigabit Ethernet,    
   3: ens1f0: Intel Corporation 82571EB/82571GB Gigabit Ethernet Controller D0/D1 (copper applications) [*],
   4: ens1f1: Intel Corporation 82571EB/82571GB Gigabit Ethernet Controller D0/D1 (copper applications),    
-Prompt: '?' for help, default=3> 
+Prompt: '?' for help, default=3&gt; 
 
 Detecting link on ens1f0; please wait...  ... 0%... 16%... 25%... 33%... 41%... 50%
 Waiting for link-local address...  ... 8%... 16%... 25%... 33%... 41%... 50%... 100%
@@ -627,15 +673,15 @@ If you don't know what your hostname should be, consult your network
 administrator. If you are setting up your own home network, you can make up the
 hostname yourself.
 Hostname:
-Prompt: '?' for help, default=debian> 
-i-x3550
+Prompt: '?' for help, default=debian&gt;
+hp-dl360g5-1
 
 The domain name is the part of your Internet address to the right of your host 
 name.  It is often something that ends in .com, .net, .edu, or .org.  If you 
 are setting up a home network, you can make something up, but make sure you use
 the same domain name on all your computers.
 Domain name:
-Prompt: '?' for help> 
+Prompt: '?' for help&gt;
 morketsmerke.org
 
  50: Puerto Rico,    
@@ -659,7 +705,7 @@ morketsmerke.org
  68: United States,    
  69: Uruguay,    
  70: Vietnam,    
-Prompt: '?' for help, default=48>
+Prompt: '?' for help, default=48&gt;
 
 Please select a Debian archive mirror. You should use a mirror in your country 
 or region if you do not know which mirror has the best Internet connection to 
@@ -674,14 +720,26 @@ Debian archive mirror:
   5: ftp.icm.edu.pl,    
   6: ftp.psnc.pl,    
   7: debian-archive.trafficmanager.net,    
-Prompt: '?' for help, default=1>
+Prompt: '?' for help, default=1&gt;
 5
 
 The proxy information should be given in the standard form of 
 "http://[[user][:pass]@]host[:port]/".
 HTTP proxy information (blank for none):
-Prompt: '?' for help>
-
+Prompt: '?' for help&gt;
+</pre>
+      <p>
+        Tutaj może pojawić się komunikat o nieznalezieniu modułów jądra. Ten
+        problem wynika z faktu, iż obraz z instalatorem Debiana znajduje się
+        w codziennym cyklu wydawniczym. Oznacza to, że na serwerach lutrzanych
+        znajdują się komponenty jądra niezbędne do pracy instalatora 
+        niekompatybilne z uruchomionym przez nas jądrem oraz ramdyskiem. Kiedy
+        ten komunikaty wystąpi, należy pobrać najnowsze jądro oraz ramdysk
+        z serwera lustrzanego Debiana (te pliki są luźno umieszczone na 
+        serwerze, wystarczy tylko pogrzebać). Nie trzeba przeprowadzać całej
+        konfiguracji PXE od zera.
+      </p>
+<pre class="code-block">
 Loading additional components  ... 0%... 10%... 20%... 30%... 40%... 50%... 60%... 70%... 80%... 90%... 100%
 Set up users and passwords
 --------------------------
@@ -712,7 +770,7 @@ instance as default origin for emails sent by this user as well as any program
 which displays or uses the user's real name. Your full name is a reasonable 
 choice.
 Full name for the new user:
-Prompt: '?' for help> 
+Prompt: '?' for help&gt; 
 
 xf0r3m
 
@@ -720,7 +778,7 @@ Select a username for the new account. Your first name is a reasonable choice.
 The username should start with a lower-case letter, which can be followed by 
 any combination of numbers and more lower-case letters.
 Username for your account:
-Prompt: '?' for help, default=xf0r3m> 
+Prompt: '?' for help, default=xf0r3m&gt; 
 
 Make sure to select a strong password that cannot be guessed.
 Choose a password for the new user:
@@ -745,14 +803,16 @@ Partitioning method:
   2: Guided - use entire disk and set up LVM,    
   3: Guided - use entire disk and set up encrypted LVM,    
   4: Manual,    
-Prompt: '?' for help> 
+Prompt: '?' for help&gt; 
+1
 
 Note that all data on the disk you select will be erased, but not before you 
 have confirmed that you really want to make the changes.
 Select disk to partition:
   1: SCSI3 (1,0,0) (sda) - 73.4 GB HP LOGICAL VOLUME,    
   2: SCSI3 (1,0,1) (sdb) - 1.2 TB HP LOGICAL VOLUME,    
-Prompt: '?' for help> 
+Prompt: '?' for help&gt;
+1
 
 Selected for partitioning:
 
@@ -764,9 +824,9 @@ Partitioning scheme:
   1: All files in one partition (recommended for new users) [*],
   2: Separate /home partition,    
   3: Separate /home, /var, and /tmp partitions,    
-  4: Separate /var and /srv, swap < 1GB (for servers),    
-  5: Small-disk (< 10GB) partitioning scheme,    
-Prompt: '?' for help, default=1> 
+  4: Separate /var and /srv, swap &lt; 1GB (for servers),    
+  5: Small-disk (&lt; 10GB) partitioning scheme,    
+Prompt: '?' for help, default=1&gt; 
 1
 Guided partitioning  ... 20%... 40%... 60%... 80%
 This is an overview of your currently configured partitions and mount points. 
@@ -779,13 +839,13 @@ free space to create partitions, or a device to initialize its partition table.
   5: Configure iSCSI volumes,    
   6: ,    
   7: SCSI3 (1,0,0) (sda) - 73.4 GB HP LOGICAL VOLUME,    
-  8: >     #1  primary  69.6 GB    f  ext4    /     ,    
-  9: >     #5  logical   3.8 GB    f  swap    swap  ,    
+  8: &gt;     #1  primary  69.6 GB    f  ext4    /     ,    
+  9: &gt;     #5  logical   3.8 GB    f  swap    swap  ,    
  10: SCSI3 (1,0,1) (sdb) - 1.2 TB HP LOGICAL VOLUME,    
  11: ,    
  12: Undo changes to partitions,    
  13: Finish partitioning and write changes to disk [*],
-Prompt: '?' for help, default=13> 
+Prompt: '?' for help, default=13&gt;
 
 If you continue, the changes listed below will be written to the disks. 
 Otherwise, you will be able to make further changes manually.
@@ -798,7 +858,7 @@ The following partitions are going to be formatted:
    partition #5 of SCSI3 (1,0,0) (sda) as swap
 Write the changes to disks?
   1: Yes      2: No [*]
-Prompt: '?' for help, default=2> 
+Prompt: '?' for help, default=2&gt; 
 1
 
 Partitions formatting  ... 33%
@@ -821,7 +881,7 @@ This choice can be later modified by running "dpkg-reconfigure
 popularity-contest".
 Participate in the package usage survey?
   1: Yes      2: No [*]
-Prompt: '?' for help, default=2> 
+Prompt: '?' for help, default=2&gt; 
 
 ... 15%
 Software selection
@@ -844,7 +904,7 @@ Choose software to install:
  11: SSH server [*],
  12: standard system utilities [*],
  13: Choose a Debian Blend for installation,    
-Prompt: '?' for help, default=11 12> 
+Prompt: '?' for help, default=11 12&gt;
 
 ... 15%... 20%... 30%... 40%... 50%... 60%... 70%... 80%... 90%... 100%
 Installing GRUB boot loader  ... 16%... 33%
@@ -860,7 +920,7 @@ failed to detect, this will make that operating system temporarily unbootable,
 though GRUB can be manually configured later to boot it.
 Install the GRUB boot loader to your primary drive?
   1: Yes [*]  2: No
-Prompt: '?' for help, default=1> 
+Prompt: '?' for help, default=1&gt; 
 
 You need to make the newly installed system bootable, by installing the GRUB 
 boot loader on a bootable device. The usual way to do this is to install GRUB 
@@ -870,7 +930,7 @@ Device for boot loader installation:
   1: Enter device manually,    
   2: /dev/sda  (scsi-3600508b1001031383520202020200009),    
   3: /dev/sdb  (scsi-3600508b100103138352020202020000a),    
-Prompt: '?' for help> 
+Prompt: '?' for help&gt; 
 2
 ... 50%... 66%... 83%... 100%
 Finishing the installation  ... 3%... 11%... 23%... 30%... 34%... 42%
@@ -885,7 +945,18 @@ than restarting the installation.
 
 Please choose <Continue> to reboot.
 [Press enter to continue]
-<
+</pre>
+      <p>
+        Tutaj na chwilę się zatrzymamy. Teraz musimy dostosować zainstalowany
+        przez nas system na serwerze do korzystania z konsoli szeregowej. Tak
+        abyśmy mieli do niego dostęp, tak jakby siedząc przy nim. Aby to
+        zrealizować musimy cofnąć się o jedno pytanie wstecz przy użyciu
+        znaku mniejszości (<strong>&lt;</strong>), co na tym etapie wywoła
+        menu główne instalatora. Następnie wybieramy opcję numer 20.
+        <code class="code-inline">Execute a shell</code>.
+      </p>
+<pre class="code-block">
+&lt;
   1: Choose language,    
   2: Access the installer using a Braille display,    
   3: Configure the keyboard,    
@@ -907,7 +978,7 @@ Please choose <Continue> to reboot.
  19: Save debug logs,    
  20: Execute a shell,    
  21: Abort the installation,    
-Prompt: '?' for help, default=17> 
+Prompt: '?' for help, default=17&gt;
 20
 Execute a shell
 ---------------
@@ -923,31 +994,47 @@ figure out. To get an idea of what Unix utilities are available to you, use the
 
 Use the "exit" command to return to the installation menu.
 [Press enter to continue]
-
-
+</pre>
+      <p>
+        Potwierdzamy i uzyskujemy dostep to powłoki w środowisku instalatora,
+        teraz musimy zmienić katalog główny, aby móc wydawać polecenia i
+        uruchamiać programy, tak jak przy normalnie funkcjonującym systemie.
+        Generalnie to edycji pliku moglibyśmy dokonać w powłoce instalatora
+        ale jeszcze musimy odświeżyć konfigurację GRUB-a. Za pomocą poniższego
+        polecenia zmieniamy katalog główny.
+      </p>
+<pre class="code-block">
 BusyBox v1.37.0 (Debian 1:1.37.0-10) built-in shell (ash)
 Enter 'help' for a list of built-in commands.
 
 ~ # chroot /target /bin/bash
+</pre>
+      <p>
+        Na początek edytujemy jedną linię w pliku konfiguracyjnym programu
+        rozruchowego (<em>/etc/default/grub</em>).
+      </p>
+<pre class="code-block">
 root@hp-dl360g5-1:/# vi /etc/default/grub
-
-root@hp-dl360g5-1:/# head -n15 /etc/default/grub
-# If you change this file or any /etc/default/grub.d/*.cfg file,
-# run 'update-grub' afterwards to update /boot/grub/grub.cfg.
-# For full documentation of the options in these files, see:
-#   info -f grub -n 'Simple configuration'
-
-GRUB_DEFAULT=0
-GRUB_TIMEOUT=5
-GRUB_DISTRIBUTOR=`( . /etc/os-release && echo ${NAME} )`
+...
 GRUB_CMDLINE_LINUX_DEFAULT="console=ttyS1,115200n8"
-GRUB_CMDLINE_LINUX=""
-
-# If your computer has multiple operating systems installed, then you
-# probably want to run os-prober. However, if your computer is a host
-# for guest OSes installed via LVM or raw disk devices, running
-# os-prober can cause damage to those guest OSes as it mounts
-
+</pre>
+      <p>
+        Jeśli chcemy kontrolować GRUB-a przy użyciu SOL-a, to możemy dodać
+        na samym końcu tego pliku dwie linijki, które przekierują również
+        działanie programu rozruchowego na konsolę szeregową.
+      </p>
+<pre class="code-block">
+GRUB_TERMINAL=serial
+GRUB_SERIAL_COMMAND="serial --unit=1 --speed=115200 --word=8 --parity=no --stop=1"
+</pre>
+      <p>
+        Na koniec musimy jeszcze wdrożyć nasze zmiany poprzez aktualizacje
+        konfiguracji programu GRUB. Po tej czynności możemy opuścić zarówno
+        zmieniony katalog jak i powłokę instalatora. Po zamknięciu powłoki
+        zostanie ponowieni wyświetlone menu główne programu instalacyjnego.
+        Teraz możemy wybrać opcję numer 17 i zakończyć instalację.
+      </p> 
+<pre class="code-block">
 root@hp-dl360g5-1:/# update-grub
 Generating grub configuration file ...
 Found linux image: /boot/vmlinuz-6.12.73+deb13-amd64
@@ -971,7 +1058,7 @@ root@hp-dl360g5-1:/# exit
  19: Save debug logs,    
  20: Execute a shell,    
  21: Abort the installation,    
-Prompt: '?' for help, default=17> 
+Prompt: '?' for help, default=17&gt;
 
 
 Finishing the installation  ... 3%... 11%... 23%... 30%... 34%... 42%
@@ -984,7 +1071,7 @@ Installation is complete, so it is time to boot into your new system. Make sure
 to remove the installation media, so that you boot into the new system rather 
 than restarting the installation.
 
-Please choose <Continue> to reboot.
+Please choose &lt;Continue&gt; to reboot.
 [Press enter to continue] 
 
 The system is going down NOW!.. 80%... 92%
@@ -995,11 +1082,39 @@ Requesting system reboot
 
 </pre>
         <p>
+          Sprzęt, który obecnie opisuje ma już swoje lata. Jednak plaga
+          zapotrzebowania na pamięci operacyjne oraz masowe przez bańkę AI
+          może spowodować, że sprzęt tego typu może jeszcze przezyć swój
+          renesans. 32 GB pamięci RAM do takiego IBM czy DL-ki od HP mogą
+          kosztować do 100 złotych. A sprzęt mimo że starszy od obecnie
+          przeze mnie używanego o jakieś 4 lata nie jest wiele od niego
+          wolniejszy. Nie mniej jednak - starszy sprzęt wymaga nieco innego
+          podejścia. Obecnie wszystko jest bardziej intuicyjne, tam tak nie
+          ma - jak się nie na kombinujesze to nie pojedziesz. Wszystkie te
+          sprzęty mają swoje charakterystyczne cechy i chcąc skorzystać z ich
+          bardziej zaawansowanych funkcji takich jak BMC czy LOM-y trzeba się
+          nieco nagłówkować, napracować, a czasem i zmęczyć czy zdenerwować.
+          Jednak gdy by nie to, że niektóre rozwiązania są niepotrzebnie
+          skomplikowane niebyli byśmy niepotrzebni, a satysfakcja z rozwiązanego
+          kolejnego problemu niebyła by aż tak bardzo budująca.
+        </p>
+        <p>
+          Starszego sprzętu, który chciałbym uruchomić mam trochę więc należy
+          spodziewać się kolejnych artykułów tego typu.
+        </p>
+        <p>
+          Źródła:
+        </p>
+        <ol>
+          <li><a href="https://www.bx.psu.edu/~nate/doc/x3550">IBM x3550 - Debian Squeeze Installation via IPMI Serial Over Lan</a></li>
+          <li><a href="https://www.ducea.com/2009/03/02/debian-lenny-pxe-installation-on-dell-poweredge-19502950-servers-bnx2-annoyances/">Debian Lenny PXE Installation on Dell PowerEdge 1950/2950 servers: bnx2 annoyances</a></li> 
+        </ol>
+        <p>
             ~xf0r3m
         </p>
     </div>
 		<p class="footer">
-			2021; COPYLEFT; ALL RIGHTS REVERSED;
+			2026; COPYLEFT; ALL RIGHTS REVERSED;
 		</p>
 </body>
 </html>
