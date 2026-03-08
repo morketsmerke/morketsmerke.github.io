@@ -20,7 +20,7 @@
 		</p>
 
 		<div class="main">
-      <h1 class="title">Systemy zarzadania serwerami LOM (Light Out Management)</h1>
+      <h1 class="title">Systemy zarządania serwerami - LOM (Light Out Management)</h1>
       <p>
         Systemy zarządzania serwerami, tak zwane LOM-y ułatwiają
         administratorm pracę z odległymi maszynami. Przy użyciu takich
@@ -29,20 +29,21 @@
         Wiekszość LOM-ów posiada interfejs WWW, przez który możemy załadować
         obraz płyty .iso i wymusić na serwerze rozruch z tego obrazu. Dzięki
         dostępowi przez przeglądarkę, takie systemy często pełnią funkcję
-        inwentaryzacyjną oraz kontrolną za ich pomocą możemy wyłączyć lub
+        inwentaryzacyjną oraz sterującą za ich pomocą możemy wyłączyć lub
         włączyć nasz serwer czy podejrzeć to co wyświetla na ekranie a nawet
-        kontrolować go za pomocą konsoli. Zakres możliwości jest w duże
+        kontrolować go za pomocą konsoli. Zakres możliwości jest w dużej
         mierze zależny od tego ile lat ma nasz sprzęt. Sprzęt na którym ja
         pracuje będzie mieć 20 lat w przyszłym roku także jego możliwości
-        w obecnych czasash mogą być moc ograniczone. Z tego względu, że mam
+        w obecnych czasash mogą być mocno ograniczone. Ze względu na to, że mam
         styczność z każdym wiekszym graczem na rynku serwerowym poza
         Supermicro, krótko scharakteryzujemy sobie jakie możliwości dają
         różni producentci.
       </p>
       <p>
-        Ze względu na to, że swoje wnioski będzie opierać o sprzęt prawie
-        20-letni. Dlatego nie należy tego artukułu traktować jako wyroczni,
-        pod kątem wyboru producenta naszych przyszłych serwerów. Ten materiał
+        Swoje wnioski będę opierać o sprzęt prawie
+        20-letni. Dlatego nie należy tego artykułu traktować jako głos 
+        decydujący 
+        o wyborze producenta naszych przyszłych serwerów. Ten materiał
         można wykorzystać jeśli takowy sprzęt wpadnie nam w ręce i nie
         będzie wiedzieli jak się zabrać za sprawę konfiguracji zarządzania
         maszyną lub też chcieli byśmy się dowiedzieć funkcjonalności LOM-ów
@@ -53,7 +54,7 @@
       <p>
         Charakterystykę rozpoczniemy od tego czy w ogóle nasz LOM znajduje się
         w standardzie wysposażenia i czy można go zdemontować z serwera. 
-        W pod tym względem prym wiodą takie firmy jak HP oraz Fujits-Siemiens,
+        W pod tym względem prym wiodą takie firmy jak HP oraz Fujits-Siemens,
         Ponieważ w ich serwerach systemy LOM są układami na płycie głównej
         podobnie do rozwiązań BMC posiadających dedytkowaną kartę sieciową,
         port RJ-45 odpowiednio oznaczony za pomocą nazwy systemu jaką jest
@@ -90,20 +91,22 @@
         na górnym pasku znajdują się poszczególne opcje. Domyślnie iLO
         ustawia stos TCP/IP na konfigurację z DHCP i musimy to wyłączyć wówczas
         możemy zmienić address IP, następnie zmienić hasło Administratora i
-        ustawić wyższą prędkość na konsoli o ile będzie korzystać z SOL-u lub
+        ustawić wyższą prędkość na konsoli o ile będziemy korzystać z SOL-u lub
         VSP. Po za tym warto w biosie ustawić, aby była możliwość kontroli
         BIOS-u z poziomu właśnie SOL-u lub VSP (o VSP będzie poźniej). To
-        w zasadzie tyle, możemy podłączać kabel i logować się przez
+        w zasadzie tyle, możemy podłączyć kabel i logować się przez
         przeglądarkę. Ja korzystałem z Firefox-a 52-esr do logowania się do
         panelu WWW. LOM od Fujitsu konfiguruje się w BIOS-ie - tutaj jednak
         mamy okrojone możliwości konfiguracyjne sprowadzające do ustawienia
         adresu IP, domyślne dane logowania do panelu WWW to
         <em>admin</em>/<em>admin</em>, jeśli on nie będą pasować to można
-        całe iRMC zresetować do ustawień fabrycznych. W moim przypadku z
-        iRMC miałem już zapisaną nazwę hosta i nie mogłem znaleźć gdzie mogę
+        całe iRMC zresetować do ustawień fabrycznych z poziomu BIOS-u. 
+        W moim przypadku z
+        iRMC miałem już zapisaną nazwę systemową i nie mogłem znaleźć gdzie mogę
         to zmienić. W przypadku rozwiązania firmy IBM za pomocą aktywnej opcji
+        w BIOS
         dotyczącej RSA dowiadujemy się, że jest obecny w systemie, Za pomocą
-        tej opcji możemy zmienić ustawienia IP dla RSA lub przywróić ustawienia
+        tej opcji możemy zmienić ustawienia IP dla RSA lub przywrócić ustawienia
         domyślne. Ustawienia IP w tym przypadku są predefiniowane na stały
         adres 192.168.70.125/24. Dodatkowo dostępny jest domyślny użytkownik
         <em>USERID</em> z hasłem <em>PASSW0RD</em> - gdzie zamiast <em>o</em>
@@ -114,8 +117,11 @@
         ustawienia odnośnie IPMI czy przywracamy ustawienia fabryczne. Tutaj
         warto wspomnieć o wersji DRAC 4/P, która swoje zastosowanie ma 
         maszynach takich jak PowerEdge 860 czy R200. Po za samą kartą potrzebna
-        jest taśma do jej działania na samą taśmę wpadłem przypadkiem szukając
-        zasilacza do PowerEdge 1800. To opcje konfiguracyjne pozwalają na
+        jest taśma do jej działania.
+        W przeciwnym wypadku serwera zwraca błąd.
+        Na samą taśmę wpadłem przypadkiem szukając
+        zasilacza do PowerEdge 1800. Opcje konfiguracyjne dostępne przy rozruchu
+        serwera pozwalają na
         zmianę adresacji IP oraz nazwy hosta i to tyle. Użytkownik jest
         predefiniowany o nazwie <em>root</em> oraz haśle <em>calvin</em>.
         Przy próbie logowania w moim przypadku dostaje informacje o tym, że
@@ -123,15 +129,16 @@
         je zresetować potrzebny jest Windows Server 2003 lub starą wersję
         RHEL 4 lub 5. Dodatkowo potrzebne są sterowniki do tej karty, które
         kiedyś istniały oficjalnie i dziś są elementem oprogramowania
-        oprogramowania pod nazœa OpenManage Server Administrator. Więc w tym
-        przypadku duży minus dla Dell-a.
+        oprogramowania pod nazwą Open Manage Server Administrator.
+        Walczyłem z tym przez pół dnia, narazie bez rezultatów.
+        Więc w tym przypadku duży minus dla Dell-a.
       </p>
       <h2>Możliwości konfiguracyjne poszczególnych LOM-ów.</h2>
       <p>
         Czy to materiał sponsorowany przez HP? Nie, ale ja znów zacznę od
         iLO. Na swoich serwera mam iLO w wersji 2. Po konfiguracji usługi jakie
         oferuje ten LOM to HTTP/S oraz jakaś inna nieznana przez NMAP usługa
-        na wysokim portcie korzystająca z transmisji TCP - jest zapewne
+        na wysokim portcie korzystająca z transmisji TCP - jest to zapewne
         <strong>wirtualne medium</strong> - najczęsiej jest pamięć flash
         która jest udostępniana administratorowi jako <em>datastore</em>, aby
         mogł on tam wrzucić obraz płyty, które zostanie uruchomiony serwer
@@ -144,7 +151,7 @@
         certyfikat dawno wygasł. Nie ma możliwości odnowy certyfikatu, można
         załadować swój ale nie wiem jak by się to skończyło. Jeśli 
         przeskanujemy iLO NMAP-em jeszcze raz
-        (jakieś 10-15 min po skonfigurowaniu iLO) uruchomi się nam ssh.
+        (jakieś 10-15 min po skonfigurowaniu iLO) uruchomi się nam SSH.
         LOM-y to przeważnie mikrokomputerki i tyle czasu zajmuje wygenerowanie
         odpowiednich dla SSH kluczy przez CPU LOM-u. Oczywiście ma ono również
         swoje ogranicznia dotyczące kryptografii. Tak wygląda polecenie SSH,
@@ -154,7 +161,7 @@
 $ ssh -o KexAlgorithms=diffie-hellman-group1-sha1 -o HostKeyAlgorithms=ssh-rsa -c aes128-cbc Administrator@192.168.0.118
 </pre>
       <p>
-        Jesli jakiś LOM nie wspiera w <code class="code-inline">ssh-rsa</code>,
+        Jesli jakiś LOM nie wspiera <code class="code-inline">ssh-rsa</code>,
         jako algorytm kluczy hosta to znaczy, że współczesne wersje SSH się
         z nim nie połączą więc możemy skreślić SSH z listy przydatnych, ale nie
         w przypadku iLO. Po zalogowaniu się do SSH otrzymujemy powłokę iLO z
@@ -178,8 +185,9 @@ TEXTCONS : Invoke Remote Text Console on supported platforms.
         się nim zajmował. Za pomocą tych podstawowych poleceń możemy,
         włączyć/wyłączyć nasz serwer oraz podłączyć się pod konsole za pomocą
         polecenia VSP. Jest to samo col SOL tylko uruchomione przez SSH.
-        Panel WWW daje świene możliwości inwentaryzacyjne takie np. zużyćie
-        energii elektycznej jak również włączyć czy wyłączyć nasz serwer.
+        Panel WWW daje świene możliwości inwentaryzacyjne takie np. zużycie
+        energii elektycznej jak również kontrolne 
+        dzięki którym możemy włączyć czy wyłączyć nasz serwer.
         Niestety wszystkie możliwości konsolowe zostały oparte na Javie i to
         dość starej wersji 5. Jeśli się jednak postarać to można to uruchomić.
         Nie mniej jednak za pomocą konsoli można kontrolować każdy aspekt
@@ -191,11 +199,12 @@ TEXTCONS : Invoke Remote Text Console on supported platforms.
       <p>
         Drugim dość podobnym przypadkiem jest DRAC 5 od Dell-a zapewniający
         nieco lepsze doznania jeśli chodzi o powłokę tam dostajem coś na
-        zasadzie BusyBox-a na dystrybucja Linuxa. Poniżej znajduje się
+        zasadzie BusyBox-a na dystrybucjach Linuksa. Poniżej znajduje się
         polecenie SSH zestawiające połączenie:
       </p>
 <pre class="code-block">
-$ ssh -o KexAlgorithms=diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1,diffie-hellman-group1-sha1 -o HostKeyAlgorithms=ssh-rsa root@192.168.0.114
+$ ssh -o KexAlgorithms=diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1,diffie-hellman-group1-sha1 \
+-o HostKeyAlgorithms=ssh-rsa root@192.168.0.114
 Dell Remote Access Controller 5 (DRAC 5)
 Firmware Version 1.40 (Build 08.08.22)
 
@@ -287,7 +296,12 @@ Server power status: ON
         role są jeszcze wstanie zapewnić, może nie jest to co potrafiły one
         w czasach swojej świetności, ale czy wówczas było by nas stać taki
         sprzęt - wtedy mogł on kosztować tyle co używany samochód średnej
-        klasy. Czasami możliwość głupiego zdalnego pstryczka, który wyłączy a
+        klasy. Oczywiście można próbować zaktualizować oprogramowanie układowe
+        tych LOM-ów (<em>firmware</em>), aby być może trochę zminimalizować
+        skutek wyparcia pewnych technologii, nie mniej jednak wsparcie
+        producenta kiedyś się kończy i pewnych naleciałości z dawnych lat
+        już nie przeskoczymy.
+        Czasami możliwość głupiego zdalnego pstryczka, który wyłączy a
         następnie włączy maszynę jest dużo ważniejsza od nie wiadomo jakich
         komponentów - przeważnie wtedy gdy siedzisz sobie na urlopie i jedna
         z maszyn się zawiesiła lub nie wstała poprawnie po zaniku napięcia i
