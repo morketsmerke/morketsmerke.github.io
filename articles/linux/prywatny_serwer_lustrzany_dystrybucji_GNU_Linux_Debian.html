@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+	<p class="header_link">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div class="main">
+		<h1 class="title">Prywatny serwer lustrzany dystrybucji GNU/Linux Debian</h1>
+    <p>
+      Czasami muszę znaleźć się w lokalizacji gdzie łącze internetowe pod kątem
+      przepustowości pozostawia wiele do życzenia. Z racji tego, iż aktywnie
+      pracuje na projektem <strong>immudex</strong> potrzebuje stałego dostępu
+      do pakietów GNU/Linux Debiana. Jakiś czasemu temu szykował się dłuższy 
+      wypad w
+      to miejsce, a ja po za <em>immudex</em> miałem jeszcze swojego rodzaju
+      zadanie
+      domowe do odrobienia. Do tego jednak potrzebowałem serwera a wraz z nim
+      pakietów. Stworzyłem coś na miarę mikro internetu - jeden komputer w
+      obudowie typu <em>tiny</em> od HP, a w nim poza rozrywką, możliwość 
+      swobodnej
+      pracy - w postaci prywatnego serwera lustrzanego Debiana. 
+      Posiadając
+      takie rozwiązanie sam dostęp do internetu nie był, aż tak potrzebny.
+      Na załadowanie się innych stron mogłem poczekać.
+    </p>
+    <p>
+      W tym materiale zajmiemy się utworzeniem takiego serwera.
+      Potocznie serwer lustrzany pakietów dystrybucji, określny jest mianem
+      <em>mirroru</em> - i takiego nazewnictwa będę się trzymać.
+      Najważniejszym założeniem tego rozwiązania jest określenie oraz
+      przygotowanie odpowiedniej ilości wolnego miejsca dysku. Moj mirror
+      obejmuje zakresem obecnie używane wersje Debiana
+      (wraz z kanałem aktualizacji)
+      w architekturze intelowskiej 64 i 32-bitowej, w sekcji głównej
+      (<em>main</em>) oraz sekcji ze sterownikami urządzeń 
+      (<em>non-free-firmware</em>). Na chwilę obecną zajmuje to
+      jakieś <strong>560GB</strong>, więc należy się uzbroić w dysk co najmniej
+      1TB. Nie będe
+      w tym materiale poruszał tematu przygotowania dysku, to chyba jest znane,
+      prawda?
+    </p>
+    <p>
+      Po przygotowaniu miejsca na dane mirroru musimy pobrać pakiety, twórcy
+      Debiana sugerują, że najlepszym źródłem do tego są
+      <strong>aliasy geograficzne serwerów lustrzanych</strong>, tj. dla 
+      Polski
+      np. <strong>ftp.pl.debian.org</strong>. Do kopiowania danych ze źródła
+      zalecene jest z wykorzystanie protokołu <strong>HTTP</strong>. A do
+      kopiowania wykorzystywany jest pakiet <strong>debmirror</strong>.
+      W dokumentacji, możemy znaleźć informacje o tym, że polecenie 
+      sychronizacji naszego serwera ze źródłem powinno uruchamiać się 4 razy
+      na dobę. Początkowo używałem takich ustawień, ale nie było zbyt wiele
+      danych przesłanych, więc skmulowałem to do jednego razu dobę. 
+      W wiekszości
+      przypadków to wystarczy, jesli nie będziemy kopiować na serwer wersji
+      testowej lub niestabilnej to i ten raz dziennie może okazać działaniem
+      nadwyraz. Pamiętam swojego czasu, kiedy tworzyłem jeszcze obrazy płyt
+      dla projektu immudex. Zazwyczaj zajmowałem się tym w sobotę rano i mając
+      już świeże obrazy, w niedziele sprawdzam listy pakietów, a tam kilka
+      pakietów już do aktualizacji. Dlatego jeśli ktoś ma plany na 
+      sychronizację w
+      trybie weekendowym to proponuje termin na niedzielę rano.
+    </p>
+    <p>
+      Z tego względu, że musimy uruchomić polecenie o czasie, potrzebujemy
+      samego polecenia jak i również samej konfiguracji harmonogramu zadań w
+      systemie. Poniżej znajduje się polecenie, którego ja używam. Przy
+      pierwszym uruchomieniu pobieranie pakietów, może nie dojść do skutku i
+      narzędzie należy uruchomić ponownie. Oczywiście, jest ono z tych
+      inteligentnych, następne uruchomienie rozpoczyna się od pakietów, których
+      pobranie nie powiodło się za pierwszym razem. Natomiast konfigurację
+      <em>crona</em> pozostawiam do samodzielnego wykonania.
+    </p>
+<pre class="code-block">
+#!/bin/bash
+
+debmirror --verbose --method=http --host=ftp.pl.debian.org \
+  --root=debian \
+  --dist=trixie,bookworm,bullseye,trixie-updates,bookworm-updates,bullseye-updates \
+  --arch=i386,amd64 \
+  --section=main,non-free-firmware --i18n --no-check-gpg /var/www/html/debian
+</pre>
+    <p>
+      W tym poleceniu kolejno, załączamy tryb gadatliwy
+      (<code class="code-inline">--verbose</code>) następnie wybieramy metodę
+      (<code class="code-inline">--method</code>), w tym przypadku jest
+      to HTTP - najpopularniejsza metoda kopiowania danych w przypadku serwera
+      lustrzanego. Kolejna opcja wskazuje host źródłowy 
+      (<code class="code-inline">--host</code>), opcja 
+      <code class="code-inline">--root</code> wskazuje gdzie u źródła
+      rozpoczynają się dane repozytorium. W tym przypadku jest to
+      poprostu <code class="code-inline">debian</code>, co oznaczna że URL
+      hosta źródłowego wygląda w ten sposób: http://ftp.pl.debian.org/debian. W
+      opcji <code class="code-inline">--dist</code>, określamy wersje Debiana
+      oraz w tym przypadku dla każdej z wersji kanał aktualizacji. Debian w
+      głownym kanale repozytorium przechowuje wersje pakietów przygotowane dla
+      tej konkretnej wersji Debiana, aktualizacje pakietów trafiają natomiast
+      do kanału aktualizacji. Następnie określana jest architektura samej
+      dystrybucji (<code class="code-inline">--arch</code>) dla mnie 
+      wystarczająca jest archtektura intelowska, a przy użyciu paramteru
+      (<code class="code-inline">--section</code>) wybieramy kolejne sekcje
+      repozytorium. Następna opcja 
+      (<code class="code-inline">--i18n</code>) nakazuje
+      poleceniu pobrać tłumaczenia, jest to ważna opcja. Bez niej
+      <code class="code-inline">apt update</code> będzie zwracać ostrzeżenie o 
+      starym tłumaczeniu bądź jego braku. Ostatnią opcją jest ignorowanie
+      podpisów GPG. Natoniast ostatnim parametrem jest miejsce docelowe dla
+      pobranych plików repozytorium.
+    </p>
+    <p>
+      Generalnie pakiety Debiana są pobierane na systemy docelowe
+      za pomocą protokołów sieciowych technologii WWW, więc aby móc udostępnić
+      nasz serwer hostom docelowym potrzebujemy serwera WWW - może być
+      <strong>Apache</strong> lub inny. Stąd w moim poleceniu ścieżka na
+      <em>/var/www/html</em>. Serwer WWW w przypadku <em>apache</em> nie wymaga
+      żadnej konfiguracji, no może poza usunięciem pliku
+      <em>/var/www/html/index.html</em> oraz utworzeniem katalogu docelowego. 
+    </p>
+    <p>
+      Aby użyć w systemie docelowym serwera, który utworzyliśmy możemy podać 
+      adres
+      naszego mirroru (już osiągalnego przez protokół HTTP) podczas
+      instalacji przy wyborze serwera lustrzanego lub na zainstalowanym już
+      systemie wyedytować plik źródeł programu <strong>APT</strong>, jeśli nasz
+      plik wygląda podobnie:
+    </p>
+<pre class="code-block">
+deb http://ftp.icm.edu.pl/pub/Linux/debian/ trixie main non-free-firmware
+deb-src http://ftp.icm.edu.pl/pub/Linux/debian/ trixie main non-free-firmware
+
+deb http://security.debian.org/debian-security trixie-security main non-free-firmware
+deb-src http://security.debian.org/debian-security trixie-security main non-free-firmware
+
+deb http://ftp.icm.edu.pl/pub/Linux/debian/ trixie-updates main non-free-firmware
+deb-src http://ftp.icm.edu.pl/pub/Linux/debian/ trixie-updates main non-free-firmware
+</pre>
+    <p>
+      To wystarczy, że zmienimy 
+      <code class="code-inline">ftp.icm.edu.pl/pub/Linux</code>, na adres
+      naszego serwera i zaktualizujemy listy pakietów w systemie.
+    </p>
+    <p>
+      Na moim serwerze dodatkowo poza serwerem lustrzanym pakietów, znajduje
+      się również wybiórczy serwer lustrzany obrazów płyt. Wybiórczy dlatego,
+      że przechowuje na nim wyłącznie obrazy instalacji sieciowej oraz
+      standardowe <em>LiveCD</em> dla obecnie wszystkich wspieranych wersji.
+      Do kopiowania danych w tym przypadku wykorzystuje się protokół jak
+      <strong>RSYNC</strong>, a poniżej znajduje się mój skrypt kopiujący
+      obrazy płyt.
+    </p>
+<pre class="code-block">
+#!/bin/bash
+
+rsync --times --links --hard-links --partial --block-size=8192  --recursive \
+  --include='*netinst*.iso' \
+  --include='*standard.iso' \
+  --exclude='bt-bd' \
+  --exclude='bt-cd' \
+  --exclude='bt-dvd' \
+  --exclude='iso-bd' \
+  --exclude='iso-dvd' \
+  --exclude='jigdo-16G' \
+  --exclude='jigdo-bd' \
+  --exclude='jigdo-cd' \
+  --exclude='jigdo-dlbd' \
+  --exclude='jigdo-dvd' \
+  --exclude='list-16G' \
+  --exclude='list-bd' \
+  --exclude='list-cd' \
+  --exclude='list-dlbd' \
+  --exclude='list-dvd' \
+  --exclude='log' \
+  --exclude='arm64' \
+  --exclude='armel' \
+  --exclude='armhf' \
+  --exclude='mips' \
+  --exclude='mips64el' \
+  --exclude='mipsel' \
+  --exclude='ppc64el' \
+  --exclude='s390x' \
+  --exclude='trace' \
+  --exclude='source' \
+  --exclude='bt-hybrid' \
+  --exclude='HEADER.html' \
+  --exclude='MD5*' \
+  --exclude='SHA1*' \
+  --exclude='SHA256*' \
+  --exclude='SHA512*' \
+  --exclude='*.packages' \
+  --exclude='*.contents' \
+  --exclude='*.log' \
+  --exclude='*.iso' \
+  --progress rsync://ftp.icm.edu.pl/pub/Linux/debian-cd/* /var/www/debian-cd;
+</pre>
+    <p>
+      Za pomocą opcji <code class="code-inline">--include</code> zaznaczyłem te
+      pliki, które chce mieć na swoim serwerze, a opcją
+      <code class="code-inline">--exclude</code> wszystkie pozostałe, które nie
+      mają być kopiowane. Komunikaty z działania wyżej wymienionych 
+      narzędzii są
+      zapisywane do odpowiednich plików dziennik, a każde ich uruchmienie 
+      zostaje odnotowane w dzienniku - datą i godziną. Poniżej znajduje się
+      mój skrypt, który uruchamia te dwa polecenia. Skrypt ten jest uruchamiany
+      przez harmonogram zadań.
+    </p>
+<pre class="code-block">
+#!/bin/bash
+echo "[$(date)]" &gt;&gt; /home/xf0r3m/debian-mirror.log;
+/usr/local/bin/debian-mirror-sync-cmd &gt;&gt; /home/xf0r3m/debian-mirror.log;
+echo "[$(date)]" &gt;&gt; /home/xf0r3m/debian-cd-mirror.log;
+/usr/local/bin/debian-cd-rsync-cmd &gt;&gt; /home/xf0r3m/debian-cd-mirror.log;
+</pre>
+    <p>
+      Za pomocą kilku poleceń stworzyliśmy serwer, który tak jak w moim
+      przypadku słabego łącza internetowego sprawił, że możemy wykonywać
+      operacje na pakietach w systemach docelowych wyłącznie za pośrednictwem
+      sieci LAN. Alternatywą metodą jest wykorzystanie wielkich obrazów płyt
+      BluRay, jednak operowanie plikami wielkości dwudziestu paru gigabajtów
+      może być nieporęczne. Ten materiał kończy nieplanowaną trylogię
+      artykułów o pakietach Debiana.
+    </p>
+    <p>
+      Źródła:
+    </p>
+    <ol>
+      <li><a href="https://www.debian.org/mirror/size">Mirror Size</a></li>
+      <li><a href="https://www.debian.org/mirror/ftpmirror">Setting up a Debian archive mirror</a></li>
+      <li><a href="https://www.debian.org/CD/mirroring/">Becoming a mirror for Debian USB/CD/DVD images</a></li>
+    </ol>
+    <p>
+      ~xf0r3m
+    </p>
+  </div>
+	<p class="footer">
+		2026; COPYLEFT; ALL RIGHTS REVERSED;
+	</p>
+</body>
+</html>
