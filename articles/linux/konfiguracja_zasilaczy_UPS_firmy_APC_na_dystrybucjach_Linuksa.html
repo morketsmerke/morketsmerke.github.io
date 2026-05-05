@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body>
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+	<p class="header_link">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div class="main">
+		<h1 class="title">Konfiguracja zasilaczy UPS firmy APC na dystrybucjach Linuksa</h1>
+    <p>
+      Na tej stronie omawialiśmy taki sprzęt jakim są serwery dedykowane, tutaj
+      występowły one w postaci serwerów RACK. Te urządzenia są projektowane
+      w taki sposób, aby zapewnić ich nieprzerwane działanie - co za tym idzie
+      stały dostęp do świadczonych przez nie usług. Co raz więcej komponentów
+      tych komputerów możemy wymieć na tzw. <strong>gorąco</strong>
+      (ang. <em>hot-swap</em>). Często serwery posiadają po dwa zasilacze w
+      celu zapewnienia maszynie odpowiedniej mocy zasilania, jednak co jeśli
+      brak zasilania maszyny, nie zależy od jego zasilaczy ale od środowiska,
+      w którym działa? Generalnie zasada jest taka, że jeśli działanie systemu
+      jest istotne dla funkcjonowania danego podmiotu - to należy go wyposażyć
+      w <strong>zasilacz awaryjny</strong> (ang. UPS) lub podłączyć do
+      instalacji zasilania komputerowego w budynku, zazwyczaj są to czerwone
+      gniazdka na ścianie - wymagające specjalnego adaptera do tego, aby włożyć
+      do nich wtyczkę. Takie rozwiązanie jak dedykowana instalacja w budynku
+      obsługiwane są przez duże przemysłowe UPS-y lub agregaty prądotwórcze.
+    </p>
+    <p>
+      Schemat działania zasilaczy UPS jest bardzo prosty. Jeśli na wejściu
+      zasilania sieciowego jest napięcie to jest ono, w zależności od stanu
+      akumulatora w UPS, albo przekazywane bezpośrednio na wyjścia urządzenia.
+      Jeśli stan baterii UPS, znajduje się poniżej pewnego poziomu to bateria
+      również jest ładowana z tego samego źródła. Jeśli natomiast napięcie
+      spadnie na wejściu wówczas to zasilacz w przeciągu od 2 do 10 ms
+      przełączy wyjście urządzenia do przetwórnicy, która zamieni 12V z
+      akumulatora na 230V wymagane do zasilania urządzeń. Jak długo komputer
+      czy serwer może działać na UPS-ie? To już zależy od jego wydajności.
+      Tutaj też warto rozdzielić systemy zasilania awaryjnego od konsumenckich
+      zasilaczy, nawet tych bardziej zaawansowanych. Systemy zasilania UPS,
+      projektowane są z myślą o jak najdłuższym podtrzymaniu zasilania.
+      Natomiast z racji tego, że przy obciążonym serwerze taki zwykły zasilacz
+      za długo nie podziała stosuje się zasadę zapewnienia stabilnego
+      zasilania do czasu poprawnego zamknięcia systemu operacyjnego oraz
+      wyłączenia serwera. Do realizacji tego zadania stan zasilania UPS musi
+      być stale monitorowany. Jest to dokonywane za pomocą specjalnego
+      opgramowania zainstalowanego na serwerze przy połączeniu USB z
+      zasilaczem lub przy pomocy specjalnego modułu sieciowego montowanego w
+      UPS.
+    </p>
+    <p>
+      W tym artykule opiszemy sobie konfigurację takiego oprogramowania
+      wykorzystując do tego swojego czasu jedyne oprogramowanie pozwalające
+      na komunikację z dedykowanymi urządzeniami UPS firmy APC
+      (ang. <em>American Power Convervions</em>, obecnie 
+      <em>Schnider Electric</em>) w dystrybucjach Linuksa. W trzech przypadkach:
+      samodzielny host z UPS, UPS udostępniany hostom podrzędnym oraz UPS
+      sieciowy. Konfiguracja oprogramowania UPS będzie polegać na tym, aby
+      uzyskać status urządzenia od niego oraz ustawić parametry w taki sposób
+      aby system mógł zamknąć swobodnie swój system operacyjny.
+    </p>
+    <h2>Samodzielny host z UPS</h2>
+    <p>
+      Do większości nowych urządzeń UPS APC dołączany jest specjalny kabel
+      zakończony jednej strony wtykiem USB a z drugiej wytykiem <strong>RJ-50</strong>,
+      kabel ma oznaczenie: <strong>APC 940-0127</strong>. Jeśli kupilismy
+      zasilacz z drugiej ręki to może on takiego kabla nie mieć i trzeba się
+      w niego zaopatrzyć. Po podłączeniu UPS do serwera, instalujemy pakiet
+      <strong>apcupsd</strong>.
+    </p>
+<pre class="code-inline">
+$ sudo apt install apcupsd -y
+</pre>
+    <p>
+      Następnie musimy wyedytować plik <em>/etc/apcupsd/apcupsd.conf</em>.
+      Poniżej zapiszę najważniejsze opcje konfiguracyjne oraz ich wartości.
+    </p>
+<pre class="code-block">
+UPSNAME BE850G2-FR
+UPSCABLE usb
+UPSTYPE usb
+DEVICE
+
+ONBATTERYDELAY 6
+BATTERYLEVEL 80
+MINUTES 5 
+TIMEOUT 0
+</pre>
+    <p>
+      Opcja <code class="code-inline">UPSNAME</code> jest opcjonalna, ale
+      warto w niej zapisać model UPS podłączonego do tego serwera. Opcja
+      <code class="code-inline">UPSCABLE</code> definuje kabel jaki został
+      użyty do komunikacji z UPS. Tych przewodów jest kilka rodzajów, następna
+      opcja <code class="code-inline">UPSTYPE</code> rodzaj komunikacji jaki
+      został użyty w naszym modelu. Z tą opcją związana jest kolejna opcja
+      jaką jest <code class="code-inline">DEVICE</code>, który najczęściej
+      oznacza port pod który podłączony jest UPS, w przypadku podłączenia USB
+      opcje tę pozostawia się pustą co oznacza automatyczną detekcję. Te trzy
+      opcje definiują nam połączenie z UPS-em. Natomiast opcje poniżej
+      konfigurują już samo zachowanie UPS. Opcja
+      <code class="code-inline">ONBATTERYDELAY</code> określa opóźnienie
+      ogłoszenia stanu ONBATTERY o określoną przez nas ilość sekund. Ta opcja
+      dobrze skonfigurowana pozwala uniknąć takiej sytuacji, gdy system
+      operacyjny na serwerze jest w trakcie zamykania, a zasilanie z sieci
+      zostanie przywrócone, wówczas system pozostanie zamknięty, nie uruchomi
+      się po powrocie zasilania. Ostatnie trzy opcje dziają w koniunkcji 
+      definiują one stan urządzenia UPS, kiedy zostaje wysłany do komputera
+      sygnał zamknięcia systemu. <code class="code-inline">BATTERYLEVEL</code>
+      określa pozostały poziom naładowania baterii,
+      <code class="code-inline">MINUTES</code> pozostała liczba minut
+      podtrzymania zasilania, natomiast 
+      <code class="code-inline">TIMEOUT</code> opóźnienie wysłania sygnału
+      zamkniecia systemu od rozpoczęcia pracy na baterii.
+    </p>
+    <p>
+      Skonfigurowanie oprogramowania musimy odnotować w pliku
+      <em>/etc/default/apcupsd</em>, zmieniając wartość opcji
+      <code class="code-inline">ISCONFIGURED</code> z 
+      <code class="code-inline">no</code> na <em>yes</em>.
+    </p>
+<pre class="code-block">
+root@pve-test:~# cat /etc/default/apcupsd 
+# Defaults for apcupsd initscript (unused with systemd as init).
+# Set to "yes" to enable startup of apcupsd.
+ISCONFIGURED=yes
+</pre>
+    <p>
+      Następnie restartujemy demon <em>apcupsd</em> i możemy sprawdzić za
+      pomocą polecenia <code class="code-inline">apcaccess</code> czy mamy
+      możliwość skomunikowania się z naszym zasilaczem.
+    </p>
+<pre class="code-block">
+root@pve-test:~# apcaccess 
+APC      : 001,038,0986
+DATE     : 2026-05-05 14:19:50 +0200  
+HOSTNAME : pve-test
+VERSION  : 3.14.14 (31 May 2016) debian
+UPSNAME  : BE850G2-FR
+CABLE    : USB Cable
+DRIVER   : USB UPS Driver
+UPSMODE  : Stand Alone
+STARTTIME: 2025-11-25 08:44:16 +0100  
+MODEL    : Back-UPS ES 850G2 
+STATUS   : ONLINE 
+LINEV    : 231.0 Volts
+LOADPCT  : 2.0 Percent
+BCHARGE  : 100.0 Percent
+TIMELEFT : 57.7 Minutes
+MBATTCHG : 80 Percent
+MINTIMEL : 5 Minutes
+MAXTIME  : 0 Seconds
+SENSE    : Medium
+LOTRANS  : 180.0 Volts
+HITRANS  : 266.0 Volts
+ALARMDEL : 30 Seconds
+BATTV    : 13.5 Volts
+LASTXFER : Automatic or explicit self test
+NUMXFERS : 11
+XONBATT  : 2026-05-05 12:25:28 +0200  
+TONBATT  : 0 Seconds
+CUMONBATT: 83 Seconds
+XOFFBATT : 2026-05-05 12:25:32 +0200  
+LASTSTEST: 2026-05-05 12:25:28 +0200  
+SELFTEST : NO
+STATFLAG : 0x05000008
+SERIALNO : 5B2415T94571  
+BATTDATE : 2024-04-13
+NOMINV   : 230 Volts
+NOMBATTV : 12.0 Volts
+NOMPOWER : 520 Watts
+FIRMWARE : 938.a2 .I USB FW:a2
+END APC  : 2026-05-05 14:19:50 +0200  
+</pre>
+    <p>
+      Tak skonfigurowane oprogramowanie pozwoli na wykorzystanie zasilacza UPS
+      do bezpiecznego zamknięcia systemu operacyjnego w przypadku zaniku
+      zasilania z sieci elektrycznej.
+    </p>
+    <h3>Monitoring stanu zasilacza UPS w czasie rzeczywistym</h3>
+    <p>
+      Obok pakietu <em>apcupsd</em> istnieje pakiet ze skrypt CGI, który
+      umożliwi nam podgląd status zasilacza z poziomu przeglądarki
+      internetowej. Mowa tutaj o pakiecie <em>apcupsd-cgi</em>, poza Debianem
+      jest on dostępny na Ubuntu oraz dystrybucjach bazujących na RHEL.
+    </p>
+    <p>
+      Skrypt ten nie wymaga żadnej konfiguracji poza pobraniem serwera WWW, w
+      moim przypadku jest to <em>Apache</em> i dodanie modułu odpowiedzialnego
+      za skryty CGI.
+    </p>
+<pre class="code-block">
+$ sudo apt install apcupsd-cgi apache2 -y
+$ sudo a2enmod cgi
+$ sudo systemctl restart apache2.service
+</pre>
+    <p>
+      Po takiej konfiguracji, możemy przejść pod adres:
+    </p>
+<pre class="code-block">
+http://ADRES.serwera/cgi-bin/apcupsd/multimon.cgi
+</pre>
+    <p>
+      Jeśli potrzebujemy ukryć tę stronę za ekranem logowania, możemy
+      wykorzystać mechanizm HTACCESS od serwera <em>Apache</em>. Jeśli nie
+      korzystamy z tego serwera, możemy znaleźć analogiczny mechanizm. Poniżej
+      znajduje się plik <em>.htaccess</em> dla jednego z moich serwerów. Plik
+      umieszczamy w katalogu głównym danego hostingu, w moim przypadku jest
+      <em>/var/www/html</em>.
+    </p>
+<pre class="code-block">
+root@pve-test:/var/www/html# cat .htaccess 
+AuthType Basic
+AuthName "Nieautoryzowany dostep jest zabroniony!"
+AuthUserFile /sciezka/do/pliku/z/uzytkownikami/i/haslami
+Require valid-user
+</pre>
+    <p>
+      Jeśli jest to pierwszy i jedyny użytkownik to dodajemy go za pomocą
+      poniższego polecenia:
+    </p>
+<pre class="code-block">
+$ sudo htpasswd -c /sciezka/do/pliku/z/uzytkownikami/i/haslami xf0r3m
+</pre>
+    <p>
+      Po jego wydaniu użytkownik zostanie zapytany o hasło dla uwierzytelnienia
+      <em>htaccess</em>.
+    </p>
+    <p>
+      W ten sposób mamy zabezpieczony dostęp do monitora UPS warto pamiętać
+      tutaj o wdrożeniu SSL.
+    </p>
+    <p>
+      ~xf0r3m
+    </p>
+  </div>
+	<p class="footer">
+	  2026; COPYLEFT; ALL RIGHTS REVERSED;
+	</p>
+</body>
+</html>
