@@ -221,7 +221,7 @@ http://ADRES.serwera/cgi-bin/apcupsd/multimon.cgi
 root@pve-test:/var/www/html# cat .htaccess 
 AuthType Basic
 AuthName "Nieautoryzowany dostep jest zabroniony!"
-AuthUserFile /sciezka/do/pliku/z/uzytkownikami/i/haslami
+AuthUserFile /sciezka/do/pliku/z/uzytkownikami/i/haslami/.htpasswd
 Require valid-user
 </pre>
     <p>
@@ -238,6 +238,23 @@ $ sudo htpasswd -c /sciezka/do/pliku/z/uzytkownikami/i/haslami xf0r3m
     <p>
       W ten sposób mamy zabezpieczony dostęp do monitora UPS warto pamiętać
       tutaj o wdrożeniu SSL.
+    </p>
+    <h2>UPS udostępniany hostom podrzędnym</h2>
+    <p>
+      Często bywa tak, że jeśli już decydujemy się na zakup zasilacza UPS,
+      wybieramy sprzęt zazwyczaj zapewniający zapotrzebowanie prądowe z dużą
+      nawiązką. Z czasem liczba urządzeń podłączonych do tego UPS-a może się
+      zwiększać, natomiast on posiada tylko jeden port przeznaczony do
+      komunikacji. W jaki sposób zatem możemy sprawić, aby pozostałe hosty
+      do niego podłączone mogły sprawdzić stan zasilania z sieci.
+      Oprogramowanie <em>apcupsd</em> daje nam możliwość komunikacji z
+      zasilaczem UPS poprzez sieci z wykorzystaniem serwera do którego
+      UPS jest podłączony po USB. Tego rodzaju host możemy nazwać
+      <strong>nadrzędnym</strong>, a hosty łaczące się z nim
+      <strong>podrzędnymi</strong>.
+    </p>
+    <p>
+      Do konfiguracji 
     </p>
     <p>
       ~xf0r3m
