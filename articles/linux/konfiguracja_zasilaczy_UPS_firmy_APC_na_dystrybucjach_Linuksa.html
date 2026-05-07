@@ -578,8 +578,106 @@ END APC  : 2026-05-07 15:46:35 +0200
       zasilacza, a za jakiś czas na konsoli serwera zostanie wyświetlony
       monit o tym, że utracono połączenie z UPS, to oznacza, że mamy tylko
       pozorne połączenie z NMC UPS-a, a przynajmniej nie takie jakiego wymaga
-      protokół PCNS.
+      protokół PCNS. Najczęściej oznacza to, że UPS oraz serwer znajdują się
+      w innych domenach rozgłoszeniowych (sieciach lokalnych), więc jeśli
+      kształtujemy ruch sieciowy za pomocą takich urządzeń jak zapora to
+      warto pamiętać o tym, że korzystając z protokołu PCNS istnieje potrzeba
+      skomunikowania się UPS-a (nawiązania połączenia, rozpoczęcia transmisji)
+      z serwerem docelowym. Zatem odpowiednia reguła powinna trafić do tablicy
+      zapory.
     </p>
+    <p>
+      Czy można użyć polecenia <code class="code-inline">apctest</code>, przy
+      połączeniu tego typu? Otóż, nie. Wyświetla się ten sam komunikat co w
+      przypadku monitorów.
+    </p>
+    <h2>Podsumowanie</h2>
+    <p>
+      Podłaczenie zasilacza awaryjnego dowolnej firmy do systemów Microsoftu
+      nie przysparza zbyt wielu problemów. Czasmi do zasilacza dołączona jest
+      płyta lub sterownik do komunikacji z nim możemy pobrać ze strony
+      producenta. A co w przypadku dystrybucji Linuksa czy innych systemów
+      operacyjnych? Jeszcze 10 lat temu, dostępny był jedynie pakiet
+      <em>apcupsd</em>, dlatego też po prostu wydawało się wiecej pieniędzy na
+      lepszy UPS firmy APC. Obecnie ulega to zmianie, co raz więcej producentów
+      publikuje na swoich stronach sterownik dla dystrybucji Linuksa. Czy trend
+      wyboru wyłącznie APC ulegnie w przysłości zmianie? Prawdopodobnie tak,
+      o ile firmy dadzą podobną jakość i takie same rozwiązania instalacji
+      jak są w przypadku APC. Ostatnio wymieniłem UPS APC po 17 latach (!)
+      działania. Gdzieś tam przewija się firma EATON, i możliwość konfiguracji
+      tanich UPS-ów przez sterownik usbhid-ups, pakietu NUT (Network UPS Tools)
+      Być może materiał o tym się pojawi o ile uda mi się znaleźć odpowiedni
+      UPS. Ten materiał pokazał, nam w jaki sposób możemy skonfigurować
+      oprogramowania <em>apcupsd</em> do pracy zasilaczami UPS w różnych
+      konfiguracjach połączenia z nimi.
+    </p>
+    <h2>Dodatkowy przypadek: Zamknięcie systemu serwera NAS Synology po zaniku zasilania</h2>
+    <p>
+      Ten przypadek nieco odbiega od tematu tego artykułu, nie mniej jednak
+      dotyczy konfiguracji oprogramowania UPS, tym razem na serwerze NAS od
+      Synology. Problem z domyślnymi ustawieniami jest taki, że system po
+      określonej liczbie czasu, po jakiej powinien zamknąć system operacyjny
+      faktycznie dokonuje on jakiś czynności. Praca dysków ustaje a sam
+      system operacyjny zostaje zatrzymany. Kiedy w zasilaczu wyczerpie się
+      bateria. Zasilacza nie wyłącza się znaczym spadku poboru energi z jego
+      wyjścia - jak powinien, ponieważ tego spadku faktycznie tam nie ma.
+      Natomiast dochodzi do rozładowania baterii i po powrocie zasilania
+      system ogłasza, że został niepoprawnie wyłączony. 
+    </p>
+    <p>
+      Myszkując trochę po Internecie, znalazłem artykuł na serwisie
+      <em>reddit</em>. Postujacy ma ten sam problem i zaproponował takie
+      rozwiązanie jak zamiana poleceń w funkcji uruchmianej w momencie
+      przekroczenia czasu pracy na baterii (rozpoczęcie procesu wyłączania
+      systemu operacyjnego). W pliku <em>/usr/syno/bin/synoups</em> w
+      186 linii, zastępujemy polecenie:
+    </p>
+<pre class="code-block">
+/usr/syno/sbin/synopoweroff -s &amp;
+</pre>
+    <p>
+      Poleceniem:
+    </p>
+<pre class="code-block">
+shutdown -P now &amp;
+</pre>
+    <p>
+      Teraz serwery wyłączają się zaraz po zaniku zasilania. Zmiana w tym
+      pliku jest w stanie przetwać restart, ale nie aktualizację systemu
+      dlatego ten dodatek w ogóle powstał, aby pamiętać gdzie szukać informacji
+      by poraz kolejny to skonfigurować. Kolejną wadą tego rozwiązania jest
+      to, że po powrocie zasilania serwer NAS nie uruchomi się sam ponownie,
+      Dlatego trzeba się zaopatrzyć w obsługę takie technologii jak WOL
+      (ang. <em>Wake On Lan</em>), aby móc zdalnie uruchmić taki serwer.
+    </p>
+    <p>
+      Ostatnią rzeczą, na którą należało by zwrócić uwagę, podczas konfiguracji
+      UPS na serwerach Synology, to jeśli jeden serwer jest podłączony do
+      instalacji UPS w budynku i nie ma swojego UPS, a monitroruje stan UPS-a
+      podłączonego prze inny serwer Synology, to należało by wyłączyć
+      zatrzymanie systemu na serwerze podrzędnym, kiedy utracji on połączenie
+      z UPS, przez np. restart serwera nadrzędnego. Możemy tego dokonać
+      poprzez komentarz linii 260 w pliku <em>/usr/syno/bin/synoups</em>.
+      Powinno to wyglądać mniej więcej tak:
+    </p>
+<pre class="code-block">
+nocomm)
+SynoUpsStateLog "synoups nocomm"
+#UPSSafeMode $1
+;;
+</pre>
+    <p>
+      To wszystkie zawiłości jeśli chodzi konfigurację UPS na serwerach NAS od
+      Synology.
+    </p>
+    <p>
+      Źródła:
+    </p>
+    <ol>
+      <li><a href="https://www.brunweb.de/configuration-of-an-apc-ups-under-proxmox/">Configuration of an APC UPS under Proxmox</a></li>
+      <li><a href="https://forums.freebsd.org/threads/problems-with-apc-configuration-via-apcupsd.93545/">Podłączanie serwerów do UPS przez sieć (kartę NMC)</a></li>
+      <li><a href="https://www.reddit.com/r/synology/comments/1ir58vt/has_anyone_figured_out_how_to_shutdown_synology/?solution=4dfc989da354ae564dfc989da354ae56&js_challenge=1&token=bbbe4bf1c9a2b5160829c4be34da586192920a0792877fe901cc6c7a303ce69b&jsc_orig_r=">Has anyone figured out how to shutdown Synology when UPS goes to battery power?</a></li>
+    </ol>
     <p>
       ~xf0r3m
     </p>
