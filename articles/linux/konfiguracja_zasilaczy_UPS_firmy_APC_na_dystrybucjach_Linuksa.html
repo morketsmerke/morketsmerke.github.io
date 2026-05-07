@@ -254,7 +254,331 @@ $ sudo htpasswd -c /sciezka/do/pliku/z/uzytkownikami/i/haslami xf0r3m
       <strong>podrzędnymi</strong>.
     </p>
     <p>
-      Do konfiguracji 
+      Ten rodzaj komunikacji wymaga podłączenia UPS do hosta nadrzędnego oraz
+      skonfigurowanie go w sposób pokazany w rozdziale 
+      <em>Samodzielny host z UPS</em>. Jeśli host nadrzędny jest wstanie
+      skomunikować się z UPS, to możemy przjeść do konfiguracji ustawień
+      sieciowych konfiguracji oprogramowania <em>apcupsd</em> komputera
+      zarządzającego zasilaczem. Interesować nas będzie głownie zmiana
+      adresu IP, z <strong>127.0.0.1</strong> na <strong>0.0.0.0</strong>.
+      W ten sposób oprogramowanie zacznie nasłuchwiwać na wszystkich
+      interfejsa hosta, poza pętlą zwrotną. Edytujemy opcję
+      <em>NISIP</em>.
+    </p>
+<pre class="code-block">
+NISIP 0.0.0.0
+</pre>
+    <p>
+      Domyślnie protokół NIS (ang. <em>Network Information Server</em>) jest
+      właczony dzięki niemu wcześniej wspominiany skrypt CGI, może odcztać
+      dane z UPS. Ze względu na to, że skrypt działa na tym samym hoście nie
+      było potrzeby niczego zmieniać. Resztę opcji pozostawiamy bez zmian,
+      nieoznacza to końca konfiguracji. Zapisujemy zmiany w pliku i
+      przechodzimy do pliku <em>/etc/apcupsd/hosts.conf</em>, gdzie zgodnie
+      z przykładem zawarty w samym pliku, dodajemy hosty podrzędne, które
+      będą odbierać dane z UPS za pośrednictwem hosta nardzędznego, tak jak
+      na poniższym przykładzie.
+    </p>
+<pre class="code-block">
+root@pve-test:~# cat /etc/apcupsd/hosts.conf 
+# Network UPS Tools - hosts.conf
+#
+# This file does double duty - it lists the systems that multimon will
+# monitor, and also specifies the systems that upsstats is allowed to 
+# watch.  It keeps people from feeding random addresses to upsstats,
+# among other things.  upsimage also uses this file to know who it 
+# may speak to. upsfstats too.
+#
+# Usage: list systems running upsd that you want to monitor
+#
+# MONITOR &lt;address&gt; "&lt;host description&gt;"
+#
+# Please note, MONITOR must start in column 1 (no spaces permitted)
+#
+# Example: 
+# MONITOR 10.64.1.1 "Finance department"
+# MONITOR 10.78.1.1 "Sierra High School data room #1"
+#
+MONITOR 127.0.0.1 "Local Host"
+MONITOR 10.0.16.11 "pve-test node2"
+MONITOR 10.0.16.12 "pbs-test"
+</pre>
+    <p>
+      Po zapisaniu zmian w pliku, możemy przjeść do konfiguracji hosta
+      podrzędnego. Wymagane jest, aby pakiet <em>apcupsd</em> był zainstalowany.
+      Po zainstalowaniu pakietu, otwieramy plik konfiguracyjny i zmieniamy 
+      następujące opcje zgodnie z poniższym przykładem.
+    </p>
+<pre class="code-inline">
+UPSCABLE ether
+UPSTYPE net
+DEVICE 10.0.16.9:3551
+</pre>
+    <p>
+      Tutaj, zamiast wybierać kabel wskazujemy, że będzie to 
+      połączenie <em>ethernetowe</em> (<code class="code-inline">ether</code>),
+      następnie ustawiamy typ połączenia na połączenie sieciowe
+      (<code class="code-inline">net</code>), jako port urządzenia podajemy
+      adres IP hosta nadrzędnego wraz z portem
+      <code class="code-inline">3551</code>.
+    </p>
+    <p>
+      Jesli planujemy zmieniać zachowanie oprogramowania podczas działania w
+      trybie <em>ONBATTERY</em> na hostach podrzędnych to czas działania na
+      baterii nie może być dłuższy od tego na hoście nadrzędnym.
+    </p>
+    <p>
+      Tak skonfigurowany przez nas host podrzędny możemy przetestować wydając
+        polecenie <code class="code-inline">apcaccess</code>.
+    </p>
+<pre class="code-block">
+root@pve-test-node2~# apcaccess 
+APC      : 001,039,1029
+DATE     : 2026-05-07 13:44:40 +0200  
+HOSTNAME : fog
+VERSION  : 3.14.14 (31 May 2016) debian
+UPSNAME  : pve-test-node1
+CABLE    : Ethernet Link
+DRIVER   : NETWORK UPS Driver
+UPSMODE  : Stand Alone
+STARTTIME: 2025-12-10 09:51:56 +0100  
+MASTERUPD: 2026-05-07 13:44:40 +0200  
+MASTER   : 172.16.1.4:3551
+MODEL    : Back-UPS RS 1500G 
+STATUS   : ONLINE SLAVE 
+LINEV    : 229.0 Volts
+LOADPCT  : 2.0 Percent
+BCHARGE  : 100.0 Percent
+TIMELEFT : 97.8 Minutes
+MBATTCHG : 80 Percent
+MINTIMEL : 3 Minutes
+MAXTIME  : 0 Seconds
+SENSE    : Medium
+LOTRANS  : 176.0 Volts
+HITRANS  : 294.0 Volts
+BATTV    : 27.3 Volts
+LASTXFER : Automatic or explicit self test
+NUMXFERS : 1
+XONBATT  : 2026-04-27 23:19:58 +0200  
+TONBATT  : 0 Seconds
+CUMONBATT: 8 Seconds
+XOFFBATT : 2026-04-27 23:20:06 +0200  
+LASTSTEST: 2026-04-27 23:19:58 +0200  
+SELFTEST : NO
+STATFLAG : 0x05000408
+SERIALNO : 4B1905P26971
+BATTDATE : 2019-01-31
+NOMINV   : 230 Volts
+NOMBATTV : 24.0 Volts
+NOMPOWER : 865 Watts
+FIRMWARE : 878.L5 .I USB FW:L5
+END APC  : 2026-05-07 13:45:29 +0200  
+</pre>
+    <p>
+      Przywykorzystaniu wyżej opisanych działań możemy podłączyć więcej
+      serwerów z dystrybucjami Linuksa do jednego UPS-a. Przy użyciu kilku
+      wierszy zaoszczędziliśmy na zakupie kolejnych urządzeń UPS. Dodając
+      hosty podrzędne do pliku <em>/etc/apcupsd/hosts.conf</em> zdefiniowaliśmy
+      tak zwane <strong>monitory</strong>. Zadaniem ich opgrogramowania jest
+      odpytywać hosta nadrzędne o stan zasilacza. Nie mogą one jednak 
+      wchodzić z nim w żadną interakcję. Za pomocą polecenia
+      <code class="code-inline">apctest</code>, możemy kontrolować nasz
+      zasialacz z poziomu serwera. Czasami przydaje się możliwość wzbudzenia
+      alarmu dźwiekowego, dzięki czemu możemy dowiedzieć się, który zasilacz
+      jest podłączony do naszego serwera spośród takich samych urządzeń obok.
+    </p>
+<pre class="code-block">
+root@pve-test-node1:~# apctest 
+
+
+2026-05-07 14:08:59 apctest 3.14.14 (31 May 2016) debian
+Checking configuration ...
+sharenet.type = Network &amp; ShareUPS Disabled
+cable.type = USB Cable
+mode.type = USB UPS Driver
+Setting up the port ...
+Doing prep_device() ...
+
+You are using a USB cable type, so I'm entering USB test mode
+Hello, this is the apcupsd Cable Test program.
+This part of apctest is for testing USB UPSes.
+
+Getting UPS capabilities...SUCCESS
+
+Please select the function you want to perform.
+
+1)  Test kill UPS power
+2)  Perform self-test
+3)  Read last self-test result
+4)  View/Change battery date
+5)  View manufacturing date
+6)  View/Change alarm behavior
+7)  View/Change sensitivity
+8)  View/Change low transfer voltage
+9)  View/Change high transfer voltage
+10) Perform battery calibration
+11) Test alarm
+12) View/Change self-test interval
+ Q) Quit
+
+Select function number: 11
+
+Testing alarm...COMPLETE
+
+1)  Test kill UPS power
+2)  Perform self-test
+3)  Read last self-test result
+4)  View/Change battery date
+5)  View manufacturing date
+6)  View/Change alarm behavior
+7)  View/Change sensitivity
+8)  View/Change low transfer voltage
+9)  View/Change high transfer voltage
+10) Perform battery calibration
+11) Test alarm
+12) View/Change self-test interval
+ Q) Quit
+
+Select function number: Q
+</pre>
+    <p>
+      Tego polecenia, nie możemy wydać kiedy działa daemon <em>apcupsd</em>.
+      To znaczy, możemy wydać polecenie, ale program nie zostanie uruchomiony.
+      Wyświetli się monit o tym, że <em>apcupsd</em> działa i przed
+      uruchomieniem <em>apctest</em>, należy go wyłączyć. Możemy to zrobić
+      z poziomu polecenia <code class="code-inline">systemctl</code>. Natomiast
+      jeśli spróbujemy uruchomić to polecenie na monitorze, otrzymamy taki
+      o to komunikat.
+    </p>
+<pre class="code-block">
+root@pve-test-node2:~# apctest 
+
+
+2026-05-07 13:55:15 apctest 3.14.14 (31 May 2016) debian
+Checking configuration ...
+sharenet.type = Network &amp; ShareUPS Disabled
+cable.type = Ethernet Link
+mode.type = NETWORK UPS Driver
+Setting up the port ...
+Doing prep_device() ...
+Testing not yet implemented for this UPSTYPE.
+</pre>
+    <h2>UPS sieciowy</h2>
+    <p>
+      Mocniejsze UPS o mocy pozornej ok. 3kVA mogą być wyposażane w kartę
+      zarządzania sieciowego <strong>NMC</strong> (ang. <em>Network Management
+      Card</em>). Ta karta pozwala nam na podłączenie zasilacza UPS już nie
+      do jednego z hostów, ale do przełącznika za pomocą kabla RJ-45. Takie
+      zasilacze najczęsciej zapewniają nieprzerwane źródło zasilania więcej
+      niż jednemu urządzeniu. Karta NMC poza samą możliwością monitorowania
+      udostępnia protokół, dzięki któremu oprogramowanie może połączyć się z
+      UPS i odpytywać go jego status. Zasada działania jest podobna do
+      monitorów z poprzedniego rozdziału, tutaj jednak nie ma czegoś takiego
+      host nadrzędny to karta NMC UPS-a daje nam takie możliwości. Dostęp do
+      NMC uzyskuje się przez przeglądarkę internetową, więc zakładając, że
+      nasz UPS jest dostępny w sieci lokalnej i osiągalne jest osiągalny przez
+      serwery docelowe (co jak się poźniej dowiemy, nie bywa takie oczywiste).
+      Logujemy sie do panelu NMC.
+    </p>
+    <p>
+      Protokół zapewniający dostęp do UPS naszym serwerom nazywa się
+      <em>PowerChute Network Shutdown</em> i domyślnie jest on wyłączony do
+      momentu, kiedy nie zostanie zdefiniowany parametr taki jak
+      <code class="code-block">Authentication Phrase</code>. Aby uruchomić ten
+      protokól, przechodzimy do zakładki <em>Configuration</em> następnie
+      <em>Shutdown</em>. Na dole nad przyciskiem <em>Apply</em> znajduje się
+      właśnie to pole. Wpisujemy w nim frazę uwierzytelniania przy czym warto
+      zaznaczyć, że istotna jest złożoność tej frazy musi zawierać znaki
+      każdego rodzaju oraz oraz minimalna długość powyżej 15 znaków - co
+      najmniej 16, 17 lub 20. Jeśli nie są załączone to załączamy również
+      protokoły komunikacyjne PCNS takie jak HTTP oraz HTTPS. Na koniec klikamy
+      <em>Apply</em>, zapisując konfigurację - jeśli oprogramowania nie zwróci
+      błedów, to znaczy, że fraza uwierzytelniania została poprawnie zapisana.
+      Następnym krokiem jest dodanie klientów, w zakładce
+      <em>Configuration/PowerChute Clients</em>. Tam dodajemy poszczególne
+      serwery. Przy czym, mocniejsze zasilacze UPS mają podzielone wyjścia
+      (gniazda, do który podłączone są serwery) na grupy.
+      W tym przypadku grupy noszą nazwę <em>Outlet</em>-u. Możemy sterować,
+      każdym <em>outlet</em>-em indywidualnie, dla przykładu możemy mieć
+      włączoną tylko jedna grupę a reszta wyłączona. Przy deklarowaniu
+      klienta musimy podać, grupę do której jest on podłaczony. Po dodaniu
+      klientów, konfiguracja po stronie UPS-a jest zakończona. Teraz możemy
+      prześć do konfiguracji poszczególnych serwerów. 
+    </p>
+    <p>
+      Konfiguracja oprogramowania <em>apcupsd</em> w tym trybie działania z
+      UPS będzie koncentrować się na konfiguracji podobnej dla samodzielnego
+      hosta z podłączonym UPS po USB. Metoda konfiguracji będzie taka sama,
+      zmienią się tylko wartości poszczególnych opcji. Poniżej znajduje się
+      zrzut konfiguracji:
+    </p>
+<pre class="code-block">
+UPSNAME TESTUPS
+UPSCABLE ether
+UPSTYPE pcnet
+DEVICE 10.0.16.2:apc:123Sup3rT4jn3H4sl0!@#
+</pre>
+    <p>
+      Konfiguracja odnośnie stanu UPS do wywołania zamknięcia systemu
+      pozostawię do waszej dyspozycji. Po wywołaniu polecenia
+      <em>apcaccess</em>, powinniśmy otrzymać taki o to wynik:
+    </p>
+<pre class="code-block">
+xf0r3m@hp-z240-1:~$ sudo apcaccess 
+APC      : 001,046,1119
+DATE     : 2026-05-07 03:40:13 +0200  
+HOSTNAME : hp-z240-1
+VERSION  : 3.14.14 (31 May 2016) debian
+UPSNAME  : TESTUPS
+CABLE    : Ethernet Link
+DRIVER   : PCNET UPS Driver
+UPSMODE  : Stand Alone
+STARTTIME: 2026-04-23 07:14:14 +0200  
+MODEL    : Smart-UPS X3000
+STATUS   : ONLINE 
+LINEV    : 227.4 Volts
+LOADPCT  : 21.2 Percent
+BCHARGE  : 100.0 Percent
+TIMELEFT : 40.0 Minutes
+MBATTCHG : 80 Percent
+MINTIMEL : 3 Minutes
+MAXTIME  : 0 Seconds
+MAXLINEV : 227.4 Volts
+MINLINEV : 227.4 Volts
+OUTPUTV  : 227.4 Volts
+DWAKE    : 0 Seconds
+DSHUTD   : 0 Seconds
+DLOWBATT : 2 Minutes
+ITEMP    : 22.4 C
+ALARMDEL : Always
+BATTV    : 136.5 Volts
+LINEFREQ : 50.0 Hz
+LASTXFER : Line voltage notch or spike
+NUMXFERS : 57
+XONBATT  : 2026-05-07 04:34:23 +0200  
+TONBATT  : 0 Seconds
+CUMONBATT: 100 Seconds
+XOFFBATT : 2026-05-07 04:34:25 +0200  
+LASTSTEST: 2026-04-27 11:48:35 +0200  
+SELFTEST : OK
+STESTI   : 336
+STATFLAG : 0x05000008
+REG1     : 0x00
+REG2     : 0x00
+REG3     : 0x00
+MANDATE  : 11/11/2019
+SERIALNO : AS1946250053
+BATTDATE : 12/15/2025
+NOMOUTV  : 230 Volts
+FIRMWARE : UPS 06.6 (ID23)
+END APC  : 2026-05-07 15:46:35 +0200  
+</pre>
+    <p>
+      Jeśli mimo poprawnego skonfigurowania, nie możemy otrzymać statusu
+      zasilacza, a za jakiś czas na konsoli serwera zostanie wyświetlony
+      monit o tym, że utracono połączenie z UPS, to oznacza, że mamy tylko
+      pozorne połączenie z NMC UPS-a, a przynajmniej nie takie jakiego wymaga
+      protokół PCNS.
     </p>
     <p>
       ~xf0r3m
