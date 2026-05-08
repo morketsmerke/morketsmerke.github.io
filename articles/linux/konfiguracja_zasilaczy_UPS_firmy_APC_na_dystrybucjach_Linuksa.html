@@ -21,7 +21,7 @@
 		<h1 class="title">Konfiguracja zasilaczy UPS firmy APC na dystrybucjach Linuksa</h1>
     <p>
       Na tej stronie omawialiśmy taki sprzęt jakim są serwery dedykowane, tutaj
-      występowły one w postaci serwerów RACK. Te urządzenia są projektowane
+      występowały one w postaci serwerów RACK. Te urządzenia są projektowane
       w taki sposób, aby zapewnić ich nieprzerwane działanie - co za tym idzie
       stały dostęp do świadczonych przez nie usług. Co raz więcej komponentów
       tych komputerów możemy wymieć na tzw. <strong>gorąco</strong>
@@ -49,25 +49,28 @@
       Tutaj też warto rozdzielić systemy zasilania awaryjnego od konsumenckich
       zasilaczy, nawet tych bardziej zaawansowanych. Systemy zasilania UPS,
       projektowane są z myślą o jak najdłuższym podtrzymaniu zasilania.
+      Oczywiście jeśli stan akumulatorów będzie krytycznie niski zostaną
+      wysłane sygnały do wyłaczenia systemów operacyjnych lub zostanie
+      uruchomiony agregat.
       Natomiast z racji tego, że przy obciążonym serwerze taki zwykły zasilacz
       za długo nie podziała stosuje się zasadę zapewnienia stabilnego
       zasilania do czasu poprawnego zamknięcia systemu operacyjnego oraz
       wyłączenia serwera. Do realizacji tego zadania stan zasilania UPS musi
-      być stale monitorowany. Jest to dokonywane za pomocą specjalnego
+      być stale monitorowany. Jest to realizowane za pomocą specjalnego
       opgramowania zainstalowanego na serwerze przy połączeniu USB z
       zasilaczem lub przy pomocy specjalnego modułu sieciowego montowanego w
       UPS.
     </p>
     <p>
       W tym artykule opiszemy sobie konfigurację takiego oprogramowania
-      wykorzystując do tego swojego czasu jedyne oprogramowanie pozwalające
+      wykorzystując do tego, swojego czasu jedyne oprogramowanie pozwalające
       na komunikację z dedykowanymi urządzeniami UPS firmy APC
       (ang. <em>American Power Convervions</em>, obecnie 
       <em>Schnider Electric</em>) w dystrybucjach Linuksa. W trzech przypadkach:
       samodzielny host z UPS, UPS udostępniany hostom podrzędnym oraz UPS
       sieciowy. Konfiguracja oprogramowania UPS będzie polegać na tym, aby
       uzyskać status urządzenia od niego oraz ustawić parametry w taki sposób
-      aby system mógł zamknąć swobodnie swój system operacyjny.
+      aby komputer mógł zamknąć swobodnie swój system operacyjny.
     </p>
     <h2>Samodzielny host z UPS</h2>
     <p>
@@ -109,7 +112,8 @@ TIMEOUT 0
       opcje definiują nam połączenie z UPS-em. Natomiast opcje poniżej
       konfigurują już samo zachowanie UPS. Opcja
       <code class="code-inline">ONBATTERYDELAY</code> określa opóźnienie
-      ogłoszenia stanu ONBATTERY o określoną przez nas ilość sekund. Ta opcja
+      ogłoszenia stanu <em>ONBATTERY</em> o określoną przez nas ilość sekund. 
+      Ta opcja
       dobrze skonfigurowana pozwala uniknąć takiej sytuacji, gdy system
       operacyjny na serwerze jest w trakcie zamykania, a zasilanie z sieci
       zostanie przywrócone, wówczas system pozostanie zamknięty, nie uruchomi
@@ -188,7 +192,7 @@ END APC  : 2026-05-05 14:19:50 +0200
     </p>
     <h3>Monitoring stanu zasilacza UPS w czasie rzeczywistym</h3>
     <p>
-      Obok pakietu <em>apcupsd</em> istnieje pakiet ze skrypt CGI, który
+      Obok pakietu <em>apcupsd</em> istnieje pakiet ze skryptem CGI, który
       umożliwi nam podgląd status zasilacza z poziomu przeglądarki
       internetowej. Mowa tutaj o pakiecie <em>apcupsd-cgi</em>, poza Debianem
       jest on dostępny na Ubuntu oraz dystrybucjach bazujących na RHEL.
@@ -196,7 +200,7 @@ END APC  : 2026-05-05 14:19:50 +0200
     <p>
       Skrypt ten nie wymaga żadnej konfiguracji poza pobraniem serwera WWW, w
       moim przypadku jest to <em>Apache</em> i dodanie modułu odpowiedzialnego
-      za skryty CGI.
+      za skrypty CGI.
     </p>
 <pre class="code-block">
 $ sudo apt install apcupsd-cgi apache2 -y
@@ -211,8 +215,10 @@ http://ADRES.serwera/cgi-bin/apcupsd/multimon.cgi
 </pre>
     <p>
       Jeśli potrzebujemy ukryć tę stronę za ekranem logowania, możemy
-      wykorzystać mechanizm HTACCESS od serwera <em>Apache</em>. Jeśli nie
-      korzystamy z tego serwera, możemy znaleźć analogiczny mechanizm. Poniżej
+      wykorzystać mechanizm <em>HTACCESS</em> od serwera <em>Apache</em>. 
+      Jeśli nie
+      korzystamy z tego serwera, możemy znaleźć analogiczny mechanizm
+      dla naszego rozwiązania. Poniżej
       znajduje się plik <em>.htaccess</em> dla jednego z moich serwerów. Plik
       umieszczamy w katalogu głównym danego hostingu, w moim przypadku jest
       <em>/var/www/html</em>.
@@ -257,13 +263,12 @@ $ sudo htpasswd -c /sciezka/do/pliku/z/uzytkownikami/i/haslami xf0r3m
       Ten rodzaj komunikacji wymaga podłączenia UPS do hosta nadrzędnego oraz
       skonfigurowanie go w sposób pokazany w rozdziale 
       <em>Samodzielny host z UPS</em>. Jeśli host nadrzędny jest wstanie
-      skomunikować się z UPS, to możemy przjeść do konfiguracji ustawień
+      skomunikować się z UPS, to możemy przjeść do ustawień
       sieciowych konfiguracji oprogramowania <em>apcupsd</em> komputera
       zarządzającego zasilaczem. Interesować nas będzie głownie zmiana
       adresu IP, z <strong>127.0.0.1</strong> na <strong>0.0.0.0</strong>.
       W ten sposób oprogramowanie zacznie nasłuchwiwać na wszystkich
-      interfejsa hosta, poza pętlą zwrotną. Edytujemy opcję
-      <em>NISIP</em>.
+      interfejsa hosta. Edytujemy opcję <em>NISIP</em>.
     </p>
 <pre class="code-block">
 NISIP 0.0.0.0
@@ -276,7 +281,7 @@ NISIP 0.0.0.0
       nieoznacza to końca konfiguracji. Zapisujemy zmiany w pliku i
       przechodzimy do pliku <em>/etc/apcupsd/hosts.conf</em>, gdzie zgodnie
       z przykładem zawarty w samym pliku, dodajemy hosty podrzędne, które
-      będą odbierać dane z UPS za pośrednictwem hosta nardzędznego, tak jak
+      będą odbierać dane z UPS za pośrednictwem hosta nadrzędnego, tak jak
       na poniższym przykładzie.
     </p>
 <pre class="code-block">
@@ -335,7 +340,7 @@ DEVICE 10.0.16.9:3551
 root@pve-test-node2~# apcaccess 
 APC      : 001,039,1029
 DATE     : 2026-05-07 13:44:40 +0200  
-HOSTNAME : fog
+HOSTNAME : pve-test-node2
 VERSION  : 3.14.14 (31 May 2016) debian
 UPSNAME  : pve-test-node1
 CABLE    : Ethernet Link
@@ -380,7 +385,7 @@ END APC  : 2026-05-07 13:45:29 +0200
       wierszy zaoszczędziliśmy na zakupie kolejnych urządzeń UPS. Dodając
       hosty podrzędne do pliku <em>/etc/apcupsd/hosts.conf</em> zdefiniowaliśmy
       tak zwane <strong>monitory</strong>. Zadaniem ich opgrogramowania jest
-      odpytywać hosta nadrzędne o stan zasilacza. Nie mogą one jednak 
+      odpytywać hosta nadrzędnego o stan zasilacza. Nie mogą one jednak 
       wchodzić z nim w żadną interakcję. Za pomocą polecenia
       <code class="code-inline">apctest</code>, możemy kontrolować nasz
       zasialacz z poziomu serwera. Czasami przydaje się możliwość wzbudzenia
@@ -476,15 +481,15 @@ Testing not yet implemented for this UPSTYPE.
       monitorów z poprzedniego rozdziału, tutaj jednak nie ma czegoś takiego
       host nadrzędny to karta NMC UPS-a daje nam takie możliwości. Dostęp do
       NMC uzyskuje się przez przeglądarkę internetową, więc zakładając, że
-      nasz UPS jest dostępny w sieci lokalnej i osiągalne jest osiągalny przez
+      nasz UPS jest dostępny w sieci lokalnej i jest osiągalny przez
       serwery docelowe (co jak się poźniej dowiemy, nie bywa takie oczywiste).
       Logujemy sie do panelu NMC.
     </p>
     <p>
       Protokół zapewniający dostęp do UPS naszym serwerom nazywa się
-      <em>PowerChute Network Shutdown</em> i domyślnie jest on wyłączony do
-      momentu, kiedy nie zostanie zdefiniowany parametr taki jak
-      <code class="code-block">Authentication Phrase</code>. Aby uruchomić ten
+      <em>PowerChute Network Shutdown</em> (PCNS) i domyślnie jest on wyłączony
+      do momentu, kiedy nie zostanie zdefiniowany parametr taki jak
+      <code class="code-inline">Authentication Phrase</code>. Aby uruchomić ten
       protokól, przechodzimy do zakładki <em>Configuration</em> następnie
       <em>Shutdown</em>. Na dole nad przyciskiem <em>Apply</em> znajduje się
       właśnie to pole. Wpisujemy w nim frazę uwierzytelniania przy czym warto
@@ -627,7 +632,7 @@ END APC  : 2026-05-07 15:46:35 +0200
     <p>
       Myszkując trochę po Internecie, znalazłem artykuł na serwisie
       <em>reddit</em>. Postujacy ma ten sam problem i zaproponował takie
-      rozwiązanie jak zamiana poleceń w funkcji uruchmianej w momencie
+      rozwiązanie jak zamiana poleceń w funkcji uruchamianej w momencie
       przekroczenia czasu pracy na baterii (rozpoczęcie procesu wyłączania
       systemu operacyjnego). W pliku <em>/usr/syno/bin/synoups</em> w
       186 linii, zastępujemy polecenie:
@@ -644,7 +649,8 @@ shutdown -P now &amp;
     <p>
       Teraz serwery wyłączają się zaraz po zaniku zasilania. Zmiana w tym
       pliku jest w stanie przetwać restart, ale nie aktualizację systemu
-      dlatego ten dodatek w ogóle powstał, aby pamiętać gdzie szukać informacji
+      dlatego ten dodatek w ogóle został zapisany, aby pamiętać gdzie szukać 
+      informacji
       by poraz kolejny to skonfigurować. Kolejną wadą tego rozwiązania jest
       to, że po powrocie zasilania serwer NAS nie uruchomi się sam ponownie,
       Dlatego trzeba się zaopatrzyć w obsługę takie technologii jak WOL
