@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+			<link rel="stylesheet" type="text/css" href="/style.css">
+			<style>
+				.code-block {
+					text-align: left;
+				}
+				ul {
+					text-align: left;
+				}
+			</style>
+		</head>
+		<body>
+<pre>
+ _                      _             _ _
+| |_ ___ _ __ _ __ ___ (_)_ __   __ _| | | ___   __ _
+| __/ _ \ '__| '_ ` _ \| | '_ \ / _` | | |/ _ \ / _` |
+| ||  __/ |  | | | | | | | | | | (_| | | | (_) | (_| |
+ \__\___|_|  |_| |_| |_|_|_| |_|\__,_|_|_|\___/ \__, |
+			                        |___/
+</pre>
+			<p class="header_link">
+				&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+			</p>
+			<div class="main">
+				<h1 class="title">Konfiguracja sieci komputerowej w oparciu o rozwiązania firmy Huawei</h1>
+        <p>
+          Marka Huawei, wielu kojarzy się ze smartfonami oraz tabletami. Firma
+          ta poza rynkiem konsumenckim, produkuje również bardziej zaawansowany
+          sprzęt sieciowy, mogący konkurować z amerykańskim Cisco. W mojej
+          sieci działa przełączników tej firmy i aby zapewnić sobie stałe
+          źródło wiedzy odnośnie konfiguracji tych że urządzeń tworzę ten
+          artykuł. Firma Huawei może za jakiś czas pozbyć się dokumentacji
+          urządzeń, które już nie są wspierane. Tak jak ma to z oprogramowanie
+          eNSP - takim odpowiednikiem <em>packet tracera</em>.
+          Artykuł będzie mieć formę otwartą - chyba, że uda się wyczerpać
+          wszystkie zaagadnienia i w miarę pojawiania się dodatkowych
+          zagadnienień będę je tutaj dopisywać.
+        </p>
+        <h2>Wprowadzenie do konfiguracji, konfiguracja dostępu SSH oraz VLAN-ów - 11.05.2026r.</h2>
+        <p>
+          Dzisiaj rozpoczyniemy zagadnieniami wprowadzenia do konfiguracji.
+          Ustawimy możliwość połączenia SSH z przełącznikiem, przestawione
+          zostaną sposoby łączenia się z dystrybucji Linuksa oraz inne
+          urządzenia Huawei - a mianowicie router. Następnie przjedziem do
+          konfiguracji VLAN-ów w trybie dostępowym oraz w trybie <em>trunk</em>.
+        </p>
+        <p>
+          Po zalogowaniu się do przełącznika otrzymamy taki o znak zachęty:
+        </p>
+<pre class="code-block">
+&lt;Huawei&gt;
+</pre>
+        <p>
+          Jest tryb klasycznego użytkownika, ten tryb ma najmniejszy poziom
+          uprawnień w systemie. Konfiguracją czasu i wyświetlaniem parametrów
+          może jeszcze zapisać bierzącą konfigurację do konfiguracji startowej.
+          Aby wejść do trybu uprzywilejowanego, należy wydać polecenie
+          <code class="code-inline">system-view</code>.
+        </p>
+<pre class="code-black">
+&lt;Huawei&gt;system-view
+[Huawei]
+</pre>
+        <p>
+          W tym trybie możemy więcej, dużow więcej. Swoją konfigurację
+          rozpoczenimy od ustawienie odpowiedniej daty i czasu. Datę i czas
+          ustawiamy w trybie zwykłego użytkownika.
+        </p>
+<pre class="code-block">
+&lt;Huawei&gt;clock set 13:28:00 2026-05-11
+</pre>
+        <p>
+          Czas podajemy w formacie 24h, natomiat datę w formacie YYYY-MM-DD.
+          Poza podaniem daty i czasu możemy jeszcze uzupełnić dane o strefę
+          czasową i tutaj panuje rozbierzność między wersjami urządzeń.
+          Starszy urądzenia ustawiają strefę w trybie klasycznego użytkownika.
+          Natomiast w nowszych, robi się to w trybie uprzywilejowanym.
+        </p>
+<pre class="code-block">
+&lt;Huawei&gt;clock timezone Warsaw add 02:00:00
+#lub
+[Huawei]clock timezone Warsaw add 02:00:00
+</pre>
+        <p>
+          Definiując strefę czasową podajemy nazwę strefy oraz ile należy dodać
+          czasu w trybie 24h. Za pomocą polecenia
+          <code class="code-inline">display</code>, w raz argumentem
+          <code class="code-inline">clock</code> możemy wyświetlić obecne
+          ustawienia czasu w urządzeniu.
+        </p>
+<pre class="code-inline">
+&lt;S1&gt;display clock
+2026-05-11 13:31:02+02:00
+Monday
+Time Zone(Warsaw) : UTC+02:00
+</pre>
+        <p>
+          Po zdefiniowaniu czasu możemy zmienić nazwę hosta.
+          Wykorzystamy do tego polecenie <code class="code-inline">sysname</code>.
+          Polecenie to uruchmiamy w trybie uprzywilejowanym.
+        </p>
+<pre class="code-block">
+[Huawei]sysname S1
+[S1]
+</pre>
+        <p>
+          Aby mogła zajść jaka kolwiek komunikacja z usługami tego przełącznika
+          musi on posiadać skonfigurowany interfejs. Na przełącznikach L2+ oraz
+          L3, interfejsy ustawia się per VLAN, dlatego należy sprawdzić jakie
+          mamy dostępne. Możemy uzyskać takie informacje, za pomocą argumentu
+          <code class="code-inline">vlan</code> polecenia
+          <code class="code-inline">display</code>. 
+        </p>
+<pre class="code-block">
+[S1]display vlan
+The total number of vlans is : 1
+--------------------------------------------------------------------------------
+U: Up;         D: Down;         TG: Tagged;         UT: Untagged;
+MP: Vlan-mapping;               ST: Vlan-stacking;
+#: ProtocolTransparent-vlan;    *: Management-vlan;
+--------------------------------------------------------------------------------
+
+VID  Type    Ports                                                          
+--------------------------------------------------------------------------------
+1    common  UT:GE0/0/1(D)      GE0/0/2(D)      GE0/0/3(D)      GE0/0/4(D)      
+                GE0/0/5(D)      GE0/0/6(D)      GE0/0/7(D)      GE0/0/8(D)      
+                GE0/0/9(D)      GE0/0/10(D)     GE0/0/11(D)     GE0/0/12(D)     
+                GE0/0/13(D)     GE0/0/14(D)     GE0/0/15(D)     GE0/0/16(D)     
+                GE0/0/17(D)     GE0/0/18(D)     GE0/0/19(D)     GE0/0/20(D)     
+                GE0/0/21(D)     GE0/0/22(D)     GE0/0/23(D)     GE0/0/24(D)     
+
+
+VID  Status  Property      MAC-LRN Statistics Description      
+--------------------------------------------------------------------------------
+1    enable  default       enable  disable    VLAN 0001  
+</pre>
+        <p>
+          Jak możemy zobaczyć na przykładzie powyżej, w obecnej konfiguracji
+          mamy dostępny tylko jeden VLAN, a co za tym idzie dostępny jest
+          również interfejs warstwy wyższej dla tej sieci tzw. SVI. Aby
+          skonfigurować SVI dla VLAN-u o ID 1, wydajemy poniższe polecenia:
+        </p>
+<pre class="code-block">
+[S1] interface Vlanif 1
+[S1-Vlanif1]ip address 10.10.10.2 255.255.255.0
+[S1-Vlanif1]quit
+</pre>
+        <p>
+          Za pomocą polecenia <code class="code-inline">interface</code>,
+          przechodzimy do konfiguracji interfejsu. W przypadku interfejsów
+          SVI podajemy argument <code class="code-inline">Vlanif</code>. Na
+          koniec tego polecenia podajemy ID VLAN-u. W trybie konfiguracji
+          interfejsu, aby ustawić adres IP, wydajemy polecenie
+          <code class="code-inline">ip</code> z argumentem
+          <code class="code-inline">address</code>, następnie adres IP oraz
+          maskę podsieci. Na koniec opuszczamy konfigurację interfejsu.
+          Jeśli będzie my łączyć się z innych sieci niż ta w której znajduje
+          się SVI naszego przełącznika, to wówczas należy skonfigurować adres
+          bramy domyślnej dla tego urządzenia. Adres bramy dodajemy poprzez
+          konfigurację trasy statycznej obejmującej wszystkie hosty w
+          internecie. 
+        </p>
+<pre class="code-block">
+[S1]ip route-static 0.0.0.0 0 10.10.10.1
+</pre>
+        <p>
+          Przy okazji dodawania bramy domyślnej, widzimy w jaki sposób
+          dodawane są trasy statyczne, po argumencie
+          <code class="code-inline">route-static</code> podajemy adres sieci
+          docelowej, w tym przypadku kiedy określamy wszystkie host czterama
+          oktetami zer, możemy pominąć maskę. Następnym argumentem jest w
+          przypadku Huawei <strong>koszt</strong>. Trasy statyczne mają
+          zawsze najniższy koszt, aby wymusić ich stosowanie przed tymi
+          uzyskanymi od protokółów dynamicznych. Ostatnim argumentem jest adres
+          nastęnego skoku - adres interfesu routera podłączonego do sieci
+          docelowej.
+        </p>
+			  <p>
+			  ~xf0r3m
+			  </p>
+			</div>
+			<p class="footer">
+				2026; COPYLEFT; ALL RIGHTS REVERSED;
+			</p>
+		</body>
+	</html>
