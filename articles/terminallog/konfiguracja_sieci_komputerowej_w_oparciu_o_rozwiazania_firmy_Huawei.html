@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+			<link rel="stylesheet" type="text/css" href="/style.css">
+			<style>
+				.code-block {
+					text-align: left;
+				}
+				ul {
+					text-align: left;
+				}
+			</style>
+		</head>
+		<body>
+<pre>
+ _                      _             _ _
+| |_ ___ _ __ _ __ ___ (_)_ __   __ _| | | ___   __ _
+| __/ _ \ '__| '_ ` _ \| | '_ \ / _` | | |/ _ \ / _` |
+| ||  __/ |  | | | | | | | | | | (_| | | | (_) | (_| |
+ \__\___|_|  |_| |_| |_|_|_| |_|\__,_|_|_|\___/ \__, |
+			                        |___/
+</pre>
+			<p class="header_link">
+				&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+			</p>
+			<div class="main">
+				<h1 class="title">Konfiguracja sieci komputerowej w oparciu o rozwiązania firmy Huawei</h1>
+        <p>
+          Marka Huawei, wielu kojarzy się ze smartfonami oraz tabletami. Firma
+          ta poza rynkiem konsumenckim, produkuje również bardziej zaawansowany
+          sprzęt sieciowy, mogący konkurować z amerykańskim Cisco. W mojej
+          sieci działa kilka przełączników tej firmy i aby zapewnić sobie stałe
+          źródło wiedzy odnośnie konfiguracji tych że urządzeń tworzę ten
+          artykuł. Firma Huawei może za jakiś czas pozbyć się dokumentacji
+          urządzeń, które już nie są wspierane. Tak jak ma to z oprogramowanie
+          eNSP - takim odpowiednikiem <em>packet tracera</em>.
+          (Dalej dostępna jest wersja <em>Pro</em>, ale tylko dla ośrodków
+          szkoleniowych i przedstawicieli handlowych.)
+          Artykuł będzie mieć formę otwartą - chyba, że uda się wyczerpać
+          wszystkie zaagadnienia i w miarę pojawiania się dodatkowych
+          zagadnienień będę je tutaj dopisywać.
+        </p>
+        <h2>Wprowadzenie do konfiguracji, konfiguracja dostępu SSH oraz VLAN-ów - 11.05.2026r.</h2>
+        <p>
+          Dzisiaj rozpoczyniemy zagadnieniami wprowadzenia do konfiguracji.
+          Ustawimy możliwość połączenia SSH z przełącznikiem, przestawione
+          zostaną sposoby łączenia się z dystrybucji Linuksa oraz z innego
+          urządzenia Huawei - a mianowicie routera. Następnie przjedziem do
+          konfiguracji VLAN-ów w trybie dostępowym oraz w trybie <em>trunk</em>.
+        </p>
+        <p>
+          Po zalogowaniu się do przełącznika otrzymamy taki o znak zachęty:
+        </p>
+<pre class="code-block">
+&lt;Huawei&gt;
+</pre>
+        <p>
+          Jest tryb użytkownika, ma on najmniejszy poziom
+          uprawnień w systemie. Poza konfiguracją czasu i wyświetlaniem 
+          parametrów
+          może jeszcze zapisać bierzącą konfigurację do konfiguracji startowej.
+          Do konfiguracji urządzeń będzie potrzebować czegoś z większymi
+          uprawnieniami - trybu <strong>konfiguracji</strong>.
+          Aby wejść do tego trybu, należy wydać polecenie
+          <code class="code-inline">system-view</code>.
+        </p>
+<pre class="code-black">
+&lt;Huawei&gt;system-view
+[Huawei]
+</pre>
+        <p>
+          W tym trybie możemy więcej, dużow więcej. Swoją konfigurację
+          rozpoczenimy od ustawienie odpowiedniej daty i czasu. Parametry te
+          ustawiamy w trybie użytkownika.
+        </p>
+<pre class="code-block">
+&lt;Huawei&gt;clock set 13:28:00 2026-05-11
+</pre>
+        <p>
+          Czas podajemy w formacie 24h, natomiat datę w formacie YYYY-MM-DD.
+          Poza podaniem daty i czasu możemy jeszcze uzupełnić dane o strefę
+          czasową i tutaj panuje rozbierzność między wersjami urządzeń.
+          Starsze urądzenia ustawiają strefę w trybie użytkownika.
+          Natomiast w nowszych, robi się to w trybie konfiguracji.
+        </p>
+<pre class="code-block">
+&lt;Huawei&gt;clock timezone Warsaw add 02:00:00
+#lub
+[Huawei]clock timezone Warsaw add 02:00:00
+</pre>
+        <p>
+          Definiując strefę czasową podajemy nazwę strefy oraz ile należy dodać
+          czasu w trybie 24h. Za pomocą polecenia
+          <code class="code-inline">display</code>, w raz argumentem
+          <code class="code-inline">clock</code> możemy wyświetlić obecne
+          ustawienia czasu w urządzeniu.
+        </p>
+<pre class="code-inline">
+&lt;Huawei&gt;display clock
+2026-05-11 13:31:02+02:00
+Monday
+Time Zone(Warsaw) : UTC+02:00
+</pre>
+        <p>
+          Po zdefiniowaniu czasu możemy zmienić nazwę hosta.
+          Wykorzystamy do tego polecenie <code class="code-inline">sysname</code>.
+          Polecenie to uruchmiamy w trybie konfiguracji.
+        </p>
+<pre class="code-block">
+[Huawei]sysname S1
+[S1]
+</pre>
+        <p>
+          Aby mogła zajść jaka kolwiek komunikacja z usługami tego przełącznika
+          musi on posiadać skonfigurowany interfejs. Na przełącznikach L2+ oraz
+          L3, interfejsy ustawia się per VLAN, dlatego należy sprawdzić jakie
+          mamy dostępne. Możemy uzyskać takie informacje, za pomocą argumentu
+          <code class="code-inline">vlan</code> polecenia
+          <code class="code-inline">display</code>. 
+        </p>
+<pre class="code-block">
+[S1]display vlan
+The total number of vlans is : 1
+--------------------------------------------------------------------------------
+U: Up;         D: Down;         TG: Tagged;         UT: Untagged;
+MP: Vlan-mapping;               ST: Vlan-stacking;
+#: ProtocolTransparent-vlan;    *: Management-vlan;
+--------------------------------------------------------------------------------
+
+VID  Type    Ports                                                          
+--------------------------------------------------------------------------------
+1    common  UT:GE0/0/1(D)      GE0/0/2(D)      GE0/0/3(D)      GE0/0/4(D)      
+                GE0/0/5(D)      GE0/0/6(D)      GE0/0/7(D)      GE0/0/8(D)      
+                GE0/0/9(D)      GE0/0/10(D)     GE0/0/11(D)     GE0/0/12(D)     
+                GE0/0/13(D)     GE0/0/14(D)     GE0/0/15(D)     GE0/0/16(D)     
+                GE0/0/17(D)     GE0/0/18(D)     GE0/0/19(D)     GE0/0/20(D)     
+                GE0/0/21(D)     GE0/0/22(D)     GE0/0/23(D)     GE0/0/24(D)     
+
+
+VID  Status  Property      MAC-LRN Statistics Description      
+--------------------------------------------------------------------------------
+1    enable  default       enable  disable    VLAN 0001  
+</pre>
+        <p>
+          Jak możemy zobaczyć na przykładzie powyżej, w obecnej konfiguracji
+          mamy dostępny tylko jeden VLAN, a co za tym idzie dostępny jest
+          również interfejs warstwy wyższej dla tej sieci tzw. SVI. Aby
+          skonfigurować SVI dla VLAN-u o ID 1, wydajemy poniższe polecenia:
+        </p>
+<pre class="code-block">
+[S1] interface Vlanif 1
+[S1-Vlanif1]ip address 10.10.10.2 255.255.255.0
+[S1-Vlanif1]quit
+</pre>
+        <p>
+          Za pomocą polecenia <code class="code-inline">interface</code>,
+          przechodzimy do konfiguracji interfejsu. W przypadku interfejsów
+          SVI podajemy argument <code class="code-inline">Vlanif</code>. Na
+          koniec tego polecenia podajemy ID VLAN-u. W tym trybie 
+          aby ustawić adres IP, wydajemy polecenie
+          <code class="code-inline">ip</code> z argumentem
+          <code class="code-inline">address</code>, następnie adres IP oraz
+          maskę podsieci. Na koniec opuszczamy konfigurację interfejsu.
+          Jeśli będzie my łączyć się z innych sieci niż ta w której znajduje
+          się SVI naszego przełącznika, to wówczas należy skonfigurować adres
+          bramy domyślnej dla tego urządzenia. Adres bramy dodajemy poprzez
+          konfigurację trasy statycznej obejmującej wszystkie hosty w
+          internecie. 
+        </p>
+<pre class="code-block">
+[S1]ip route-static 0.0.0.0 0 10.10.10.1
+</pre>
+        <p>
+          Przy okazji dodawania bramy domyślnej, widzimy w jaki sposób
+          dodawane są trasy statyczne, po argumencie
+          <code class="code-inline">route-static</code> podajemy adres sieci
+          docelowej, w tym przypadku kiedy określamy wszystkie host czterama
+          oktetami zer, możemy pominąć maskę. Przy normalnym adresie sieci
+          podajemy w postaci CIDR. Następnym argumentem jest w
+          przypadku Huawei <strong>koszt</strong>. Trasy statyczne mają
+          zawsze najniższy koszt, aby wymusić ich stosowanie przed tymi
+          uzyskanymi od protokółów dynamicznych. Ostatnim argumentem jest adres
+          nastęnego skoku - adres interfesu routera podłączonego do sieci
+          docelowej. Do póki żaden komputer nie zostanie podłączony do tego
+          przełącznika w tym VLAN-ie to interfejs VLAN-u będzie nie aktywny
+          (w stanie Down/Down), dodana przez nas trasa domyślna będzie
+          niewidoczna. 
+        </p>
+        <p>
+          Dodając bramę domyślną zakończyliśmy podstawową
+          konfigurację sieciową przełącznika. Teraz możemy przejść do 
+          utworzenia użytkownika i skonfigurowania SSH. Na początek
+          ustawiamy odpowiedni tryb uwierzytlenienia oraz protokół
+          przychodzący dla wirtualnych konsol.
+        </p>
+<pre class="code-block">
+[S1]user-interface vty 0 4
+[S1-ui-vty0-4]authentication-mode aaa
+[S1-ui-vty0-4]protocol inbound ssh
+[S1-ui-vty0-4]quit
+</pre>
+        <p>
+          Dla przykładu wykonałem konfigurację tylko dla 5 wirtualnych
+          konsol (<code class="code-inline">user-interface vty 0 4</code>),
+          jako tryb uwierzytelniania wybrano metodę AAA - daje ona możliwość
+          utworzenia kont użytkowników oraz przypisania im konkretnych
+          uprawnień (<code class="code-inline">authentication-mode aaa</code>).
+          Jako protokoł zdalnego dostępu ustawiamy SSH
+          (<code class="code-inline">protocol inbound ssh</code>) i możemy
+          opuścić konfigurację wirtualnych konsol.
+        </p>
+        <p>
+          Przechodzimy do tworzenia kont użytkownikom. Dla celów testowych
+          wystarczy tylko jedno. Konta tworzymy w konfiguracji metody AAA:
+        </p>
+<pre class="code-block">
+[S1]aaa
+[S1-aaa]local-user admin password cipher admin@123
+[S1-aaa]local-user admin service-type ssh terminal
+[S1-aaa]local-user admin privilege level 15
+[S1-aaa]quit
+</pre>
+        <p>
+          Tworzymy lokalnego użytkownika admin z hasłem zaszyfrowanym
+          <em>admin@123</em>
+          (<code class="code-inline">local-user admin password cipher admin@123</code>).
+          W przypadku nowszych urządzeń lub przy nowszym oprogramowaniu mamy
+          dostęp lepszej metody szyfrowania haseł jaką jest
+          <code class="code-inline">irreversible-cipher</code>. Następnie
+          ustalamy w jaki sposób nowy użytkownik ma mieć dostęp do urządzenia,
+          nam zależy na protokole SSH
+          (<code class="code-inline">local-user admin service-type ssh terminal</code>).
+          Na koniec ustalamy zakres dostępu do urządzenia - jest to nasze
+          konto więc administrator globalny (tak jak na przykładzie) będzie
+          idealny
+          (<code class="code-inline">local-user admin privilege level 15</code>).
+          Po utworzeniu uzytkownika możemy opuścić konfigurację trybu AAA.
+        </p>
+        <p>
+          Ostatnim etapem jest konfiguracja samego SSH oraz uruchomienie
+          serwera tej usługi. W trybie konfiguracji wydajemy następujące
+          polecenia:
+        </p>
+<pre class="code-block">
+[S1]ssh user admin
+[S1]ssh user admin authentication-type password
+[S1]ssh user admin service-type stelnet 
+[S1]stelnet server enable
+</pre>
+        <p>
+          Wiążemy użytkownika lokalnego z usługą SSH
+          (<code class="code-inline">ssh user admin</code>), następnie ustalamy
+          w jaki sposób użytkownik ma się uwierzytelnić przez ten protokół
+          (<code class="code-inline">ssh user admin authentication-type password</code>).
+          oraz rodzaj usługi do bezpiecznego połączenia zdalnego
+          (<code class="code-inline">ssh user admin service-type stelnet</code>).
+          Na koniec możemy właczyć SSH. 
+          W przypadku urządzeń firmy Huawei
+          SSH nazwywane jest <code class="code-inline">stelnet</code>. Tak
+          przygotowany przełącznik oczekuje na połączenia SSH.
+        </p>
+        <p>
+          Połączenie SSH z tym urządzeniem jest możliwe z dystrybucji Linuksa,
+          gdy użyjemy niestandardowych algorytmów wymiany kluczy, takich
+          jak <em>diffie-hellman-group14-sha1</em> oraz
+          <em>diffie-hellman-group-exchange-sha</em>.
+        </p>
+<pre class="code-block">
+ssh -o KexAlgorithms=diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1 admin@10.10.10.2
+User Authentication
+(admin@10.10.10.2) Password: 
+</pre>
+        <p>
+          Połączenie również możemy uzyskać po przez inne urządzenie sieciowe
+          Huawei, jak przedstawiono na poniższym przykładzie.
+        </p>
+<pre class="code-block">
+[R1]ssh client first-time enable 
+[R1]stelnet 10.10.10.2
+Please input the username:admin
+Trying 10.10.10.2 ...
+Press CTRL+K to abort
+Connected to 10.10.10.2 ...
+The server is not authenticated. Continue to access it? (y/n)[n]:y
+May 11 2026 15:42:57-08:00 R1 %%01SSH/4/CONTINUE_KEYEXCHANGE(l)[0]:The server ha
+d not been authenticated in the process of exchanging keys. When deciding whethe
+r to continue, the user chose Y. 
+[R1]
+Save the server's public key? (y/n)[n]:y
+The server's public key will be saved with the name 10.10.10.2. Please wait...
+May 11 2026 15:43:01-08:00 R1 %%01SSH/4/SAVE_PUBLICKEY(l)[1]:When deciding wheth
+er to save the server's public key 10.10.10.2, the user chose Y. 
+[R1]
+</pre>
+        <p>
+          Pierwsze polecenie
+          (<code class="code-inline">ssh client first-time enable</code>)
+          umożliwia weryfikację klucza publicznego serwera,
+          wydawane jest tylko raz przez cały okres działania urządzenia. Jeśli
+          o nim zapopnimy to otrzymamy odpowiednie powiadomienie.
+        </p>
+<pre class="code-block">
+Connected to 10.10.10.2 ...
+Error: Failed to verify the server's public key.
+Please run the command "ssh client first-time enable"to enable the first-time ac
+cess function and try again.
+</pre>
+        <p>
+          Dzięki konfiguracji SSH, możemy w bezpieczny sposób połączyć się z
+          przełącznikiem i rozpocząć nieco bardziej zaawansowaną konfigurację
+          jaka są sieci wirtualne tzw. VLAN-y. 
+        </p>
+        <p>
+          VLAN na przełącznika Huawei możemy utworzyć w sposób wsadowy, dzięki
+          argumentowi <code class="code-inline">batch</code> polecenia
+          <code class="code-inline">vlan</code>. Po argumencie podajemy kolejne
+          ID VLAN-ów. Polecenie wydajemy w trybie konfiguracji.
+        </p>
+<pre class="code-block">
+[S1]vlan batch 10 20 30 40
+</pre>
+        <p>
+          Jeśli potrzebuje dodać do każdego z VLAN-ów opis, to możemy to
+          zrobić za pomoc polecenia <code class="code-inline">description</code>
+          w konfiguracji VLAN-ów. Ja dodałem opisy do wszystkich tutaj
+          utworzonych.
+        </p>
+<pre class="code-block">
+[S1]vlan 10
+[S1-vlan10]description GREEN
+[S1-vlan10]vlan 20
+[S1-vlan20]description BLUE
+[S1-vlan20]vlan 30
+[S1-vlan30]description IPMI
+[S1-vlan30]vlan 40	
+[S1-vlan40]description CCTV
+</pre>
+        <p>
+          Wówczas konfiguracja VLAN-ów na urządzeniu prezentuje się w
+          następujący sposób.
+        </p>
+<pre class="code-block">
+[S1]display vlan
+The total number of vlans is : 5
+--------------------------------------------------------------------------------
+U: Up;         D: Down;         TG: Tagged;         UT: Untagged;
+MP: Vlan-mapping;               ST: Vlan-stacking;
+#: ProtocolTransparent-vlan;    *: Management-vlan;
+--------------------------------------------------------------------------------
+
+VID  Type    Ports                                                          
+--------------------------------------------------------------------------------
+
+1    common  UT:GE0/0/1(U)      GE0/0/2(D)      GE0/0/3(D)      GE0/0/4(D)      
+                GE0/0/5(D)      GE0/0/6(D)      GE0/0/7(D)      GE0/0/8(D)      
+                GE0/0/9(D)      GE0/0/10(D)     GE0/0/11(D)     GE0/0/12(D)     
+                GE0/0/13(D)     GE0/0/14(D)     GE0/0/15(D)     GE0/0/16(D)     
+                GE0/0/17(D)     GE0/0/18(D)     GE0/0/19(D)     GE0/0/20(D)     
+                GE0/0/21(D)     GE0/0/22(D)     GE0/0/23(D)     GE0/0/24(D)     
+
+10   common  
+20   common  
+30   common  
+40   common  
+
+VID  Status  Property      MAC-LRN Statistics Description      
+--------------------------------------------------------------------------------
+
+1    enable  default       enable  disable    VLAN 0001                         
+10   enable  default       enable  disable    GREEN                             
+20   enable  default       enable  disable    BLUE                              
+30   enable  default       enable  disable    IPMI                              
+40   enable  default       enable  disable    CCTV
+</pre>
+        <p>
+          Teraz aby dodać porty do konkretnych VLAN-ów, przechodzimy do
+          konfiguracji interfejsu, następnie ustawiamy port w tryb dostępowy.
+          A na koniec przypisujemy do portu odpowiednie ID VLAN-u.
+        </p>
+<pre class="code-block">
+[S1]interface g0/0/1
+[S1-GigabitEthernet0/0/1]port link-type access 
+[S1-GigabitEthernet0/0/1]port default vlan 10
+[S1-GigabitEthernet0/0/1]interface g0/0/7
+[S1-GigabitEthernet0/0/7]port link-type access
+[S1-GigabitEthernet0/0/7]port defa
+May 11 2026 09:58:02+02:00 S1 DS/4/DATASYNC_CFGCHANGE:OID 1.3.6.1.4.1.2011.5.25.
+191.3.1 configurations have been changed. The current change number is 23, the c
+hange loop count is 0, and the maximum number of records
+[S1-GigabitEthernet0/0/7]port default vlan 20
+[S1-GigabitEthernet0/0/7]quit
+</pre>
+        <p>
+          Czasami podczas konfiguracji, przełącznik będzie wyrzucać do konsoli
+          rózne komunikaty, jeśli będzie to dla nas irytujące - kiedyś się to
+          stanie - to jesteśmy to wstanie je wyłączyć za pomocą poniższego
+          polecenia.
+        </p>
+<pre class="code-block">
+[S1]undo info-center enable
+Info: Information center is disabled.
+</pre>
+        <p>
+          To polecenie pokazuje nam również mechanizm negacji poleceń. W
+          przypadku Cisco IOS mieliśmy słowo <em>no</em>. Tutaj jest
+          <code class="code-inline">undo</code>. Więc jeśli będziemy chcheć
+          włączyć wyłączony port to wydajemy polecenie
+          <code class="code-inline">undo shutdown</code> oczywiście w
+          konfiguracji interfejsu.
+        </p>
+        <p>
+          W nowszych urządzeniach dostępne jest pod-polecenie <em>range</em>,
+          dzięki któremy możemy przydzielić od razu przydzielić do VLAN-u 
+          odpowiednie porty, stosując tylko 3 polecenia.
+        </p>
+<pre class="code-block">
+[S1]interface range GigabitEthernet 0/0/8 to GigabitEthernet 0/0/12
+[S1-port-group]port link-type access
+[S1-port-group]port default vlan 20
+[S1-port-group]quit
+</pre>
+        <p>
+          Przy starszych pozostaje nam jedynie przechodzenie z jednego portu
+          do drugiego i konfiguracja ręczna. Poleceniem
+          <code class="code-inline">display</code> z argument
+          <code class="code-inline">vlan</code>, możemy sprawdzić jak wygląda
+          konfiguracja VLAN-ów w systemie oraz czy nasze poprzednie polecenia
+          się powiodły. W ten sposób możemy konfigurować porty dostępowe dla
+          sieci VLAN.  
+        </p>
+        <p>
+          Jeśli sieci VLAN mają obejmować więcej niz jedno urządzenie, to
+          musi zostać uruchomione znakowanie ramek <em>Ethernet</em>, aby
+          kolejne przełączniki wiedziały do której sieci VLAN przekazać daną
+          ramkę. Znakowanie ramek konfigurowane jest na tzw. portach 
+          <em>Uplink</em> - odprowadzających i doprowadzających ruch sieciowy
+          do urządzenia. Port z włączonym znakowaniem ramek nazywany jest
+          <strong>trunk</strong>. Aby ustawić port jako <em>trunk</em>, należy
+          w trybie konfiguracji interfejsu wydać następujące polecenia:
+        </p>
+<pre class="code-block">
+[S1]int g0/0/24
+[S1-GigabitEthernet0/0/24]port link-type trunk
+[S1-GigabitEthernet0/0/24]port trunk allow-pass vlan all
+[S1-GigabitEthernet0/0/24]quit
+</pre>
+        <p>
+          Za pomocą pierwszego polecenia
+          (<code class="code-inline">port link-type trunk</code>) zmieniliśmy
+          tryb portu. Natomiast drugie
+          (<code class="code-inline">port trunk allow-pass vlan all</code>)
+          polecenie nakazuje przełącznikowi
+          przekazywać ruch pochodzący ze wszystkich VLAN-ów przez ten port.
+          Możemy to zmienić, podając ID VLAN-u zamiast słowa
+          <code class="code-inline">all</code>. Na koniec opuszczamy tryb
+          konfiguracji interfejsu.
+          Jeśli wyświetlimy konfigurację VLAN-ów na urzadzeniu zobaczymy, że
+          do każdego z VLAN-ów został dodany dodatkowy port ze znakowaniem
+          ramek.
+        </p>
+<pre class="code-block">
+[S1]display vlan
+The total number of vlans is : 5
+--------------------------------------------------------------------------------
+U: Up;         D: Down;         TG: Tagged;         UT: Untagged;
+MP: Vlan-mapping;               ST: Vlan-stacking;
+#: ProtocolTransparent-vlan;    *: Management-vlan;
+--------------------------------------------------------------------------------
+
+VID  Type    Ports                                                          
+--------------------------------------------------------------------------------
+1    common  UT:GE0/0/2(D)      GE0/0/3(D)      GE0/0/4(D)      GE0/0/5(D)      
+                GE0/0/6(D)      GE0/0/8(D)      GE0/0/9(D)      GE0/0/10(D)     
+                GE0/0/11(D)     GE0/0/12(D)     GE0/0/13(D)     GE0/0/14(D)     
+                GE0/0/16(D)     GE0/0/17(D)     GE0/0/18(D)     GE0/0/19(D)     
+                GE0/0/20(D)     GE0/0/21(D)     GE0/0/23(D)     GE0/0/24(U)     
+10   common  UT:GE0/0/1(D)                                                      
+             TG:GE0/0/24(U)                                                     
+
+20   common  UT:GE0/0/7(D)                                                      
+
+             TG:GE0/0/24(U)                                                     
+
+30   common  UT:GE0/0/15(D)                                                     
+
+             TG:GE0/0/24(U)                                                     
+
+40   common  UT:GE0/0/22(D)                                                     
+
+             TG:GE0/0/24(U)                                                     
+
+
+VID  Status  Property      MAC-LRN Statistics Description      
+--------------------------------------------------------------------------------
+
+1    enable  default       enable  disable    VLAN 0001                         
+
+10   enable  default       enable  disable    GREEN                             
+20   enable  default       enable  disable    BLUE                              
+30   enable  default       enable  disable    IPMI                              
+40   enable  default       enable  disable    CCTV
+</pre>
+        <p>
+          Omówieniem portów <em>trunk</em> zakończyliśmy opisywanie konfiguracji
+          na chwilę obecną. Jak już wcześniej wspomniałem tem artykuł ma formę
+          otwartą - jeśli zajdzie taka potrzeba będzie on aktualizowany.
+        </p>
+        <p>
+          Źródła:
+        </p>
+        <ol>
+          <li><a href="https://support.huawei.com/enterprise/en/doc/EDOC1100095728/fb2283cf/configuring-system-information-on-s-series-switches">Configuring System Information on S Series Switches</a></li>
+          <li><a href="https://www.grandmetric.com/pl/knowledge-base/design_and_configure/jak-skonfigurowac-vlan-na-huawei/">Jak skonfigurować VLAN na Huawei</a></li>
+          <li><a href="https://www.grandmetric.com/pl/knowledge-base/design_and_configure/jak-skonfigurowac-port-trunk-huawei/">Konfiguracja port trunk (Huawei)</a></li>
+        </ol>
+			  <p>
+			  ~xf0r3m
+			  </p>
+			</div>
+			<p class="footer">
+				2026; COPYLEFT; ALL RIGHTS REVERSED;
+			</p>
+		</body>
+	</html>
