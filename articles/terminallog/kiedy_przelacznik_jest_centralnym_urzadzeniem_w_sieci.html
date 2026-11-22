@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+			<link rel="stylesheet" type="text/css" href="/style.css">
+			<style>
+				.code-block {
+					text-align: left;
+				}
+				ul {
+					text-align: left;
+				}
+			</style>
+		</head>
+		<body>
+<pre>
+ _                      _             _ _
+| |_ ___ _ __ _ __ ___ (_)_ __   __ _| | | ___   __ _
+| __/ _ \ '__| '_ ` _ \| | '_ \ / _` | | |/ _ \ / _` |
+| ||  __/ |  | | | | | | | | | | (_| | | | (_) | (_| |
+ \__\___|_|  |_| |_| |_|_|_| |_|\__,_|_|_|\___/ \__, |
+			                        |___/
+</pre>
+			<p class="header_link">
+				&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+			</p>
+			<div class="main">
+				<h1 class="title">Kiedy przełącznik jest centralnym urządzeniem w sieci.</h1>
+				<p>
+          Przyglądając się schematowi, klasycznej sieci lokalnej możemy
+          dostrzec, że jej centralnym i zarazem najważeniejszym urządzeniem
+          jest router, który trasując ruch i stosując na nim mechanizm NAT-u
+          zapewnia na dostęp do Internetu. W tym materiale chciałbym
+          zaprezentować trochę inne podjeście do zastosowania urządzeń
+          w sieci. 
+			  </p>
+        <p>
+          To podejscie stawia <strong>zarządzalny</strong> przełącznik
+          (to bardzo ważne, w przypadku urządzeń bez możliwości konfiguracji
+          nie będzie wykonalne), w centrum naszej sieci. Dzięki niemu dowiemy
+          się, że router (chciaż w naszym przypadku będzie to
+          <strong>programowy firewall</strong>) do poprawnego działania
+          operacyjnego potrzebuje tylko jednego portu. Podobnie jest w
+          przypadku serwerów, aby mogły być one osiągalne z dwóch różnych sieci
+          lokalnych. Mowa oczywiście technologii
+          <strong>wirtualnych sieci lokalnych - VLAN</strong>. Z konfiguracją
+          tego rozwiązania mieliśmy styczność w przypadku kursu Cisco CCNA, tam
+          jednak laboratoria przestawiały to w bardzo sterylny i jednolity 
+          jakościowo i konfiguracyjnie. Wiadomo Akademia Cisco wykorzystuje
+          własne technologie, które mogą być dla wielu nieosiągalne nie tylko
+          z pobudek finasowych. Oczywiście, co producent to jego własna
+          implementacja konfiguracji VLANów, a także jak miałem szansę się
+          przekonać ich wydajność. Ale zacznij od początku.
+        </p>
+        <p>
+          W mojej lokalnej sieci domowej, pojawiło się zapotrzebowanie na
+          uprządkowanie kącika, w którym znajdować się serwer NAS. Zakupiłem
+          więc mały stojak typu <em>open rack</em> w wersji 10", ponieważ
+          komputer, który pełnił rolę NAS był komputerem w obudowie typu
+          Tiny. Jakiś czas później pojawiła się potrzeba stworzenia pierwszego
+          domowego serwera <strong>PVE</strong> 
+          (ang.<em>Proxmox Virtual Environment</em>). Dokupiłem półkę i już
+          chciałem użyć drugiego takiego samego komputerka jak NAS (swojego
+          czasu - kupiłem dwie sztuki), ale sprzęt okazał się być uszkodzony.
+          Odziwo zepsuł się od leżenia na półce w pomieszczeniu, do któtego
+          tylko ja miałem dostęp. Po dłuższej próbie przywrócenia sprzętu,
+          poddałem się i mając jeszcze w zanadżu terminal od Della, który
+          niegdyś służył za NAS - stwierdziłem, że lepiej zmigrować tego NAS,
+          z powrotem na terminal.
+        </p>
+        <p>
+          Mniej więcej po określeniu tego co chcę mieć na tym serwerze PVE,
+          doszedłem do wniosku, że niezbędne będzie wydzielenie drugiej sieci
+          lokalnej (laboratoryjne, gościnnej - jak zwał, tak zwał), która
+          będzie mieć dostęp do innych hostów w tej sieci oraz do internetu,
+          nigdzie więcej. Na potrzeby tej sieci wybrałem system 
+          <strong>PFSense</strong>, który
+          jest bardzo wydajnym programowym firewallem, jako platformę sprzętową
+          wybrałem komputer Lenovo ThinkCentre M600 Tiny, z procesoren Intel
+          Celeron do tego dobrałem dwie karty Ethernetowe Digitus na USB 3.0.
+          Które w przypadku tego sprzętu, okazały się fatalnym wyborem, w
+          systemie karta wyłączała się (nie mamy Pana płaszcza, i co Pan nam
+          zrobisz). Dla testów zrzuciłem wszystko co miałem serwerze PVE, i
+          tam dla testów skonfigurowałem sobie <em>PFSense</em>, wykorzystując
+          do tego jedną z tych kart. Taka konfiguracja pochodziła ze 2-3
+          tygodnie (nie miałem za bardzo czasu, aby to dokończyć). Do pracy
+          karty nie było zastrzeżeń. Gemini od Google twierdzi, że problemem
+          jest komputer, ponieważ jest wersja energooszczędna i może być
+          zdolna do wyłączania interfejsu. Nawet jeśli przez chwilę nie jest
+          używany. Ja ma co do tego inną teorię, gdyż wbudowana karta w to
+          Lenovo to chip <em>Realteka</em>, a to co siedzi w karcie również.
+          I może jak w przypadku systemów serwerowych z Rodziny Windows, na
+          serwerze muszą być zainstalowane dwa różne chipy. Na potwierdzenie
+          tej tezy niech świadczy fakt, że komputer HP ProDesk 600 G2 Mini,
+          posiada wbudowaną kartę sieciową Intela I219-LM. 
+        </p>
+        <p>
+          Ze względu na niekompatybilność tej karty, rozpocząłem poszukiwanie
+          na portalu aukcyjnym karty sieciowej z innym chipem niż Realtek.
+          Pytania do LLM od Google z zapytaniem jaką kartę kupić, wskazały 
+          Jakiś model UGREEN. Zachęcające było to, że w opisie przedmiotu
+          znajdowało oznaczenie chipsetu: AX88791, co wskazywało by na chipset
+          firmy ASIX. Jakież było moje zdziwienie, ze otwieram paczkę,
+          podłaczam kartę do komputera patrzę, a tam Realtek. Więc odrazu
+          została zgłoszona reklamacja, wczasie postępowania wyjaśniającego 
+          musiałem,
+          nagrywać filmik, jak podłączam kartę do komputera, a tam zgłasza się
+          karta jako Realtek. Reklamacja została użnana, pieniądze zwrócone.
+          Ale ja dalej jest bez jednego interfejsu. Generalnie chcąc wydzielić
+          te dwie sieci lokalne stwierdziłem, że na przełączniku utworze dwa
+          osobne VLAN-y (coś a'la <em>Port Based VLAN</em> na przełącznikach
+          marki TP-Link), bez żadnego portu <em>Trunk</em> - wszystkie porty
+          odseparowane. Do tego wybrałem przełącznik firmy 
+          <strong>Mikrotik</strong>, nie dlatego, że jest on bardzo dobrze do
+          tego przygotowane - z tą firmą planuje związać się na dłużej jeśli
+          chodzi o rozwiązania sieciowe oraz ewentualne kursy. W konfiguracji
+          tego przełącznika przypisał bym połowę portów do jednego, a drugą
+          połowę do drugiego, przy czym potrzebował bym dwóch chipsetów
+          kart sieciowych. Co w obecnych czasach jest trudne do wykonania
+          przynajmniej w Polsce, ponieważ wiekszość sprzedawanych kart
+          Ethernetowych na USB, nie zawiera nic innego niż chip <em>Realtek</em>.
+          Alternatywą pozostają adaptery USB firmy Ubiquity, jednak
+          wykorzystany tam chip ma słabe wsparcie lub jego brak w PFSense.
+          Ostatnią deską ratunku pozostało skonfigurowanie sieci VLAN wraz
+          łączami <em>Trunk</em> i stworzenie konfiguracji, którą nomenklatura
+          Cisco nazywa <em>Routerem na patyku</em>.
+        </p>
+        <h2>Konfiguracja wstępna konfiguracja przełącznika oraz VLANów.</h2>
+        <p>
+          Po wyjęciu z opakowania switcha, podłączamu mu internet, następnie
+          na swoim interfejsie ustawiamy adres IP z sieci 192.168.88.0/24, przy
+          czym adres 192.168.88.1, jest adresem przełacznika. Te czynności
+          zależa od przełącznika i moga róznić się w przypadku innych modeli
+          naszego sprzętu. Na przykład przełączniki z serii RB260GS pobierają
+          adres z serwera DHCP, a ten zapisany działa w trybie <em>failover</em>
+          - jeśli nie uda się pobrać adresu z DHCP. Logujemy się do
+          przełącznika, login: <strong>admin</strong>. Domyślne początkowe
+          hasło jest <strong>puste</strong>. Jeśli nasz przełącznik ma
+          statyczny adres IP, to przechodzimy do zakładki <em>System</em> i 
+          (w urządzeniach Mikrotik z system SwOS, konfiguracja IP polega na
+          podaniu jednego z poprawnych adresów należących do naszej sieci,
+          resztę w pamięci dopisze sam przełącznik, następnie potwierdzamy
+          klikając "Apply All". Po naciśnięciu tego przycisku, zmieniamy
+          konfigurację naszego interfejsu, aby znów stać się człokiem naszej
+          sieci lokalnej. Logujemu się ponownie, następnie przechodzimy do
+          zakładki Upgrade. Zainstalujemy najnowszą wersję SwOW, naciskając
+          przycisk "Download &amp; Upgrade". Po pobraniu urządzenie samo się
+          uruchomi ponowonie - w ten sposób aktualizowany jest system
+          operacyjny.
+        </p>
+        <p>
+          Po załdowaniu systemu możemy przjeść do zakładki 
+          <strong>VLANs</strong>, gdzie definiujemy sieci VLAN. W tym miejscu
+          panuje zasadnicza różnica między systemami SwOS oraz SwOS Lite.
+        </p>
+        <h3>Dla SwOS</h3>
+        <p>
+          Przynależność portów do VLANów określamy na podstawie tego co należy
+          zrobić z polem VLAN, w ramce Ethernetowej opuszczającej port. Na
+          początku, podajemy VLAN ID, następnie pole IVL zostawiamy puste,
+          zaznaczmy pole IGMP Snooping i następnie:
+        </p>
+        <ul>
+          <li><strong><em>leave as is</em></strong> - ang. <em>pozostaw takie 
+            jakie</em> dobry wybór dla urządzeń, którym niepodoba się 
+            ingerencja w ramki, np. router pełniący funkcję AP wraz ze
+            switchem, który nie ma funkcji zarządzania jest wyłącznie
+            przedłużeniem domeny rozgłoszeniowej.</li>
+          <li><strong><em>always strip</em></strong> - ang. <em>zawsze oczyść</em>,
+            określa porty dostępowe (do których będą podłączane komputery)
+            dla tego VLAN. Zawsze usuwa pole VLANu (komputer go nie potrzebują).</li>
+          <li><strong><em>add if missing</em></strong> - ang. <em>dodaj jeśli
+            brakuje</em>, ta czynność jest idealna dla łączy TRUNK, dodaje
+            pole VLAN, jeśli go brakuje.<li>
+          <li><strong><em>not a member</em></strong> - ang. <em>nie jest
+            członkiem / nie należy do...</em>, ta czynność wyklucza port z
+            udziału w danym VLANie.</li>
+        </ul>
+        <p>
+          Te role mają głównie znaczenie dla ruchu <em>egress</em> - 
+          opuszczającego urządzenie. Jednak w przypadku definicji sieci VLAN
+          za ich pomocą określamy stopień przy należności portów dla
+          poszczególnych VLANów. Dlatego poniżej znajduje się kilka przypadków,
+          w jakich należy ustawić te role:
+        </p> 
+        <ul>
+          <li><strong>Port należy do tego VLANu</strong> - <em>always
+          stip</em></li>
+          <li><strong>Port nie należy do tego VLANu</strong> - <em>not a member</em></li>
+          <li><strong>Do portu podłączone jest urządzenie nieinteligente /
+          bez obsługi VLANów.</strong> - <em>leave as is</em></li>
+          <li><strong>Port jest łączem typu TRUNK</strong> - <em>leave as is</em></li>
+        </ul>
+        <p>
+          Po ustawieniu tych ról, możemy przjeść do ustawień ruchu VLAN dla
+          poszczególnych portów. Tutaj strona dzieli się na dwie konfiguracje
+          dla ruchu napływającego (<em>Ingress</em>) oraz dla ruchu
+          odpływającego (<em>Egress</em>). Przypadku dla tego pierwszego pola
+          ustawiamy w taki sposób:
+        </p>
+        <ul>
+          <li><strong>VLAN Mode:</strong> - <em>strict</em></li>
+          <li><strong>VLAN Receive:</strong> - </em>Porty dostępowe: only untagged</em></li>
+          <li><strong>Default VLAN ID:</strong> - <em>ID VLANU</em></li>
+          <li><strong>Force VLAN ID: </strong> - <em>Porty dostępowe: TAK,
+          porty typu TRUNK: NIE</em></li>
+        </ul>
+        <p>
+          Natomiast dla ruchu opuszczającego urządzenie, należy ustawić
+          odpowiednie role, zgodnie wcześniejszym ustaleniami. Tutaj jedynie
+          różni się ustawienie dla portów typu TRUNK, zamiast <em>leave as is</em>
+          ustawiamy <em>add if missing</em>.
+        </p>
+        <h3>Dla SwOS Lite</h3>
+        <p>
+          W przypadku systemu <em>SwOS Lite</em> nie podajemy, żadnych
+          informacji na temat roli pola VLAN w ramce. W zakładce <em>VLANs</em>
+          definiujemy VLANy podając ID, zaznaczając <em>IGMP Snooping</em> oraz
+          określajac za pomocą listy <em>checkbox</em>ów członkostwo w
+          utworzonych VLANach (oczywiście porty typu TRUNK, będą członkami we
+          wszystkich VLANach). Na koniec zatwierdzamy wszystko i przechodzimy
+          do zakładki <em>VLAN</em>, tam określamy ruch dla poszczególnych
+          portów w taki sam sposób jak dla ruchu napływającego w klasycznym
+          <em>SwOS</em>. Nie spotkałem się jeszcze z tak prostym, łatwym i
+          intuicyjnym sposóbem konfigurowanie VLANów.
+        </p>
+      <h2>Konfiguracja VLANów w systemie PFSense</h2>
+      <p>
+        Po skonfigurowaniu VLANów, nie miałem zielonego pojęcia czy moja
+        konfiguracja w ogóle działa. Dlatego postanowiłem, że skonfiguruje
+        sobie <em>firewall</em>, żeby przydzieli mi odpowiedni adres dla
+        odpowiedniego VLANu. Prób konfiguracji były 4, jedna na działającej
+        konfiguracji, próba konfiguracji VLANów na zinicjowanym już interfejsie
+        fizycznym, nie przyniesie niczego dobre. Zero komunikacji jakiej
+        kolwiek. Druga próba, przy restarcie do ustawień fabrycznych z poziomu
+        konsoli, przyniosła pewien rezultat - jednak krótkotrwały, ponieważ
+        udało mi się uzyskać adres IP z sieci dla gości, jednak kiedy
+        przełączyłem laptop, do głównej sieci lokalnej już nie było komunikacji
+        karta sieciowa się zawiesiła, nie dostałem adresu, ani po nadaniu
+        sobie adresu, nie było odpowiedzi na ping. Jak stwierdziłem, że to
+        problem z <em>firewallem</em>, a nie np. z konfiguracją przełącznika.
+        Dobre pytanie. W jaki sposób możemy to określić? Otóż ja miałem taki
+        pomysł, że podłącze się laptopem pod TRUNK, a drugi komputer będę
+        przełączać między VLANami, i jeśli wyłapie ramki, zawierające
+        odpowiednie ID w polach VLANów, to znaczy że switch dobrze switchuje.
+        I tak też było. W podejsciu numer 3, zamieniłem karty miejscami z
+        reinstalowałem PFSense, na domyślnych ustawieniach. Zaraz po
+        uruchmieniu systemu, wybrałem 
+        <strong>opcję przywrócenia ustawień fabrycznych</strong>.
+        Przy tej czynności znów mamy możliwość przypisać odpowiednio interfejsy
+        sieciowe, ale przypisywanie 
+        <strong>rozpoczynamy od zdefiniowania VLANów</strong>, tam
+        <strong>podajemy urządzenie nadrzędne</strong>, z które ruch danego 
+        VLANu będzie
+        spływać do <em>firewalla</em> <strong>oraz ID VLANu</strong>, 
+        <strong>następnie ustawia się
+        adresy IP i zakres DHCP</strong> dla tej sieci lokalnej. Ważne jest, 
+        aby na pytanie o zmianę protokołu
+        dla <em>webConfiguratora</em> odpowiedzieć na nie, wówczas klasyczna
+        konfiguracja zostanie i będzie mieć dostęp przez HTTPS. Ostatnią ważną
+        konfiguracją jest <strong>pozostawienie urządzenia nadrzędnego
+        nieskonfigurowanego</strong>.
+        </p>
+        <p>
+        Te trzy podejścia były realizowane na
+        testowym komputerze HP ProDesk 600 G2 Mini. Teraz ze względu na
+        terminy musiałem, zabrać się konfigurację pozostałej infrastruktury.
+        Jednak, jak miałem to zrobić, skoro nie miałem karty dla komputera
+        Lenovo, który był docelowo przeznaczony dlatego zadania. Podczas
+        szukania karty Gemini podsunęło takie rozwiązanie jak karta sieci
+        Ethernet, wpianana w złącze przeznaczone dla karty sieci bezprzewodowej
+        dla tego urządzenia, gdzie port RJ-45 dołączany na taśmach motowało
+        się w obudowie, zamiast (w moim przypadku) portu COM. Ta karta
+        kosztowała mnie prawie tyle samo pięniędzy co ten komputer Lenovo.
+        Jeszcze zamówiłem ją we wtorek, w środę jest Święto Niepodległości
+        (Marcina :)) i karta przyjdzie w czwartek, a ja na piątek muszę mieć
+        skonfigurowaną infrę, bo wyjeżdzam i potrzbuje na wyjazd mieć
+        udostępnioną pewną usługę (będzie o niej osobny materiał) przez VPN.
+        W środę rano, przy śniadanku wpadłem na pewien genialny pomysł. A co
+        jeśli puścić oba LAN-y oraz WAN tym samym kablem, ale osobnymi VLANami?
+        Generalnie to konfiguracja nie wymagała zbyt wiele zachodu, jedynie
+        jeden z interfejsów mojego komputera stacjonarnego miał być wpinany
+        w Mikrotik (do sieci gościnnej), to teraz będzie wpinany w AP bo
+        musiałem jego port przeznaczyć na nowy VLAN - WAN. Szybka
+        rekonfiguracja przełącznika. Teraz możemy się zabrać, za instalację
+        PFSense na Lenovo. Przy czym kabel od WANu wpiełem bezpośrednio w
+        port komputera i zainstalowałem system bez przypisanego portu LAN.
+        Następnie przystąpiłem do konfiguracji, tak jak to opisałem powyżej
+        przyczym utworzyłem o jeden VLAN więcej i wszystkie VLANu miały ten
+        <em>parent device</em>.
+      </p>
+      <p>
+        Po restarcie okazało się, że wszystko działa. <em>Firewall</em>
+        uzyskał adres od ODU na WANie. Ja sprawdziłem DHCP na obu LANach -
+        wszystko w porządku. Zablokowałem osiągalność <em>webConfiguratora</em>
+        z sieci gościnnej oraz przjeściej z sieci gościnnej to sieci domowej
+        (lokalnej), ale komputery z sieci domowej mogą komunikować się z 
+        komputerami w sieci gościnnej. Ja zabrałem się z przygotowanie
+        pozostałej cześci infrastruktury, między innymi do instalacji PVE na
+        komputerach HP oraz drugim komputerze Lenovo. Po zainstalowaniu systemu
+        na HP, odłożyłem go na poźniej, ponieważ on będzie świadczyć usługi w
+        obu sieciach i trzeba mu również skonfigurować VLANy. Przeszedłem do
+        komputera Lenovo, na którym ma być ta niezbędna mi usługa. Po
+        zainstalowaniu PVE, przeszedłem do jego aktualizacji wszystko niby ok,
+        ale jakby przepustowość zaczęła zwalniać, aż tu połączenie z internetem
+        się skończyło. Po sprawdzeniu, to nie tylko połączenie z internetem ale
+        i z bramami w obu sieciach, czy konfiguracji VLANów na PFSense
+        zdechła. Szybkie wrzucenie zapytania w Google, z nadzieją że może
+        Gemini pomoże. Tak, pomógł. Okazało się, że wbudowany sterownik
+        <em>Realteka</em> we FreeBSD (system operacyjny, na którym stoi
+        PFSense) jest słaby oraz wadliwy i lepiej zainstalować odpowiedni
+        moduł dla <em>Realteka</em> oraz wyłączyć zgodnie z poradą
+        odciążenie sprzętowe w konfiguracji PFSense. Problemy z tym
+        sterownikiem mają bardzo ciekawy obiaw, otóż nie można dokńczyć lub
+        w ogóle uruchomić <em>speedtestu</em> i interfejs po diodzie na 
+        przełączniku było widać, że już zaniku komunikacją się wyłącza i włącza.
+        Po załadowaniu sterownika oraz
+        restarcie PFSense, pierwsze co uruchomiłem to właśnie <em>SpeedTest</em>
+        Który tym razem, zakończył się sukcesem.
+      </p>
+      <h3>Instalacja oraz włączenie oficjalnego sterownika dla Realteka pod PFSense</h3>
+      <p>
+        Instalację rozpoczynamy od pobrania i zainstalowania odpowiedniego
+        pakietu:
+      </p>
+<pre class="code-block">
+# pkg install realtek-re-kmod
+</pre>
+      <p>
+        Następnie musimy wymusić włączenie sterownika w taki sposób, aby
+        PFSense nie nadpisał tego podczas aktualizacji. Konfigurację
+        rozpoczniemy od otworzenia odpowiedniego pliku:
+      </p>
+<pre class="code-block">
+# vi /boot/loader.conf.local
+</pre>
+      <p>
+        Po otwarciu pliku dopisujemy w nim, poniżej te dwie linie:
+      </p>
+<pre class="code-block">
+if_re_load="YES"
+if_re_name="/boot/modules/if_re.ko"
+</pre>
+      <p>
+        Zapisujemy plik, następnie restartujemy maszynę, po jej uruchomieniu
+        wydajemy polecenie: <code class="code-inline">kldstat</code> i w
+        informacjach zwróconych przez nie szukamy
+        <code class="code-inline">if_re.ko</code>.
+      </p>
+<pre class="code-block">
+Id Refs Address                Size Name
+ 1   23 0xffffffff80200000  3189028 kernel
+ 2    1 0xffffffff8338b000   16d9f8 if_re.ko
+ 3    1 0xffffffff834f9000   673f50 zfs.ko
+ 4    1 0xffffffff83b6d000    1e168 opensolaris.ko
+ 5    1 0xffffffff84420000     23a0 cpuctl.ko
+ 6    1 0xffffffff84423000     4250 ichsmb.ko
+ 7    1 0xffffffff84428000     2178 smbus.ko
+</pre>
+      <p>
+        Po podniesiu <em>firewalla</em>, mogłem wrócić do konfiguracji
+        serwerów PVE.
+      </p>
+			<p>
+			~xf0r3m
+			</p>
+			</div>
+			<p class="footer">
+				2026; COPYLEFT; ALL RIGHTS REVERSED;
+			</p>
+		</body>
+	</html>
