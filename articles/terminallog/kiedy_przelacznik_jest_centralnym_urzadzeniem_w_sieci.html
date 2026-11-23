@@ -362,9 +362,184 @@ Id Refs Address                Size Name
         Po podniesiu <em>firewalla</em>, mogłem wrócić do konfiguracji
         serwerów PVE.
       </p>
+      <h2>Konfiguracja VLANów w środowisku Proxmox Virtual Environment</h2>
+      <p>
+        W momencie gdy <em>firewall</em> przestał działać, ja byłem w trakcie
+        aktualizacji, nalejpszej z moich maszyn. Po przywróceniu jego działania
+        stwierdziłem, że chyba w najlepszym przypadku będzie postawić tam
+        system od zera, niż działać w możliwie zaburzonym środowisku. Póki co
+        odłożyłem ten komputer, i zabrałem się za drugi serwer PVE, ten był
+        w stanie bezczynności, gdy <em>firewall</em> odmówił posłuszeństwa.  
+      </p>
+      <p>
+        Ten serwer ma świadczyć usługi dla obu sieci, więc trzeba przygotować
+        go na obsługę ich ruchu. Prawdopobnie będzie chcieli kontrolować ten
+        serwer, z którejś z sieci - więc potrzebny będzie nam jeden z jej
+        adresów. Na początek nadajemy jakiś dowolny adres interfejsowi mostu,
+        który został utworzony podczas instalacji - zapewni to nam swobodną
+        manipulację adresmi naszych sieci. Jeśli zmienilismy ten adres, to 
+        należy również zmienić go na komputerze, pamiętając aby z tej samej
+        sieci, aby komunikacja doszła do skutku. Logujemy się panelu, wybieramy
+        nasz <em>node</em>, z listy po lewej stronie, okno poprawej stronie
+        skupi się na tym urządzeniu, następnie ze "środkowej" kolumny lub
+        lewego panelu, prawego okna. wybieramy zakładkę <strong>Network</strong>.
+      </p>
+      <p>
+        W tym oknie będą znajdować się dwa urządzenia. Jedno urządzenie
+        fizyczne i jedno urządzenie wirtualne mostu, te któremu nadaliśmy
+        adres egzotyczny. Konfigurację rozpoczniemy od utworzenia urządzeń
+        <em>VLANowych</em>. Nad tabelą z interfejsami znajduje sie przycisk
+        <em>Create</em>, naciskamy go następnie z listy wybieramy
+        <strong>Linux VLAN</strong>. Zostanie nam wyświetlone okienko z kilkoma
+        polami do uzupełnienia, my musimy wypełnić jedynie trzy lub dwa, w
+        zależności jaką nazwę nadaliśmy dla tego urządzenia, jeśli najedziemym
+	      myszką na pole z nazwą, to ukaża się nam podpowiedź:
+      </p>
+<pre class="code-block">
+Format: [interface].[vlan-id] (e.g., eno1.50, bond1.30)
+</pre>
+      <p>
+        Jeśli zastosujemy sie do tej wskazówki, pole
+        <code class="code-inline">VLAN Tag:</code> stanie się szare. 
+        Nam pozostanie jedynie uzupełnienie, pola
+        <code class="code-inline">Vlan raw device:</code>. Oczywiście możemy
+        całkowicie zignorować tę wskazówke, nazwać urządzenie po swojemu i
+        uzupełnić zarówno pole przeznaczone na ID VLANu jak i wskazać
+        urządze nadrzędne. Tę samą czynność powtarzamy dla drugiej sieci.
+      </p>
+      <p>
+        Urządzenia VLANów, zapewnią nam rozróżnianie ruchu i odpowiednie
+        tagowanie ramek. Bo oczywiście wiemy, że port pod który podłaczamy
+        jest portem <em>TRUNK</em>. Teraz musimy zapewnić możliwość korzystania
+        z tych sieci kontenerom oraz maszynom wirtualnym. Za to odpowiedzialne
+        jest urządzenie mostu.
+      </p>
+      <p>
+        Aby utworzyć takie urządzenie należy ponownie wybrać przycisk
+        <em>Create</em>, ale w tym przypadku wybieramy 
+        <strong>Linux Bridge</strong>, następnie nadajemy nazwę naszemu
+        urządzeniu oraz wskazujemy urządzenie VLANu w polu
+        <code class="code-inline">Bridge ports:</code>. Jeśli z tej sieci
+        mamy mieć dostęp do panelu serwera lub za jej pomocą ma łączyć się
+        z internetem, to należy dodatkowo uzupełnić konfigurajcę mostu o 
+        adres IP wraz maska w formacie CIDR oraz adres bramy sieciowej. 
+        W innym razie taka konfiguracja nie jest w ogóle potrzebna,
+        zostawiamy takie puste urządzenia - to kontener czy maszyna wirtualna
+        ma posiadać odpowiedni dla danej sieci adres. Teraz
+        możemy zapisać nasze zmiany. Następnie przełączamy się pod VLAN, który
+        zapewni nam dostęp do konsoli administracyjnej serwera. Wracamy
+        z powrotem do konfiguracji sieci. Teraz możemu usunąc ten domyślny
+        (utworzony podczas instalacji) most, z tym egzotycznym adresem.
+        Interfejs fizyczny pozostawiamy aktywny, nieskonfigurowany.
+      </p>
+      <p>
+        Tak przygotowana konfiguracja sieciowa pozwoli na zaspokojenie potrzeb
+        wirtualizacyjnych obu sieci. Ostatnim elementem konfiguracji sieciowej
+        mojej infrastrktury jest konfiguracja sieci oraz usług na serwerze
+        NAS.
+      </p>
+      <h2>Konfiguracja VLANów w dystrybucjach Linuksa na przykładzie dystrybucji Debian.</h2>
+      <p>
+        Ze względu na to, że będziemy intensywnie wykorzystywać konfigurację
+        interfejsu sieciowego serwera, nalepiej podłączyć się do niego
+        bezpośrednio przez konsolę. Do konfiguracji VLANów potrzebujemy
+        pakietu o bardzo zmyślnej nazwie jak jest <strong>vlan</strong>.
+      </p>
+<pre class="code-block">
+$ sudo apt install vlan
+</pre>
+      <p>
+        Następnie możemy przjeść, do konfiguracji sieciowej pakietu
+        <em>ifupdown</em> - <em>/etc/network/interfaces</em>, aby ustalić pod
+        jakimi adresami ten serwer będzie dostępny w obu sieciach. 
+      </p>
+<pre class="code-block">
+auto enp4s0
+iface enp4s0 inet manual
+
+auto enp4s0.10
+iface enp4s0.10 inet static
+  address 192.168.7.2
+  netmask 255.255.255.0
+  gateway 192.168.7.1
+  dns-nameservers 192.168.7.1
+
+auto enp4s0.20
+iface enp4s0.20 inet static
+  address 192.168.8.2
+  netmask 255.255.255.0
+</pre>
+      <p>
+        W przypadku Debiana konfiguracja jest podobna do PVE (PVE bazuje na
+        Debianie). Dla interfejsu będącego jedynie dostępowym, wystarczy
+        sam adres oraz maska podsieci. Jeśli chodzi o konfigurację sieciową
+        serwera, to tak naprawdę tyle. Resztą zajmuje się moduł jądra
+        zainstalowany za pomocą pakietu.
+      </p>
+      <p>
+        Jeśli chodzi o konfigurację usług, to polega ona wyłącznie na zmianie
+        adresu dostępowego dla jednego z udziałów NFS. Tyle, prosta zmiana
+        zmiana adresu. Ostatnią, rzeczą jaką należy ustawić, to możlwiwość
+        zdalnego odblokowania (odszyfrowania) partycji z katalogiem głównym
+        przy użyciu serwera DropBear. Cały problem polega na tym, że
+        komputer ma zapisany w <em>initramfs</em> adres IP pod którym jest
+        osiągalny jeszcze z kilkoma danymi. Nie ma on jednak przypisanej,
+        żadnej informacji na temat VLANu, z którego należy spodziewać się
+        połączenia. Co więcej system operacyjny na tym etapie jeszcze nie
+        jest wstanie obsłużyć VLANów.
+      </p>
+      <p>
+        Kiedy ktoś stanął przed podobnym problemem i w serwisie
+        <em>Github</em> zostało przedstawione rozwiązanie. Można za pomocą
+        kilku skryptów powłoki składających się na jedną wtyczkę załadować
+        obsługę VLANów, już na tak wczesnym etapie rozruchu systemu
+        operacyjnego. Wtyczka dostępna jest pod tymi adresami i instaluje się
+        ją poprzez skopiowanie zawartości podkatalogu do katalogu
+        <em>/etc/initramfs</em>. Wymagana jest również odpowiednia składania
+        podczas konfiguracji <em>initramfs</em>.
+      </p>
+      <ul>
+        <li><a href="https://github.com/stcz/initramfs-tools-network-hook">https://github.com/stcz/initramfs-tools-network-hook</a></li>
+        <li><a href="https://ftp.morketsmerke.org/initramfs-tools-network-hook-main.zip">https://ftp.morketsmerke.org/initramfs-tools-network-hook-main.zip</a></li>
+      </ul>
+      <p>
+        Poniżej znajduje się poprawna składnia jaka powinna znajdować się
+        w pliku <em>/etc/initramfs/initramfs.conf</em>.
+      </p>
+<pre class="code-block">
+  VLAN="enp4s0:10"
+  IP=192.168.7.2::192.168.7.1:255.255.255.0::enp4s0.10:off
+</pre>
+      <p>
+        Dodatkowo wtyczka wymaga aby w katalogu
+        <em>etc/initramfs-tools/conf.d</em> został utworzony pusty plik o
+        dowolnej nazwie z rozszerzeniem <em>.conf</em>. Po aktualizacji
+        <em>initramfs</em> oraz <em>GRUBa</em> i restarcie w momencie
+        załączenia <em>dropbear</em> z <em>initramfsu</em>, komputer zaczął 
+        się komunikować się w danym VLAN-ie.
+      </p>
+      <p>
+        Podsumowując, konfiguracja wielu sieci LAN korzystająchyc z techonlogi
+        VLANów, może być specyficzna, niekoniecznie skomplikowana. Jednak jak
+        mogliśmy się przekonać na moim przypadku jest bardzo wiele zmiennych,
+        które należy wziać pod uwagę. Od słabych jakościowo kart sieciowych
+        USB, fatalnej konfiguracji sprzętowej, stosu urządzeń virtualnych do
+        uruchamiania obsługi VLANów we wczesnych etapach rozruchu systemu.
+        To wszystko składa się na działającą infrastrukturę, której
+        dokumentacją stał się niniejszy artykuł. 
+      </p>
 			<p>
 			~xf0r3m
 			</p>
+      <p>
+        Źródła:
+        <ol>
+          <li><a href="https://manual.mikrotik.com/docs/bridging-and-switching/swos/css106/">Mikrotik VLANy</a></li>
+          <li><a href="https://daniel.es/blog/pfsense-fix-realtek-issues/">Rozwiązanie problemu ze sterownikiem Realteka pod PfSense</a></li>
+          <li><a href="https://github.com/stcz/initramfs-tools-network-hook/issues/15">Poprawna składnia dla initramfs.conf</a></li>
+          <li><a href="https://github.com/stcz/initramfs-tools-network-hook/issues/14">Potrzeba utworzenia pustego pliku .conf</a></li>
+        </ol>
+      </p>
 			</div>
 			<p class="footer">
 				2026; COPYLEFT; ALL RIGHTS REVERSED;
