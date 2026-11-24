@@ -38,27 +38,29 @@
         <p>
           To podejscie stawia <strong>zarządzalny</strong> przełącznik
           (to bardzo ważne, w przypadku urządzeń bez możliwości konfiguracji
-          nie będzie wykonalne), w centrum naszej sieci. Dzięki niemu dowiemy
-          się, że router (chciaż w naszym przypadku będzie to
+          nie będzie to wykonalne), w centrum naszej sieci. Taka konfiguracja 
+          spowoduje, że router (chciaż w naszym przypadku będzie to
           <strong>programowy firewall</strong>) do poprawnego działania
-          operacyjnego potrzebuje tylko jednego portu. Podobnie jest w
+          operacyjnego potrzebuje tylko jednego portu. Podobnie jest w 
           przypadku serwerów, aby mogły być one osiągalne z dwóch różnych sieci
           lokalnych. Mowa oczywiście technologii
           <strong>wirtualnych sieci lokalnych - VLAN</strong>. Z konfiguracją
           tego rozwiązania mieliśmy styczność w przypadku kursu Cisco CCNA, tam
           jednak laboratoria przestawiały to w bardzo sterylny i jednolity 
-          jakościowo i konfiguracyjnie. Wiadomo Akademia Cisco wykorzystuje
+          sposób jakościowo i konfiguracyjnie. Wiadomo Akademia Cisco 
+          wykorzystuje
           własne technologie, które mogą być dla wielu nieosiągalne nie tylko
           z pobudek finasowych. Oczywiście, co producent to jego własna
           implementacja konfiguracji VLANów, a także jak miałem szansę się
-          przekonać ich wydajność. Ale zacznij od początku.
+          przekonać ich wydajność, ale zacznij od początku.
         </p>
         <p>
           W mojej lokalnej sieci domowej, pojawiło się zapotrzebowanie na
-          uprządkowanie kącika, w którym znajdować się serwer NAS. Zakupiłem
+          uprządkowanie kącika, w którym znajdował się serwer NAS. Zakupiłem
           więc mały stojak typu <em>open rack</em> w wersji 10", ponieważ
           komputer, który pełnił rolę NAS był komputerem w obudowie typu
-          Tiny. Jakiś czas później pojawiła się potrzeba stworzenia pierwszego
+          Tiny, idealnie pasowały wymiary krótszego standardu RACK.
+          Jakiś czas później pojawiła się potrzeba stworzenia pierwszego
           domowego serwera <strong>PVE</strong> 
           (ang.<em>Proxmox Virtual Environment</em>). Dokupiłem półkę i już
           chciałem użyć drugiego takiego samego komputerka jak NAS (swojego
@@ -67,13 +69,14 @@
           tylko ja miałem dostęp. Po dłuższej próbie przywrócenia sprzętu,
           poddałem się i mając jeszcze w zanadżu terminal od Della, który
           niegdyś służył za NAS - stwierdziłem, że lepiej zmigrować tego NAS,
-          z powrotem na terminal.
+          z powrotem na terminal. Terminal Dell Wyse również świetnie pasował
+          do wymiaru 10-calowego.
         </p>
         <p>
           Mniej więcej po określeniu tego co chcę mieć na tym serwerze PVE,
           doszedłem do wniosku, że niezbędne będzie wydzielenie drugiej sieci
-          lokalnej (laboratoryjne, gościnnej - jak zwał, tak zwał), która
-          będzie mieć dostęp do innych hostów w tej sieci oraz do internetu,
+          lokalnej (laboratoryjnej, gościnnej - jak zwał, tak zwał), która
+          będzie mieć dostęp do innych hostów w tej sieci oraz do internetu i
           nigdzie więcej. Na potrzeby tej sieci wybrałem system 
           <strong>PFSense</strong>, który
           jest bardzo wydajnym programowym firewallem, jako platformę sprzętową
@@ -88,9 +91,9 @@
           karty nie było zastrzeżeń. Gemini od Google twierdzi, że problemem
           jest komputer, ponieważ jest wersja energooszczędna i może być
           zdolna do wyłączania interfejsu. Nawet jeśli przez chwilę nie jest
-          używany. Ja ma co do tego inną teorię, gdyż wbudowana karta w to
-          Lenovo to chip <em>Realteka</em>, a to co siedzi w karcie również.
-          I może jak w przypadku systemów serwerowych z Rodziny Windows, na
+          używany. Ja mam co do tego inną teorię, gdyż wbudowana karta w to
+          Lenovo to chip <em>Realteka</em>, a to co siedzi w karcie USB również.
+          I może jak w przypadku systemów serwerowych z rodziny Windows, na
           serwerze muszą być zainstalowane dwa różne chipy. Na potwierdzenie
           tej tezy niech świadczy fakt, że komputer HP ProDesk 600 G2 Mini,
           posiada wbudowaną kartę sieciową Intela I219-LM. 
@@ -106,14 +109,16 @@
           została zgłoszona reklamacja, wczasie postępowania wyjaśniającego 
           musiałem,
           nagrywać filmik, jak podłączam kartę do komputera, a tam zgłasza się
-          karta jako Realtek. Reklamacja została użnana, pieniądze zwrócone.
-          Ale ja dalej jest bez jednego interfejsu. Generalnie chcąc wydzielić
+          karta jako Realtek. Reklamacja została użnana, pieniądze zwrócone i
+          odziwo karta została u mnie. Taką mają one wartość, że więcej jest
+          warte opakowanie i logistyka niż gotowy produkt. Niestety
+          ja dalej jestem bez jednego interfejsu. Generalnie chcąc wydzielić
           te dwie sieci lokalne stwierdziłem, że na przełączniku utworze dwa
           osobne VLAN-y (coś a'la <em>Port Based VLAN</em> na przełącznikach
           marki TP-Link), bez żadnego portu <em>Trunk</em> - wszystkie porty
           odseparowane. Do tego wybrałem przełącznik firmy 
           <strong>Mikrotik</strong>, nie dlatego, że jest on bardzo dobrze do
-          tego przygotowane - z tą firmą planuje związać się na dłużej jeśli
+          tego przygotowany - z tą firmą planuje związać się na dłużej jeśli
           chodzi o rozwiązania sieciowe oraz ewentualne kursy. W konfiguracji
           tego przełącznika przypisał bym połowę portów do jednego, a drugą
           połowę do drugiego, przy czym potrzebował bym dwóch chipsetów
@@ -128,11 +133,11 @@
         </p>
         <h2>Konfiguracja wstępna konfiguracja przełącznika oraz VLANów.</h2>
         <p>
-          Po wyjęciu z opakowania switcha, podłączamu mu internet, następnie
+          Po wyjęciu z opakowania switcha, podłączamy mu internet, następnie
           na swoim interfejsie ustawiamy adres IP z sieci 192.168.88.0/24, przy
           czym adres 192.168.88.1, jest adresem przełacznika. Te czynności
-          zależa od przełącznika i moga róznić się w przypadku innych modeli
-          naszego sprzętu. Na przykład przełączniki z serii RB260GS pobierają
+          zależy od przełącznika i moga róznić się w przypadku innych modeli
+          Mikrotika. Na przykład przełączniki z serii RB260GS pobierają
           adres z serwera DHCP, a ten zapisany działa w trybie <em>failover</em>
           - jeśli nie uda się pobrać adresu z DHCP. Logujemy się do
           przełącznika, login: <strong>admin</strong>. Domyślne początkowe
@@ -142,9 +147,9 @@
           podaniu jednego z poprawnych adresów należących do naszej sieci,
           resztę w pamięci dopisze sam przełącznik, następnie potwierdzamy
           klikając "Apply All". Po naciśnięciu tego przycisku, zmieniamy
-          konfigurację naszego interfejsu, aby znów stać się człokiem naszej
+          konfigurację naszego interfejsu, aby znów stać się komputerem naszej
           sieci lokalnej. Logujemu się ponownie, następnie przechodzimy do
-          zakładki Upgrade. Zainstalujemy najnowszą wersję SwOW, naciskając
+          zakładki Upgrade. Zainstalujemy najnowszą wersję SwOS, naciskając
           przycisk "Download &amp; Upgrade". Po pobraniu urządzenie samo się
           uruchomi ponowonie - w ten sposób aktualizowany jest system
           operacyjny.
@@ -163,7 +168,7 @@
         </p>
         <ul>
           <li><strong><em>leave as is</em></strong> - ang. <em>pozostaw takie 
-            jakie</em> dobry wybór dla urządzeń, którym niepodoba się 
+            jakie jest</em> dobry wybór dla urządzeń, którym niepodoba się 
             ingerencja w ramki, np. router pełniący funkcję AP wraz ze
             switchem, który nie ma funkcji zarządzania jest wyłącznie
             przedłużeniem domeny rozgłoszeniowej.</li>
@@ -172,7 +177,7 @@
             dla tego VLAN. Zawsze usuwa pole VLANu (komputer go nie potrzebują).</li>
           <li><strong><em>add if missing</em></strong> - ang. <em>dodaj jeśli
             brakuje</em>, ta czynność jest idealna dla łączy TRUNK, dodaje
-            pole VLAN, jeśli go brakuje.<li>
+            pole VLAN, jeśli go brakuje.</li>
           <li><strong><em>not a member</em></strong> - ang. <em>nie jest
             członkiem / nie należy do...</em>, ta czynność wyklucza port z
             udziału w danym VLANie.</li>
@@ -180,7 +185,7 @@
         <p>
           Te role mają głównie znaczenie dla ruchu <em>egress</em> - 
           opuszczającego urządzenie. Jednak w przypadku definicji sieci VLAN
-          za ich pomocą określamy stopień przy należności portów dla
+          za ich pomocą określamy stopień przynależności portów dla
           poszczególnych VLANów. Dlatego poniżej znajduje się kilka przypadków,
           w jakich należy ustawić te role:
         </p> 
@@ -194,14 +199,16 @@
         </ul>
         <p>
           Po ustawieniu tych ról, możemy przjeść do ustawień ruchu VLAN dla
-          poszczególnych portów. Tutaj strona dzieli się na dwie konfiguracje
+          poszczególnych portów - zakładki <strong>VLAN</strong>. 
+          Tutaj strona dzieli się na dwie konfiguracje
           dla ruchu napływającego (<em>Ingress</em>) oraz dla ruchu
           odpływającego (<em>Egress</em>). Przypadku dla tego pierwszego pola
           ustawiamy w taki sposób:
         </p>
         <ul>
           <li><strong>VLAN Mode:</strong> - <em>strict</em></li>
-          <li><strong>VLAN Receive:</strong> - </em>Porty dostępowe: only untagged</em></li>
+          <li><strong>VLAN Receive:</strong> - </em>Porty dostępowe: only
+          untagged, Porty typu trunk: only tagged</em></li>
           <li><strong>Default VLAN ID:</strong> - <em>ID VLANU</em></li>
           <li><strong>Force VLAN ID: </strong> - <em>Porty dostępowe: TAK,
           porty typu TRUNK: NIE</em></li>
@@ -270,12 +277,12 @@
         Lenovo, który był docelowo przeznaczony dlatego zadania. Podczas
         szukania karty Gemini podsunęło takie rozwiązanie jak karta sieci
         Ethernet, wpianana w złącze przeznaczone dla karty sieci bezprzewodowej
-        dla tego urządzenia, gdzie port RJ-45 dołączany na taśmach motowało
+        dla tego urządzenia, gdzie port RJ-45 dołączany na taśmach montowało
         się w obudowie, zamiast (w moim przypadku) portu COM. Ta karta
         kosztowała mnie prawie tyle samo pięniędzy co ten komputer Lenovo.
         Jeszcze zamówiłem ją we wtorek, w środę jest Święto Niepodległości
         (Marcina :)) i karta przyjdzie w czwartek, a ja na piątek muszę mieć
-        skonfigurowaną infrę, bo wyjeżdzam i potrzbuje na wyjazd mieć
+        wszystko skonfigurowane, bo wyjeżdzam i potrzbuje na wyjazd mieć
         udostępnioną pewną usługę (będzie o niej osobny materiał) przez VPN.
         W środę rano, przy śniadanku wpadłem na pewien genialny pomysł. A co
         jeśli puścić oba LAN-y oraz WAN tym samym kablem, ale osobnymi VLANami?
@@ -309,12 +316,13 @@
         zdechła. Szybkie wrzucenie zapytania w Google, z nadzieją że może
         Gemini pomoże. Tak, pomógł. Okazało się, że wbudowany sterownik
         <em>Realteka</em> we FreeBSD (system operacyjny, na którym stoi
-        PFSense) jest słaby oraz wadliwy i lepiej zainstalować odpowiedni
+        PFSense) jest słaby oraz wadliwy i lepiej zainstalować odpowiedni,
+        dedykowany
         moduł dla <em>Realteka</em> oraz wyłączyć zgodnie z poradą
         odciążenie sprzętowe w konfiguracji PFSense. Problemy z tym
         sterownikiem mają bardzo ciekawy obiaw, otóż nie można dokńczyć lub
         w ogóle uruchomić <em>speedtestu</em> i interfejs po diodzie na 
-        przełączniku było widać, że już zaniku komunikacją się wyłącza i włącza.
+        przełączniku było widać, że już zaniku komunikacji wyłącza się i włącza.
         Po załadowaniu sterownika oraz
         restarcie PFSense, pierwsze co uruchomiłem to właśnie <em>SpeedTest</em>
         Który tym razem, zakończył się sukcesem.
@@ -345,7 +353,7 @@ if_re_name="/boot/modules/if_re.ko"
       <p>
         Zapisujemy plik, następnie restartujemy maszynę, po jej uruchomieniu
         wydajemy polecenie: <code class="code-inline">kldstat</code> i w
-        informacjach zwróconych przez nie szukamy
+        informacjach zwróconych przez nie szukamy:
         <code class="code-inline">if_re.ko</code>.
       </p>
 <pre class="code-block">
@@ -365,7 +373,7 @@ Id Refs Address                Size Name
       <h2>Konfiguracja VLANów w środowisku Proxmox Virtual Environment</h2>
       <p>
         W momencie gdy <em>firewall</em> przestał działać, ja byłem w trakcie
-        aktualizacji, nalejpszej z moich maszyn. Po przywróceniu jego działania
+        aktualizacji, najlepszej z moich maszyn. Po przywróceniu jego działania
         stwierdziłem, że chyba w najlepszym przypadku będzie postawić tam
         system od zera, niż działać w możliwie zaburzonym środowisku. Póki co
         odłożyłem ten komputer, i zabrałem się za drugi serwer PVE, ten był
@@ -402,7 +410,8 @@ Format: [interface].[vlan-id] (e.g., eno1.50, bond1.30)
         Jeśli zastosujemy sie do tej wskazówki, pole
         <code class="code-inline">VLAN Tag:</code> stanie się szare. 
         Nam pozostanie jedynie uzupełnienie, pola
-        <code class="code-inline">Vlan raw device:</code>. Oczywiście możemy
+        <code class="code-inline">Vlan raw device:</code> - interfejs fizyczny/
+        urządzenie nadrzędne. Oczywiście możemy
         całkowicie zignorować tę wskazówke, nazwać urządzenie po swojemu i
         uzupełnić zarówno pole przeznaczone na ID VLANu jak i wskazać
         urządze nadrzędne. Tę samą czynność powtarzamy dla drugiej sieci.
@@ -421,7 +430,7 @@ Format: [interface].[vlan-id] (e.g., eno1.50, bond1.30)
         urządzeniu oraz wskazujemy urządzenie VLANu w polu
         <code class="code-inline">Bridge ports:</code>. Jeśli z tej sieci
         mamy mieć dostęp do panelu serwera lub za jej pomocą ma łączyć się
-        z internetem, to należy dodatkowo uzupełnić konfigurajcę mostu o 
+        z internetem, to należy dodatkowo uzupełnić konfiguracje mostu o 
         adres IP wraz maska w formacie CIDR oraz adres bramy sieciowej. 
         W innym razie taka konfiguracja nie jest w ogóle potrzebna,
         zostawiamy takie puste urządzenia - to kontener czy maszyna wirtualna
@@ -438,7 +447,7 @@ Format: [interface].[vlan-id] (e.g., eno1.50, bond1.30)
         mojej infrastrktury jest konfiguracja sieci oraz usług na serwerze
         NAS.
       </p>
-      <h2>Konfiguracja VLANów w dystrybucjach Linuksa na przykładzie dystrybucji Debian.</h2>
+      <h2>Konfiguracja VLANów w dystrybucjach Linuksa na przykładzie Debiana.</h2>
       <p>
         Ze względu na to, że będziemy intensywnie wykorzystywać konfigurację
         interfejsu sieciowego serwera, nalepiej podłączyć się do niego
@@ -474,14 +483,14 @@ iface enp4s0.20 inet static
         Debianie). Dla interfejsu będącego jedynie dostępowym, wystarczy
         sam adres oraz maska podsieci. Jeśli chodzi o konfigurację sieciową
         serwera, to tak naprawdę tyle. Resztą zajmuje się moduł jądra
-        zainstalowany za pomocą pakietu.
+        zainstalowany za pomocą wcześniejszego pakietu.
       </p>
       <p>
         Jeśli chodzi o konfigurację usług, to polega ona wyłącznie na zmianie
         adresu dostępowego dla jednego z udziałów NFS. Tyle, prosta zmiana
         zmiana adresu. Ostatnią, rzeczą jaką należy ustawić, to możlwiwość
         zdalnego odblokowania (odszyfrowania) partycji z katalogiem głównym
-        przy użyciu serwera DropBear. Cały problem polega na tym, że
+        przy użyciu serwera <em>dropbear</em>. Cały problem polega na tym, że
         komputer ma zapisany w <em>initramfs</em> adres IP pod którym jest
         osiągalny jeszcze z kilkoma danymi. Nie ma on jednak przypisanej,
         żadnej informacji na temat VLANu, z którego należy spodziewać się
