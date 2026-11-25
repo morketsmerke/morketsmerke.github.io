@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="https://i.ibb.co/khy45hh/mm.png">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+	</head>
+	<body style="font-family: monospace;" >
+<pre>
+  _____ _   _ _    _    ___      _
+ / ____| \ | | |  | |  / / |    (_)
+| |  __|  \| | |  | | / /| |     _ _ __  _   ___  __
+| | |_ | . ` | |  | |/ / | |    | | '_ \| | | \ \/ /
+| |__| | |\  | |__| / /  | |____| | | | | |_| |>  <
+ \_____|_| \_|\____/_/   |______|_|_| |_|\__,_/_/\_\
+</pre>
+	<p class="header_link">
+		&#9760;&nbsp;<a href="https://morketsmerke.github.io">morketsmerke</a>&nbsp;&#9760;
+	</p>
+	<div class="main">
+		<h1 class="title">Przekierowywania urządzeń USB oraz umożliwienie działania OpenVPN na kontenerze PVE.</h1>
+    <p>
+      W tym artykule chciałbym podzieli się z wami, historią pewnego kontenera
+      Proxmoxa, który był mi potrzebny na wyjazd. Co chciałem osiągnąć? Otóż
+      chciałem badać pasmo radiowe PMR446 z mojego miasta będąc na wyjeździe,
+      a ze względu iż w mieszkaniu mam internet z sieci komórkowej stwierdziłem,
+      że muszę ustawić jeszcze VPN. Byłem święcie przekonany, że przecież można
+      uruchomić oprogramowanie OpenVPN, jak na zwykłym komputerze i kiedy to
+      do mnie dotarło, że przecież nie za bardzo jest możliwe, przez
+      ograniczony dostęp do urządzeń. Na przykładzie mojego kontenera, z tzw.
+      <em>WebSDRem</em> chciałbym przedstawić w jaki sposób możemy to zrobić.
+		</p>
+    <p>
+      Przed uruchomieniem kontenera, dokonuje wpisu w jego konfiguracji to jest
+      właśnie to <strong>przekierowanie</strong>.
+    </p>
+<pre class="code-block">
+dev0: path=/dev/bus/usb/001/002,mode=0666
+</pre>
+    <p>
+      Wartość zmiennej <code class="code-inline">path</code> jest niczym innym
+      jak ścieżką wystąpienia pliku urządzenia w komputerze hostującym
+      kontener. Jedyną niewiadomą mogą być dwa ostatnie elementy w tym
+      przypadku jest <code class="code-inline">/001/002</code> - są to numery
+      identyfikujące szynę USB oraz to urządzenie. Te informacje możemy
+      pobrać chociażby z polecenia <code class="code-inline">lsusb</code>.
+    </p>
+<pre class="code-block">
+root@pve1:~# lsusb
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 001 Device 002: ID 0bda:2838 Realtek Semiconductor Corp. RTL2838 DVB-T
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+</pre>
+    <p>
+      Natomiast <code class="code-inline">mode</code>, określa uprawnienia
+      do tego urządzenia już w kontenerze. W przypadku SDR, te uprawnienia
+      wydają się optymalne. Inne urządzenia mogą wymagać innych uprawnień do
+      poprawnego działania. 
+    </p>
+    <p>
+      Moją konfigurację kontenera z WebSDR-em (nazwanym potocznie, ponieważ nie
+      tego oprogrowanie używam). Rozpoczynam od aktualizacji systemych oraz
+      instalacji ogólnych programów, które wykorzystuje na codzień do
+      pracy nie tylko z konternami, ale i ogólnie z dystrybucjami Linuksa.
+    </p>
+<pre class="code-block">
+  # apt update &amp;&amp; apt upgrade -y
+  # apt install sudo git vim ranger
+</pre>
+    <p>
+      Następnie korzystając ze strony, z piewszego link na liście źródłem,
+      sprawdzam czy nie brakuje jakiś pakietów i je uzupełniam. Tworzę również
+      zwykłego użytkownika z możliwościa podniesienie uprawenień
+    </p>
+<pre class="code-block">
+  # apt install curl gpg -y
+  # adduser -m -s /bin/bash xf0r3m
+  # usermod -aG sudo xf0r3m
+  # passwd xf0r3m
+</pre>
+    <p>
+      Po utworzeniu użytkownika, możemy zalogować się przez SSH. Po zalogowaniu
+      mogę teraz przekleić zapisane na stronie polecenia odnośnie instalacji
+      oprogramowania <strong>OpenWebRX+</strong>, odpowiedniego dla mojej
+      wersji Debiana. Początkowo instalacja rozpoczyna się od konfiguracji
+      repozytoriów.
+    </p>
+<pre class="code-block">
+$ curl -s https://luarvique.github.io/ppa/openwebrx-plus.gpg | \
+sudo gpg --yes --dearmor -o /etc/apt/trusted.gpg.d/openwebrx-plus.gpg
+$ sudo tee /etc/apt/sources.list.d/openwebrx-plus.list &lt;&lt;&lt;"deb [signed-by=/etc/apt/trusted.gpg.d/openwebrx-plus.gpg] https://luarvique.github.io/ppa/trixie ./"
+</pre>
+    <p>
+      Teraz możemy odświeżyć listy pakietów i zainstalować nasze oprogramowanie.
+      Podczas instalacji zostaniemy poproszeni o podanie hasła dla konta admina
+      do OpenWebRX.
+    </p>
+<pre class="code-block">
+$ sudo apt update
+$ sudo apt install openwebrx
+</pre>
+    <p>
+      Instalacja <em>OpenWebRX</em>, nie oznacza końca. Teraz musimy zająć
+      sterownikiem. Sterownik dla RTL-SDRv4 znajduje się na githubie, a jego
+      instalacja jest dość specyficzna, z wcześniej przygotowanych plików
+      tworzymy paczki <em>.deb</em> i następnie instalujemy za pomocą polecenia
+      <em>dpkg</em>.
+    </p>
+<pre class="code-block">
+sudo apt install libusb-1.0-0-dev git cmake build-essential pkg-config debhelper
+git clone https://github.com/rtlsdrblog/rtl-sdr-blog
+cd rtl-sdr-blog
+sudo dpkg-buildpackage -b --no-sign
+cd ..
+sudo dpkg -i librtlsdr0_*.deb librtlsdr-dev_*.deb rtl-sdr_*.deb 
+</pre>
+    <p>
+      Teraz możemy się zresartować, po ponownym załadowaniu systemu za pomocą
+      odpowiedniego polecenia, należy sprawdzić czy nasze oprogramowanie jest
+      gotowe. Przy użyciu polecenia <code class="code-inline">ss</code> wraz
+      opcjami <code class="code-inline">-ltnp</code>, szukamy procesu, który
+      nasłuchuje na portcie <strong>8073</strong>
+    </p>
+<pre class="code-block">
+  $ sudo ss -ltnp
+  ...
+  LISTEN  0  5 *:8073 *:*   users:(("openwebrx",pid=91,fd=3))
+</pre>
+    <p>
+      Poprzejsciu na stronę przy użyciu przeglądarki internetowej powiniśmy
+      ujrzeć wodospad oraz kilka peredefiniowanych zakładek, kilkając przycisk
+      <em>play</em> na środku powiniśmy usłyszeć biały szum - dzięki temu wiemy
+      że SDR został poprawnie przekazany do kontenera i działa.
+    </p>
+    <p>
+      Tutaj chciałbym jeszcze nadmienić jedną rzecz. Otóż przy dłuższej bez
+      czynności, komputer może odłączyć to urządzenie. Kiedy coś spróbuje się
+      do niego odwołać, komputer z powrotem je włącz, ale już będzie jego
+      miejsce na szynie USB (drugi numer, na ścieżce
+      <code class="code-inline">path=</code>). Ze względu to, że tego
+      przekierowanego urządzenia już nie ma, kontener jeśli był wcześniej
+      wyłączony, nie będzie chciał się włączyć, dopóki nie poprawimy lub nie
+      usuniemy przekierowania.
+    </p>
+    <p>
+      Druga sprawą jaką chciałem skonfigurować na tej maszynie poza SDRem jest
+      dostęp do nie poprzez OpenVPN. Tutaj darować sobie będę samo połączenie
+      z OpenVPN, było wałkowane wielokrotnie. Na kontenerach LXC jakie 
+      zapewnia nam Proxmox, problemem przy usłudze OpenVPN jest to, że chce
+      ona skorzystać z urządzenia <em>/dev/net/tun</em>, które w domyślnej
+      konfiguracji nie istnieje. Musimy je dodać, a dokonamy tego za pomocą
+      pliku konfiguracyjnego. Na końcu pliku dopisujemy dwie poniższe linie
+    </p>
+<pre class="code-block">
+ lxc.cgroup2.devices.allow: c 10:200 rwm
+ lxc.mount.entry: /dev/net dev/net none bind,create=dir
+</pre>
+    <p>
+      Następnie <strong>na hoście</strong> musimy nadać odpowiednie uprawnienia,
+      po to aby kontenery nieuprzywilejowane mogły skorzystać z tego
+      urządzenia. Musimy zmapować właściciela oraz grupę pliku urządzenia
+      <em>/dev/net/tun</em>.
+    </p>
+<pre class="code-block">
+chown 100000:100000 /dev/net/tun
+</pre>
+    <p>
+      To w zasadzie tyle. Teraz uruchamiamy konterner lub go resetujemy i
+      OpenVPN, powinien zacząć działać.
+    </p>
+    <p>
+      W tym nieco krótkim arytykule poruszyliśmy dwa zgadnienia, które bardzo
+      często spędzają sen z powiek administratorom, którzy wymagają nieco
+      więcej kontenerów Proxmox. Teraz będą oni mogli odświeżyć sobie pamięć
+      tym materiałem.
+    </p>
+		<p>
+			~xf0r3m
+		</p>
+    <p>
+      Źródła:
+      <ol>
+        <li><a href="https://pve.proxmox.com/pve-docs/chapter-pct.html">Dokumentacja polecenia pct Proxmox</a></li>
+        <li><a href="https://fms.komkon.org/OWRX/#InstallGuide">Instalacja OpenWebRX</a></li>
+        <li><a href="https://pve.proxmox.com/wiki/OpenVPN_in_LXC">Korzystanie z OpenVPN pod LXC</a></li>
+      </ol>
+    </p>
+    </div>
+		<p class="footer">
+			2026; COPYLEFT; ALL RIGHTS REVERSED;
+		</p>
+	</body>
+</html>
