@@ -59,13 +59,13 @@ Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
     </p>
     <p>
       Moją konfigurację kontenera z WebSDR-em (nazwanym potocznie, ponieważ nie
-      tego oprogrowanie używam). Rozpoczynam od aktualizacji systemych oraz
+      tego oprogramowania używam). Rozpoczynam od aktualizacji systemych oraz
       instalacji ogólnych programów, które wykorzystuje na codzień do
       pracy nie tylko z konternami, ale i ogólnie z dystrybucjami Linuksa.
     </p>
 <pre class="code-block">
-  # apt update &amp;&amp; apt upgrade -y
-  # apt install sudo git vim ranger
+# apt update &amp;&amp; apt upgrade -y
+# apt install sudo git vim ranger -y
 </pre>
     <p>
       Następnie korzystając ze strony, z piewszego link na liście źródłem,
@@ -73,14 +73,14 @@ Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
       zwykłego użytkownika z możliwościa podniesienie uprawenień
     </p>
 <pre class="code-block">
-  # apt install curl gpg -y
-  # adduser -m -s /bin/bash xf0r3m
-  # usermod -aG sudo xf0r3m
-  # passwd xf0r3m
+# apt install curl gpg -y
+# adduser -m -s /bin/bash xf0r3m
+# usermod -aG sudo xf0r3m
+# passwd xf0r3m
 </pre>
     <p>
-      Po utworzeniu użytkownika, możemy zalogować się przez SSH. Po zalogowaniu
-      mogę teraz przekleić zapisane na stronie polecenia odnośnie instalacji
+      Po utworzeniu użytkownika, możemy zalogować się przez SSH. Teraz mogę
+      przekleić zapisane na stronie polecenia odnośnie instalacji
       oprogramowania <strong>OpenWebRX+</strong>, odpowiedniego dla mojej
       wersji Debiana. Początkowo instalacja rozpoczyna się od konfiguracji
       repozytoriów.
@@ -135,7 +135,7 @@ sudo dpkg -i librtlsdr0_*.deb librtlsdr-dev_*.deb rtl-sdr_*.deb
     <p>
       Tutaj chciałbym jeszcze nadmienić jedną rzecz. Otóż przy dłuższej bez
       czynności, komputer może odłączyć to urządzenie. Kiedy coś spróbuje się
-      do niego odwołać, komputer z powrotem je włącz, ale już będzie jego
+      do niego odwołać, komputer z powrotem je włącz, ale już inne będzie jego
       miejsce na szynie USB (drugi numer, na ścieżce
       <code class="code-inline">path=</code>). Ze względu to, że tego
       przekierowanego urządzenia już nie ma, kontener jeśli był wcześniej
@@ -143,8 +143,8 @@ sudo dpkg -i librtlsdr0_*.deb librtlsdr-dev_*.deb rtl-sdr_*.deb
       usuniemy przekierowania.
     </p>
     <p>
-      Druga sprawą jaką chciałem skonfigurować na tej maszynie poza SDRem jest
-      dostęp do nie poprzez OpenVPN. Tutaj darować sobie będę samo połączenie
+      Druga sprawą jaką chciałem skonfigurować na tym kontenerze poza SDRem jest
+      dostęp do niego poprzez OpenVPN. Tutaj darować sobie będę samo połączenie
       z OpenVPN, było wałkowane wielokrotnie. Na kontenerach LXC jakie 
       zapewnia nam Proxmox, problemem przy usłudze OpenVPN jest to, że chce
       ona skorzystać z urządzenia <em>/dev/net/tun</em>, które w domyślnej
@@ -171,7 +171,7 @@ chown 100000:100000 /dev/net/tun
     <p>
       W tym nieco krótkim arytykule poruszyliśmy dwa zgadnienia, które bardzo
       często spędzają sen z powiek administratorom, którzy wymagają nieco
-      więcej kontenerów Proxmox. Teraz będą oni mogli odświeżyć sobie pamięć
+      więcej od kontenerów Proxmox. Teraz będą oni mogli odświeżyć sobie pamięć
       tym materiałem.
     </p>
 		<p>
